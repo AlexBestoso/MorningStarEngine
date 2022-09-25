@@ -6,8 +6,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-using namespace std;
+#include <X11/Xlib.h>
 
+using namespace std;
 
 #include "./classes/GodsBlessing.h"
 #include "./cryptography/base64.h"

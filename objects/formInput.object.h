@@ -97,7 +97,7 @@ class ObjectFormInput : Object{
 		void drawContained(){
 			/* Core Container.*/
 			Object::setColor(this->color[0]+.33, this->color[1]+.55, this->color[2]);
-			Object::drawContainedRectangle(this->x, this->y, this->z, this->w, this->h);
+			Object::drawRectangle(this->x, this->y, this->z, this->w, this->h);
 			
 			/* Input Label.*/
 			this->blocks[labelBlock].x = this->x;
@@ -107,7 +107,7 @@ class ObjectFormInput : Object{
 			this->blocks[labelBlock].h = this->h/2;
 			
                         Object::setColor(0, 0, 0);
-                        Object::drawContainedRectangle(this->blocks[labelBlock].x - 5, 
+                        Object::drawRectangle(this->blocks[labelBlock].x - 5, 
 						       this->blocks[labelBlock].y - 5, 
 						       this->blocks[labelBlock].z, 
 						       this->blocks[labelBlock].w + 10, 
@@ -117,7 +117,7 @@ class ObjectFormInput : Object{
 					 this->blocks[labelBlock].color[1] - .11, 
 					 this->blocks[labelBlock].color[2] - .11
 			);
-			Object::drawContainedRectangle(this->blocks[labelBlock].x, 
+			Object::drawRectangle(this->blocks[labelBlock].x, 
 						       this->blocks[labelBlock].y, 
 						       this->blocks[labelBlock].z, 
 						       this->blocks[labelBlock].w, 
@@ -142,7 +142,7 @@ class ObjectFormInput : Object{
 			
 			// border
 			Object::setColor(0, 0, 0);
-                        Object::drawContainedRectangle(this->blocks[inputFieldBlock].x - 5, 
+                        Object::drawRectangle(this->blocks[inputFieldBlock].x - 5, 
 						       this->blocks[inputFieldBlock].y - 5, 
 						       this->blocks[inputFieldBlock].z, 
 						       this->blocks[inputFieldBlock].w + 10, 
@@ -157,7 +157,7 @@ class ObjectFormInput : Object{
 			}else{
 				Object::setColor(this->hoverColor[0], this->hoverColor[1], this->hoverColor[2]);		
 			}
-                        Object::drawContainedRectangle(this->blocks[inputFieldBlock].x, 
+                        Object::drawRectangle(this->blocks[inputFieldBlock].x, 
 						       this->blocks[inputFieldBlock].y, 
 						       this->blocks[inputFieldBlock].z + 1, 
 						       this->blocks[inputFieldBlock].w, 

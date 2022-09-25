@@ -56,19 +56,15 @@ class ObjectFormTitle : Object{
 			return this->titleText;
 		}
 		
-		void setConstraints(int x, int y, int w, int h){
-			Object::setConstraints(x, y, w, h);
-		}
-
 		void draw(){
 			
 		}
 
 		void drawConstrained(){
                         Object::setColor(this->color[0], this->color[1], this->color[2]);
-			Object::drawContainedRectangle(this->x, this->y, 1, this->w, this->h);
+			Object::drawRectangle(this->x, this->y, 1, this->w, this->h);
 
 			Object::setColor(this->textColor[0], this->textColor[1], this->textColor[2]);
-			Object::drawContainedText(this->textX, this->textY, 2, this->titleText, GLUT_BITMAP_TIMES_ROMAN_24);
+			Object::drawText(this->textX, this->textY, 2, this->titleText, GLUT_BITMAP_TIMES_ROMAN_24);
 		}
 };

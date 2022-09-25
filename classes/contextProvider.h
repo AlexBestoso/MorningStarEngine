@@ -24,7 +24,7 @@ class ContextProvider{
                                         //login
                                         break;
                                 default:
-                                        //this->current_context = setupPage.runPage();
+                                        this->current_context = setupPage.handleMouseClick(button, state, x, y);
                                         break;
                         }
                 }

@@ -40,8 +40,8 @@ class Object{
 		 * Setters and Getters.
 		 * */
 		void setConstraints(float x, float y, float w, float h){
-			this->constraintX = x;
-			this->constraintY = y;
+			this->constraintX = this->getX(x);
+			this->constraintY = this->getY(y);
 			this->constraintW = w;
 			this->constraintH = h;
 		}
@@ -104,12 +104,15 @@ class Object{
                 }
 
 		float getX(float x){
-			if(keyboard.width > keyboard.height)
-                                x = -1 + (x * .002);
-                        else if(keyboard.width < keyboard.height)
-                                x = -1 + (x * .002 * (keyboard.height / keyboard.width));
-                        else
-                                x = -1 + x * .002;
+			if(x >=0 && x < keyboard.width/2){
+                	        x = -1 + (x*((9999999/(keyboard.width/2))*0.0000001));
+                	}else if(x == keyboard.width/2){
+                	        x = 0;
+                	}else if(x > keyboard.width/2 && x < keyboard.width){
+                	        x = -1 + (x*((9999999/(keyboard.width/2))*0.0000001));
+                	}else if(x == keyboard.width){
+                	        x = 1;
+                	}
 			return x;
 		}
 
@@ -117,38 +120,45 @@ class Object{
 			return s / 1000;
 		}
 		float getContainedX(float x){
-			float multipleX = this->getMultiple(this->constraintW, this->constraintX);
+			x = this->getX(x) + this->constraintX;
+
+			//float multipleX = this->getMultiple(this->constraintW, this->constraintX);
+
 
                         /* Convert X and Y values. */
-                        if(this->constraintW > this->constraintH)
+                        /*if(this->constraintW > this->constraintH)
                                 x = this->constraintX + (x * multipleX);
                         else if(this->constraintW < this->constraintH)
                                 x = this->constraintX + (x * multipleX * (this->constraintH / this->constraintW));
                         else
-                                x = this->constraintX + x * multipleX;
+                                x = this->constraintX + x * multipleX;*/
 			return x;
 		}
 
 		float getY(float y){
-			if(keyboard.width > keyboard.height)
-                                y = -1 + (y * .002 * (keyboard.width / keyboard.height));
-                        else if(keyboard.width < keyboard.height)
-                                y = -1 + (y * .002);
-                        else
-                                y = -1 + y * .002;
+			if(y >=0 && y < keyboard.height/2){
+                	        y = -1 + (y*((9999999/(keyboard.height/2))*0.0000001));
+                	}else if(y == keyboard.height/2){
+                	        y = 0;
+                	}else if(y > keyboard.height/2 && y < keyboard.height){
+                	        y = -1 + (y*((9999999/(keyboard.height/2))*0.0000001));
+                	}else if(y == keyboard.height){
+                	        y = 1;
+                	}
 			return y;
 		}
 		
 		float getContainedY(float y){
-			float multipleY = this->getMultiple(this->constraintH, this->constraintY);
+			y = this->getY(y) + this->constraintY;
+			//float multipleY = this->getMultiple(this->constraintH, this->constraintY);
 
                         /* Convert X and Y values. */
-                        if(this->constraintW > this->constraintH)
+                        /*if(this->constraintW > this->constraintH)
                                 y = this->constraintY + (y * multipleY * (this->constraintW / this->constraintH));
                         else if(this->constraintW < this->constraintH)
                                 y = this->constraintY + (y * multipleY);
                         else
-                                y = this->constraintY + y * multipleY;
+                                y = this->constraintY + y * multipleY;*/
 			return y;
 		}
 
@@ -176,13 +186,14 @@ class Object{
 
                         this->setVertex(x, y, z);
                 }
-		void drawContainedRectangle(float x, float y, float z, float w, float h){
-			this->startDrawing();
-                        this->setContainedVertex(x, y, z);
-                        this->setContainedVertex(x+w, y, z);
-			this->setContainedVertex(x+w, y+h, z);
-			this->setContainedVertex(x, y+h, z);
+
+		void drawRectangle(float x, float y, float z, float w, float h){
+                        this->startDrawing();
+                        this->setVertex(x, y, z);
+                        this->setVertex(x+w, y, z);
+                        this->setVertex(x+w, y+h, z);
+                        this->setVertex(x, y+h, z);
                         this->stopDrawing();
-		}
+                }
 
 };

@@ -1,12 +1,26 @@
 class GlutController{
 public:
+	int displayX = 0;
+	int displayY = 0;
+	
+	void getDisplayResolution(void){
+		Display* d = XOpenDisplay(NULL);
+		Screen*  s = DefaultScreenOfDisplay(d);
+		this->displayX = s->width;
+		this->displayY = s->height;
+	}
+
 	int startGlutController(int argc, char *argv[]){
+		this->getDisplayResolution();
 		
 		glutInit(&argc, argv);
         	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
-        	glutInitWindowSize(1000, 500);
-        	glutInitWindowPosition(100, 100);
-        	glutCreateWindow("Hello world");
+        	glutInitWindowSize(this->displayX, this->displayY);//(1000, 500);
+		keyboard.width = this->displayX;
+		keyboard.height = this->displayY;
+		printf("Screen Resolition %d x %d\n", this->displayX, this->displayY);
+        	glutInitWindowPosition(0, 0);
+        	glutCreateWindow("Morning Star Engine");
 		glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 
         	glutDisplayFunc(display);
@@ -22,22 +36,28 @@ public:
 	}
 	
 	static float getX(float x){
-        	if(keyboard.width > keyboard.height)
-                        x = -1 + (x * .002);
-                else if(keyboard.width < keyboard.height)
-                        x = -1 + (x * .002 * (keyboard.height / keyboard.width));
-                else
-                        x = -1 + x * .002;
+		if(x >=0 && x < keyboard.width/2){
+			x = -1 + (x*((9999999/(keyboard.width/2))*0.0000001));
+		}else if(x == keyboard.width/2){
+			x = 0;
+		}else if(x > keyboard.width/2 && x < keyboard.width){
+			x = -1 + (x*((9999999/(keyboard.width/2))*0.0000001));
+		}else if(x == keyboard.width){
+			x = 1;
+		}
                 return x;
         }
 
         static float getY(float y){
-                if(keyboard.width > keyboard.height)
-                        y = -1 + (y * .002 * (keyboard.width / keyboard.height));
-                else if(keyboard.width < keyboard.height)
-                        y = -1 + (y * .002);
-                else
-                        y = -1 + y * .002;
+                if(y >=0 && y < keyboard.height/2){
+                        y = -1 + (y*((9999999/(keyboard.height/2))*0.0000001));
+                }else if(y == keyboard.height/2){
+                        y = 0;
+                }else if(y > keyboard.height/2 && y < keyboard.height){
+                        y = -1 + (y*((9999999/(keyboard.height/2))*0.0000001));
+                }else if(y == keyboard.height){
+                        y = 1;
+                }
                 return y;
         }	
 
@@ -66,9 +86,9 @@ private:
 	}
 
 	static void mousePassive(int x, int y){
-		keyboard.mouseX = x;
-		keyboard.mouseY = y;
-		context.mousePassiveContextSwitch(x, y);
+		keyboard.mouseX = getX(x);
+		keyboard.mouseY = getY(y);
+		context.mousePassiveContextSwitch(getX(x), getY(y));
 	}
 
 	static void idle(void){

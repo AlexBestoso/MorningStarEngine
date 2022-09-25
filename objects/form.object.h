@@ -1,4 +1,4 @@
-struct ObjectFormStruct{
+struct ObjectFormConfig{
 	int id;
 	string name;
 	int x;
@@ -10,18 +10,18 @@ struct ObjectFormStruct{
 };
 class ObjectForm : Object{
 	private:
-		struct ObjectFormStruct ofs;
-		ObjectFormTitle title;
 		ObjectFormInput *formInputs;
-		size_t inputCount;
+		size_t inputCount = 0;
+
+		size_t buttonCount = 0;
 
 		void createFormContainer(){
-			Object::setColor(this->ofs.color[0], this->ofs.color[1], this->ofs.color[2]);
+			Object::setColor(this->config.color[0], this->config.color[1], this->config.color[2]);
 			Object::startDrawing();
-				Object::setVertex(this->ofs.x, this->ofs.y, 0);
-				Object::setVertex(this->ofs.x + this->ofs.w, this->ofs.y, 0);
-				Object::setVertex(this->ofs.x + this->ofs.w, this->ofs.y + this->ofs.h, 0);
-				Object::setVertex(this->ofs.x, this->ofs.y + this->ofs.h, 0);
+				Object::setVertex(this->config.x, this->config.y, 0);
+				Object::setVertex(this->config.x + this->config.w, this->config.y, 0);
+				Object::setVertex(this->config.x + this->config.w, this->config.y + this->config.h, 0);
+				Object::setVertex(this->config.x, this->config.y + this->config.h, 0);
 			Object::stopDrawing();
 		
 		}
@@ -35,28 +35,46 @@ class ObjectForm : Object{
 				this->formInputs[i].drawContained();
 			}	
 		}
+
+		void createButtons(void){
+                        for(int i=0; i<this->buttonCount; i++){
+                                this->formButtons[i].drawContained();
+                        }
+                }
 		
 	public:
+		ObjectFormButton *formButtons;
+		struct ObjectFormConfig config;
+		ObjectFormTitle title;
 		void mouseClickAction(int button, int state, float x, float y){
-			
+				
 		}
 		void passiveMouseAction(float x, float y){
-			for(int i=0; i<this->inputCount; i++)
-				this->formInputs[i].passiveMouseAction(x, y);
+			for(int i=0; i<this->buttonCount; i++)
+				this->formButtons[i].passiveMouseAction(x, y);
 		}
 
-		ObjectForm(){}
-		ObjectForm(struct ObjectFormStruct ofs, ObjectFormTitle title, ObjectFormInput *inputs, size_t inputCount){
-			Object::setObjectId(ofs.id);
-			Object::setObjectName(ofs.name);
-			this->ofs = ofs;
-			this->title = title;
+		void setInputs(ObjectFormInput *inputs, size_t inputCount){
 			this->formInputs = inputs;
-			this->inputCount = inputCount;
+                        this->inputCount = inputCount;
+		}
+
+		void setButtons(ObjectFormButton *buttons, size_t buttonCount){
+                        this->formButtons = buttons;
+                        this->buttonCount = buttonCount;
+                }
+
+		ObjectForm(){}
+		ObjectForm(struct ObjectFormConfig config, ObjectFormTitle title, ObjectFormInput *inputs, size_t inputCount){
+			Object::setObjectId(config.id);
+			Object::setObjectName(config.name);
+			this->config = config;
+			this->title = title;
 		}
 		void draw(){
 			this->createFormContainer();
 			this->createTitle();
 			this->createInputs();
+			this->createButtons();
 		}
 };
