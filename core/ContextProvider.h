@@ -1,4 +1,3 @@
-#include "../pages/pageLinker.h"
 class ContextProvider{
 	private:
 		int current_context = 0;
@@ -13,7 +12,7 @@ class ContextProvider{
 					//login
 					break;
 				default:
-					this->current_context = setupPage.runPage();
+					this->current_context = homePage.runPage();
 					break;
 			}
 		}
@@ -24,7 +23,7 @@ class ContextProvider{
                                         //login
                                         break;
                                 default:
-                                        this->current_context = setupPage.handleMouseClick(button, state, x, y);
+                                        this->current_context = homePage.handleMouseClick(button, state, x, y);
                                         break;
                         }
                 }
@@ -46,7 +45,7 @@ class ContextProvider{
                                         //login
                                         break;
                                 default:
-                                        this->current_context = setupPage.handleMousePassive(x, y);
+                                        this->current_context = homePage.handleMousePassive(x, y);
                                         break;
                         }
                 }

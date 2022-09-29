@@ -6,7 +6,7 @@ class Object{
 		float constraintY = 0;
 		float constraintW = 0;
 		float constraintH = 0;
-		GLuint texture;
+		GLuint texture = 0;
 	public:
 
 		void drawContainedTextArray(float x, float y, float z, float w, float h, string text, void* bitmap, float spacing, int maxXOverflow){
@@ -182,20 +182,21 @@ class Object{
 		}
 
 		void drawTexturedRectangle(string textureFile, float x, float y, float z, float w, float h){
-			this->texture = this->loadTexture(textureFile);
+			if(this->texture == 0){
+				this->texture = this->loadTexture(textureFile);
+			}
 			glEnable(GL_TEXTURE_2D);
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,GL_REPLACE);
 			glBindTexture(GL_TEXTURE_2D,this->texture);
-			//this->startDrawing();
 			glBegin(GL_QUADS);
-			glTexCoord2f( 0, 0 );
-                        this->setVertex(x, y, z);
-    			glTexCoord2f( 1, 0 );
-                        this->setVertex(x+w, y, z);
-    			glTexCoord2f( 1, 1 );
-                        this->setVertex(x+w, y+h, z);
-    			glTexCoord2f( 0, 1 );
-                        this->setVertex(x, y+h, z);
+				glTexCoord2f( 0, 0 );
+                        	this->setVertex(x, y, z);
+    				glTexCoord2f( 1, 0 );
+                       	 	this->setVertex(x+w, y, z);
+    				glTexCoord2f( 1, 1 );
+                        	this->setVertex(x+w, y+h, z);
+    				glTexCoord2f( 0, 1 );
+                        	this->setVertex(x, y+h, z);
                         this->stopDrawing();
 			glDisable(GL_TEXTURE_2D);
 		}

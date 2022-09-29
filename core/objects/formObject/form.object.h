@@ -12,18 +12,17 @@ class ObjectForm : Object{
 	private:
 		ObjectFormInput *formInputs;
 		size_t inputCount = 0;
-
 		size_t buttonCount = 0;
+		string formTextureLocation = "";
+		bool textureLoaded = false;
 
 		void createFormContainer(){
-			Object::setColor(this->config.color[0], this->config.color[1], this->config.color[2]);
-			Object::startDrawing();
-				Object::setVertex(this->config.x, this->config.y, 0);
-				Object::setVertex(this->config.x + this->config.w, this->config.y, 0);
-				Object::setVertex(this->config.x + this->config.w, this->config.y + this->config.h, 0);
-				Object::setVertex(this->config.x, this->config.y + this->config.h, 0);
-			Object::stopDrawing();
-		
+			if(formTextureLocation == ""){
+				Object::setColor(this->config.color[0], this->config.color[1], this->config.color[2]);
+				Object::drawRectangle(this->config.x, this->config.y, 0, this->config.w, this->config.h);
+			}else{
+				Object::drawTexturedRectangle(this->formTextureLocation, this->config.x, this->config.y, 0, this->config.w, this->config.h);
+			}
 		}
 
 		void createTitle(void){
@@ -64,6 +63,10 @@ class ObjectForm : Object{
                         this->buttonCount = buttonCount;
                 }
 
+		void setFormTexture(string textureLocation){
+			this->formTextureLocation = textureLocation;
+		}
+
 		ObjectForm(){}
 		ObjectForm(struct ObjectFormConfig config, ObjectFormTitle title, ObjectFormInput *inputs, size_t inputCount){
 			Object::setObjectId(config.id);
@@ -72,7 +75,6 @@ class ObjectForm : Object{
 			this->title = title;
 		}
 		void draw(){
-			Object::drawTexturedRectangle("/home/ninjs-grey/Documents/GithubRepositories/bmpParser/BmpParser/sample.bmp", 0, 0, -5, 100, 100);
 			this->createFormContainer();
 			this->createTitle();
 			this->createInputs();

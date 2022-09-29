@@ -16,13 +16,12 @@ using namespace std;
 #include "./classes/fileIO.h"
 #include "./classes/settingsController.h"
 #include "./classes/keyboard.h"
-#include "./objects/linker.h"
-#include "./classes/contextProvider.h"
-#include "./classes/glutController.h"
+//#include "./objects/linker.h"
+#include "./core/MorningStarEngine.core.h"
 
 int main(int argc, char *argv[]){
-	GlutController glutController;
+	MorningStarEngine engine;
 
-	glutController.startGlutController(argc, argv);
+	engine.startEngine(argc, argv);
 	return 0;
 }

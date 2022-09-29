@@ -1,5 +1,5 @@
-#define SETUP_PAGE 0
-class SetupPage{
+#define HOME_PAGE 0
+class HomePage{
 	private:
                 size_t inputCount = 0;
                 size_t buttonCount = 0;
@@ -23,7 +23,7 @@ class SetupPage{
 			exit(EXIT_SUCCESS);
 		}
 	public:
-		SetupPage(){
+		HomePage(){
 			Display* d = XOpenDisplay(NULL);
 	                Screen*  s = DefaultScreenOfDisplay(d);
 
@@ -37,6 +37,7 @@ class SetupPage{
 			configForm.config.color[0] = .5;
 			configForm.config.color[1] = .647;
 			configForm.config.color[0] = 0;
+			configForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
 
 			/* Configure the title */
 			int titleX = (configForm.config.w + configForm.config.x)-(500+(configForm.config.w-500)/2);
@@ -87,50 +88,46 @@ class SetupPage{
 			configForm.setButtons(buttons, buttonCount);
 		}
 
-		int runPage(){
-			if(!settings.isInstalled()){
-				this->initPage();
-                                switch(this->pageContext){
-					case 0:
-                        			configForm.draw();
-						this->pageContext = 1;
-						break;
-					case 1: // security context
-                        			configForm.draw();
-						break;
-				}
-				return SETUP_PAGE;
-                        }else{
-				return 1;
-                        }
+		int runPage(void){
+			this->initPage();
+                               switch(this->pageContext){
+				case 0: // main menu
+                        		configForm.draw();
+					break;
+				case 1: // new project
+					break;
+				case 2: // load project
+				      	break;
+			}
+			return HOME_PAGE;
 		}
 
 		int handleMouseClick(int button, int state, float x, float y){
-                        if(!settings.isInstalled()){
                                 switch(this->pageContext){
-                                        case 1: 
+                                        case 0: // main menue
 						/* Exit button */
 						this->configForm.formButtons[2].mouseClickAction(button, state, x, y);
                                                 break;
+					case 1: // new project
+						break;
+					case 2: // load project
+						break;
                                 }
-                                return SETUP_PAGE;
-                        }else{
-                                return 1;
-                        }
+                                return HOME_PAGE;
 		} 
 
 		int handleMousePassive(float x, float y){
-			if(!settings.isInstalled()){
 				switch(this->pageContext){
-                                        case 1: // only invoke in the security context
+                                        case 0: // main menu
 						this->configForm.formButtons[0].passiveMouseAction(x, y);
 						this->configForm.formButtons[1].passiveMouseAction(x, y);
 						this->configForm.formButtons[2].passiveMouseAction(x, y);
 						break;
+					case 1: // new project
+						break;
+					case 2: // load project
+						break;
 				}
-				return SETUP_PAGE;
-			}else{
-				return 1;
-			}
+				return HOME_PAGE;
 		}
-}setupPage;
+}homePage;

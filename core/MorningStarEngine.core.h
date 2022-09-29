@@ -1,4 +1,7 @@
-class GlutController{
+#include "./objectLinker.h"
+#include "./pageLinker.h"
+#include "./ContextProvider.h"
+class MorningStarEngine{
 public:
 	int displayX = 0;
 	int displayY = 0;
@@ -10,7 +13,7 @@ public:
 		this->displayY = s->height;
 	}
 
-	int startGlutController(int argc, char *argv[]){
+	int startEngine(int argc, char *argv[]){
 		this->getDisplayResolution();
 		
 		glutInit(&argc, argv);
