@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#include "./classes/GodsBlessing.h"
+#include "./classes/bmpParser.h"
 #include "./cryptography/base64.h"
 #include "./cryptography/aes128cbc.h"
 #include "./classes/fileIO.h"

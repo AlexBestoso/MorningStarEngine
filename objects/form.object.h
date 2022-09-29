@@ -72,6 +72,7 @@ class ObjectForm : Object{
 			this->title = title;
 		}
 		void draw(){
+			Object::drawTexturedRectangle("/home/ninjs-grey/Documents/GithubRepositories/bmpParser/BmpParser/sample.bmp", 0, 0, -5, 100, 100);
 			this->createFormContainer();
 			this->createTitle();
 			this->createInputs();

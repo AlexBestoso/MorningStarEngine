@@ -6,6 +6,7 @@ class Object{
 		float constraintY = 0;
 		float constraintW = 0;
 		float constraintH = 0;
+		GLuint texture;
 	public:
 
 		void drawContainedTextArray(float x, float y, float z, float w, float h, string text, void* bitmap, float spacing, int maxXOverflow){
@@ -121,17 +122,6 @@ class Object{
 		}
 		float getContainedX(float x){
 			x = this->getX(x) + this->constraintX;
-
-			//float multipleX = this->getMultiple(this->constraintW, this->constraintX);
-
-
-                        /* Convert X and Y values. */
-                        /*if(this->constraintW > this->constraintH)
-                                x = this->constraintX + (x * multipleX);
-                        else if(this->constraintW < this->constraintH)
-                                x = this->constraintX + (x * multipleX * (this->constraintH / this->constraintW));
-                        else
-                                x = this->constraintX + x * multipleX;*/
 			return x;
 		}
 
@@ -150,15 +140,6 @@ class Object{
 		
 		float getContainedY(float y){
 			y = this->getY(y) + this->constraintY;
-			//float multipleY = this->getMultiple(this->constraintH, this->constraintY);
-
-                        /* Convert X and Y values. */
-                        /*if(this->constraintW > this->constraintH)
-                                y = this->constraintY + (y * multipleY * (this->constraintW / this->constraintH));
-                        else if(this->constraintW < this->constraintH)
-                                y = this->constraintY + (y * multipleY);
-                        else
-                                y = this->constraintY + y * multipleY;*/
 			return y;
 		}
 
@@ -186,6 +167,38 @@ class Object{
 
                         this->setVertex(x, y, z);
                 }
+		GLuint loadTexture(string texture){
+			BmpParser bmp(texture);
+			GLuint textureID;
+                        glGenTextures(1, &textureID);
+                        glBindTexture(GL_TEXTURE_2D, textureID);
+                        glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+                        glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, bmp.bmpStats.width, bmp.bmpStats.height, 0, GL_BGR, GL_UNSIGNED_BYTE, bmp.imageData);
+                        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+                        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+                        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP);
+                        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);
+			return textureID;
+		}
+
+		void drawTexturedRectangle(string textureFile, float x, float y, float z, float w, float h){
+			this->texture = this->loadTexture(textureFile);
+			glEnable(GL_TEXTURE_2D);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,GL_REPLACE);
+			glBindTexture(GL_TEXTURE_2D,this->texture);
+			//this->startDrawing();
+			glBegin(GL_QUADS);
+			glTexCoord2f( 0, 0 );
+                        this->setVertex(x, y, z);
+    			glTexCoord2f( 1, 0 );
+                        this->setVertex(x+w, y, z);
+    			glTexCoord2f( 1, 1 );
+                        this->setVertex(x+w, y+h, z);
+    			glTexCoord2f( 0, 1 );
+                        this->setVertex(x, y+h, z);
+                        this->stopDrawing();
+			glDisable(GL_TEXTURE_2D);
+		}
 
 		void drawRectangle(float x, float y, float z, float w, float h){
                         this->startDrawing();
