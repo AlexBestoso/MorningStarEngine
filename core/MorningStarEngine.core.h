@@ -1,4 +1,5 @@
 #include "./objectLinker.h"
+#include "./Project.core.h"
 #include "./pageLinker.h"
 #include "./ContextProvider.h"
 class MorningStarEngine{

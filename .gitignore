@@ -1,0 +1,8 @@
+# ignore project files
+projects/
+
+# ignore swap files
+*.swp
+
+# ignore msge binary
+msge

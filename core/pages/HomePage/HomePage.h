@@ -93,8 +93,12 @@ class HomePage{
 			return 0;
 		}
 
+		static int loadFormCreateProjectButton(void){
+			return 1; 
+		}
+
 		ObjectForm loadForm;
-		ObjectFormButton *loadButtons = new ObjectFormButton[1];
+		ObjectFormButton *loadButtons = new ObjectFormButton[2];
 		ObjectFormInput *loadInputs = new ObjectFormInput[1];
 		void configLoadContext(void){
 			Display* d = XOpenDisplay(NULL);
@@ -134,7 +138,18 @@ class HomePage{
                         loadButtons[0].setTextPosition(buttonX + 85, buttonY+20, 1);
                         loadButtons[0].buttonEvent = &loadFormCancelButton;
 
-			loadForm.setButtons(loadButtons, 1);
+			buttonX = (loadForm.config.x + loadForm.config.w) - (0+(loadForm.config.w-200)/2) - 80;
+                        buttonY = (loadForm.config.y + loadForm.config.h) - (50+(loadForm.config.h-50)/4) - 55*4;
+                        loadButtons[1].setPositionAndSize(buttonX, buttonY, 1, 200, 50);
+                        loadButtons[1].setNameAndId("Create", 3);
+                        loadButtons[1].setColor(1, 1, 0);
+                        loadButtons[1].setHoverColor(.75,.75,0);
+                        loadButtons[1].setButtonText("Create");
+                        loadButtons[1].setTextColor(1, 1, 1);
+                        loadButtons[1].setTextPosition(buttonX + 85, buttonY+20, 1);
+                        loadButtons[1].buttonEvent = &loadFormCancelButton;
+
+			loadForm.setButtons(loadButtons, 2);
 
 			// Form Inputs
 			int inputX = (loadForm.config.x + loadForm.config.w) - (400+125);
@@ -147,7 +162,7 @@ class HomePage{
 			loadInputs[0].setTextPosition(inputX + 85, inputY+20, 1);
 			loadInputs[0].setLabelPosition(inputX+5, inputY+20, 1);
 			loadInputs[0].setLabel("Project Name:");
-			loadInputs[0].setInputData("Click");
+			loadInputs[0].setInputData("Project 1");
 
 			loadForm.setInputs(loadInputs, 1);
 		}
@@ -192,6 +207,12 @@ class HomePage{
                                                 this->pageContext = buttonOption;
                                                 break;
                                         }
+					/* create Button */
+					buttonOption = this->loadForm.formButtons[1].mouseClickAction(button, state, x, y);
+					if(buttonOption != -1){
+						printf("creating project\n");
+						project.create(this->loadForm.formInputs[0].getInputData());
+					}
 					/* Project Name Input */
 					this->loadForm.formInputs[0].mouseClickAction(button, state, x, y);
 
@@ -224,6 +245,7 @@ class HomePage{
 					break;
 				case 1: // new project
 					this->loadForm.formButtons[0].passiveMouseAction(x, y);
+					this->loadForm.formButtons[1].passiveMouseAction(x, y);
 					this->loadForm.formInputs[0].passiveMouseAction(x, y);
 					break;
 				case 2: // load project
