@@ -1,179 +1,162 @@
-struct ObjectFormInputStruct{
-		float x, y, z, w, h;
-                float color[3] = {0, 0, 0};
-};
 class ObjectFormInput : Object{
 	private:
 		const int labelBlock = 0;
-		const int inputFieldBlock = 1;
-		ObjectFormInputStruct blocks[3];
-		
-		float x, y, z, w, h;
-		float color[3] = {0, 0, 0};
-		float labelColor[3] = {0, 0 , 0};
-		float hoverColor[3] = {0, 0, 0,};
-		string label = "";
-		string defaultValue = "Click To Type";
-		size_t maxXOverflow = 20;
+                const int inputFieldBlock = 1;
 
+                float x, y, z, w, h;
+                float textX, textY, textZ, textW, textH;
+		float labelX, labelY, labelZ;
+                float color[3] = {0, 0, 0};
+                float textColor[3] = {0, 0 , 0};
+                float hoverColor[3] = {0, 0, 0};
+		float focusColor[3] = {0, 0, 0};
+                string label = "";
+		string inputData = "";
 
-		bool isInHitbox(float x, float y){
-			float _x = x;
-			float _y = (y - keyboard.height ) * -1;
+                bool isInHitbox(float x, float y){
 
-			float b_x = Object::getContainedX(this->blocks[inputFieldBlock].x);
-			float b_y  = Object::getContainedY(this->blocks[inputFieldBlock].y);		
-			float b_w = Object::getContainedX(this->blocks[inputFieldBlock].w + this->blocks[inputFieldBlock].x);
-			float b_h  = Object::getContainedY(this->blocks[inputFieldBlock].h + this->blocks[inputFieldBlock].y);		
-			
-			if((_x > b_x && _x < b_w) && (_y > b_y && _y < b_h)){
-				return true;
-			}
+                        y = y * -1;
+                        float b_x = Object::getX(this->x);
+                        float b_y  = Object::getY(this->y);
+                        float b_w = Object::getX(this->w + this->x);
+                        float b_h  = Object::getY(this->h + this->y);
 
-			return false;
-		}
+                        if((x > b_x && x < b_w) && (y > b_y && y < b_h)){
+                                return true;
+                        }
+                        return false;
+                }
 
-		int mousePassiveHover = 0;
+                int mousePassiveHover = 0;
+		bool focused = false;
+
 	public:
-		void passiveMouseAction(float x, float y){
-			if(isInHitbox(x, y)){
-				this->mousePassiveHover = 1;
-			}else{
-				this->mousePassiveHover = 0;
+                ObjectFormInput(int id, string name){
+                        Object::setObjectId(id);
+                        Object::setObjectName(name);
+                }
+                ObjectFormInput(){
+                }
+
+                int mouseClickAction(int button, int state, float x, float y){
+                        if(mousePassiveHover == 1){
+                                if(button == 0 && state == 1){
+                                       	this->focused = true;
+                                }
+                        }else{
+				if(button == 0 && state == 1){
+                                        this->focused = false;
+                                }
+			}
+                        return -1;
+                }
+		int keyDownAction(unsigned char key, int mouseX, int mouseY){
+			if(this->focused){
+				if(key == 0x08){
+					if(this->inputData.size() > 0)
+						this->inputData.pop_back();
+				}else if((key >= 0x61 && key <= 0x7a) || (key >= 0x41 && key <= 0x5a) || (key >= 0x30 && key <= 0x39) || key == 0x20){
+					this->inputData += key;
+				}else if(key == 0x0d){
+					this->focused = false;
+				}
 			}
 		}
+                void passiveMouseAction(float x, float y){
+                        if(isInHitbox(x, y)){
+                                this->mousePassiveHover = 1;
+                        }else{
+                                this->mousePassiveHover = 0;
+                        }
+                }
 
-		void setHoverColor(float r, float g, float b){
-			this->hoverColor[0] = r;
-			this->hoverColor[1] = g;
-			this->hoverColor[2] = b;
+                void setHoverColor(float r, float g, float b){
+                        this->hoverColor[0] = r;
+                        this->hoverColor[1] = g;
+                        this->hoverColor[2] = b;
+                }
+
+		void setFocusColor(float r, float g, float b){
+			this->focusColor[0] = r;
+			this->focusColor[1] = g;
+			this->focusColor[2] = b;
 		}
 
-		void setMaxXOverflow(size_t value){
-			maxXOverflow = value;
-		}
-		void setDefaultValue(string value){
-			this->defaultValue = value;
-		}
 		void setConstraints(int x, int y, int w, int h){
                         Object::setConstraints(x, y, w, h);
                 }
 
+                void setInputData(string text){
+                        this->inputData = text;
+                }
 		void setLabel(string label){
 			this->label = label;
 		}
-
-		ObjectFormInput(int id, string name){
-			Object::setObjectId(id);
-			Object::setObjectName(name);
-		}
-		ObjectFormInput(){
 		
+		string getInputData(void){
+			return this->inputData;	
 		}
-		void setDefaultInputValue(string value){
-			this->defaultValue = value;
-		}
-		void setNameAndId(string name, int id){
-			Object::setObjectName(name);
-			Object::setObjectId(id);
-		}
-		void setColor(float r, float g, float b){
-			this->color[0] = r;
-			this->color[1] = g;
-			this->color[2] = b;
-		}
-		void setLabelColor(float r, float g, float b){
-			this->blocks[labelBlock].color[0] = r;
-			this->blocks[labelBlock].color[1] = g;
-			this->blocks[labelBlock].color[2] = b;
-		}
-		void setPositionAndSize(float x, float y, float z, float w, float h){
-			this->x = x;
-			this->y = y;
-			this->z = z;
-			this->w = w;
-			this->h = h;
-		}
-		void drawContained(){
-			/* Core Container.*/
-			Object::setColor(this->color[0]+.33, this->color[1]+.55, this->color[2]);
-			Object::drawRectangle(this->x, this->y, this->z, this->w, this->h);
-			
-			/* Input Label.*/
-			this->blocks[labelBlock].x = this->x;
-			this->blocks[labelBlock].y = this->y+(this->h/4);
-			this->blocks[labelBlock].z = this->z+1;
-			this->blocks[labelBlock].w = this->w;//this->w/3;
-			this->blocks[labelBlock].h = this->h/2;
-			
-                        Object::setColor(0, 0, 0);
-                        Object::drawRectangle(this->blocks[labelBlock].x - 5, 
-						       this->blocks[labelBlock].y - 5, 
-						       this->blocks[labelBlock].z, 
-						       this->blocks[labelBlock].w + 10, 
-						       this->blocks[labelBlock].h + 10
-			);
-			Object::setColor(this->blocks[labelBlock].color[0] - .11, 
-					 this->blocks[labelBlock].color[1] - .11, 
-					 this->blocks[labelBlock].color[2] - .11
-			);
-			Object::drawRectangle(this->blocks[labelBlock].x, 
-						       this->blocks[labelBlock].y, 
-						       this->blocks[labelBlock].z, 
-						       this->blocks[labelBlock].w, 
-						       this->blocks[labelBlock].h
-			);
-			Object::setColor(0, 0, 0);
-			Object::drawContainedText(this->blocks[labelBlock].x + 20, 
-						  this->blocks[labelBlock].y + this->blocks[labelBlock].h/3, 
-						  this->blocks[labelBlock].z + 1, 
-						  this->label, 
-						  GLUT_BITMAP_HELVETICA_12
-			);
 
-			/* Input Field */
-			this->blocks[inputFieldBlock].x = this->x + this->w/3;
-                        this->blocks[inputFieldBlock].y = this->y+(this->h/4);
-                        this->blocks[inputFieldBlock].z = this->z+1;
-                        this->blocks[inputFieldBlock].w = this->w - this->w/3 - 20;
-                        this->blocks[inputFieldBlock].h = this->h/2;
-			for(int i=0; i<3; i++)
-				this->blocks[inputFieldBlock].color[i] = this->blocks[labelBlock].color[i];
-			
-			// border
-			Object::setColor(0, 0, 0);
-                        Object::drawRectangle(this->blocks[inputFieldBlock].x - 5, 
-						       this->blocks[inputFieldBlock].y - 5, 
-						       this->blocks[inputFieldBlock].z, 
-						       this->blocks[inputFieldBlock].w + 10, 
-						       this->blocks[inputFieldBlock].h + 10
-			);
-			// input
-			if(this->mousePassiveHover == 0){
-                        	Object::setColor(this->blocks[inputFieldBlock].color[0], 
-						 this->blocks[inputFieldBlock].color[1], 
-						 this->blocks[inputFieldBlock].color[2]
-				);
-			}else{
-				Object::setColor(this->hoverColor[0], this->hoverColor[1], this->hoverColor[2]);		
-			}
-                        Object::drawRectangle(this->blocks[inputFieldBlock].x, 
-						       this->blocks[inputFieldBlock].y, 
-						       this->blocks[inputFieldBlock].z + 1, 
-						       this->blocks[inputFieldBlock].w, 
-						       this->blocks[inputFieldBlock].h
-			);
-			// default
-			Object::setColor(0, 0, 0);
-			Object::drawContainedTextArray(this->blocks[inputFieldBlock].x + 5, 
-						       this->blocks[inputFieldBlock].y + 20, 
-						       this->blocks[inputFieldBlock].z + 2, 
-						       this->blocks[inputFieldBlock].w, 
-						       this->blocks[inputFieldBlock].h, 
-						       this->defaultValue, 
-						       GLUT_BITMAP_HELVETICA_12, 
-						       18, 
-						       this->maxXOverflow
-			);
+                void setNameAndId(string name, int id){
+                        Object::setObjectName(name);
+                        Object::setObjectId(id);
+                }
+                void setColor(float r, float g, float b){
+                        this->color[0] = r;
+                        this->color[1] = g;
+                        this->color[2] = b;
+                }
+                void setTextColor(float r, float g, float b){
+                        this->textColor[0] = r;
+                        this->textColor[1] = g;
+                        this->textColor[2] = b;
+                }
+                void setPositionAndSize(float x, float y, float z, float w, float h){
+                        this->x = x;
+                        this->y = y;
+                        this->z = z;
+                        this->w = w;
+                        this->h = h;
+                }
+                void setTextPosition(float x, float y, float z){
+                        this->textX = x;
+                        this->textY = y;
+                        this->textZ = z;
+                }
+		void setLabelPosition(float x, float y, float z){
+			this->labelX = x;
+			this->labelY = y;
+			this->labelZ = z;
 		}
+
+		void drawContained(){
+                        /* Core Container.*/
+                        if(this->focused){
+				Object::setColor(this->focusColor[0], this->focusColor[1], this->focusColor[2]);
+			}else if(this->mousePassiveHover == 0){
+                                Object::setColor(this->color[0], this->color[1], this->color[2]);
+                        }else{
+                                Object::setColor(this->hoverColor[0], this->hoverColor[1], this->hoverColor[2]);
+                        }
+                        Object::drawRectangle(this->x, this->y, this->z, this->w, this->h);
+			
+			/* Label Text*/
+                        Object::setColor(this->textColor[0], this->textColor[1], this->textColor[2]);
+                        Object::drawText(this->labelX,
+                                         this->labelY,
+                                         this->labelZ,
+                                         this->label,
+                                         GLUT_BITMAP_HELVETICA_12
+                        );
+			
+                        /* Input Data Text */
+                        Object::setColor(this->textColor[0], this->textColor[1], this->textColor[2]);
+                        Object::drawText(this->textX,
+                                         this->textY,
+                                         this->textZ,
+                                         this->inputData,
+                                         GLUT_BITMAP_HELVETICA_12
+                        );
+
+                }
 };

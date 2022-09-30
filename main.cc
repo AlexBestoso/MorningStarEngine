@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <X11/Xlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -16,7 +17,6 @@ using namespace std;
 #include "./classes/fileIO.h"
 #include "./classes/settingsController.h"
 #include "./classes/keyboard.h"
-//#include "./objects/linker.h"
 #include "./core/MorningStarEngine.core.h"
 
 int main(int argc, char *argv[]){

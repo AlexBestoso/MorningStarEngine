@@ -103,7 +103,7 @@ private:
         	keyboard.mouseX = getX(mouseX);
         	keyboard.mouseY = getY(mouseY);
         	keyboard.activateKey(key);
-		context.keydownContextSwitch();
+		context.keydownContextSwitch(key, getX(mouseX), getY(mouseY));
         	glutPostRedisplay();
 	}
 
@@ -111,7 +111,7 @@ private:
 	        keyboard.mouseX = getX(mouseX);
 	        keyboard.mouseY = getY(mouseY);
 	        keyboard.deactivateKey(key);
-		context.keyupContextSwitch();
+		context.keyupContextSwitch(key, getX(mouseX), getY(mouseY));
 	        glutPostRedisplay();
 	}
 

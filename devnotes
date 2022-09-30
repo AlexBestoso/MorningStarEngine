@@ -1,27 +1,14 @@
-System Init Dev Notes
-	Utilize the environment variables to get to the user's /home/user/.mty_storage
-		Default to /tmp/mty_storage and display a warning that no HOME variable was found.
-	
-	check if the .mty_challenge file exists, if not, system needs to be initialized. 
+To Do List
 
-	Challenge file will contain the phrase: 
-		"A fat monkey once tried to take my marbles. I retaliated by taking his bananas."
-	
-	The user will be prompted: 
-		- where to store their storage data, where the above default is added automatically.
-		- A user name, which will be used for IV generation. 
-		- A password, which will be used for AES key generation.
+Task 3 - Create New project page
 
-	Upon form submission, a file named /home/user/.mty_config will be created. The file will contian:
-		storageLocation:/home/user/.mty_storage
-		audioOptions:Some Value
-		customDisplayOptions:Some Value
-		autoLogoutTime: some value
-	
-	The file is then encrypted using typed IV and Key, which is stored in the SecurityGuard class during the duration of program execution.
+Task 2 - create an in-application compiler.
+	--- Basic requirements ---
+		~ Game / Project name
+		~ Game Version
+		~ build button.
+		~ Hello World template
+		~ Makefile templet
 
-	Required values are then stored into the context provider during program execution. 
 
-	There must be an automated logout feature that activates after x amount of inactivity. Which will clear the key and IV from memory.
-	
-	
+Task 1 - create version archetecture for displaying software version on the home page.

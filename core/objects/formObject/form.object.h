@@ -10,7 +10,6 @@ struct ObjectFormConfig{
 };
 class ObjectForm : Object{
 	private:
-		ObjectFormInput *formInputs;
 		size_t inputCount = 0;
 		size_t buttonCount = 0;
 		string formTextureLocation = "";
@@ -43,8 +42,9 @@ class ObjectForm : Object{
 		
 	public:
 		ObjectFormButton *formButtons;
-		struct ObjectFormConfig config;
+		ObjectFormInput *formInputs;
 		ObjectFormTitle title;
+		struct ObjectFormConfig config;
 		void mouseClickAction(int button, int state, float x, float y){
 				
 		}

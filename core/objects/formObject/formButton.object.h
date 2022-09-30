@@ -10,8 +10,6 @@ class ObjectFormButton : Object{
 		float hoverColor[3] = {0, 0, 0};
 		string label = "";
 
-
-
 		bool isInHitbox(float x, float y){
 			
 			y = y * -1;
@@ -37,12 +35,13 @@ class ObjectFormButton : Object{
 		
 		}
 
-		void mouseClickAction(int button, int state, float x, float y){
+		int mouseClickAction(int button, int state, float x, float y){
 			if(mousePassiveHover == 1){
 				if(button == 0 && state == 1){
-					buttonEvent();
+					return buttonEvent();
 				}
 			}
+			return -1;
                 }
 		void passiveMouseAction(float x, float y){
 			if(isInHitbox(x, y)){

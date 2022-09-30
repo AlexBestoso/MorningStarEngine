@@ -61,18 +61,18 @@ class ContextProvider{
                         }
                 }
 
-		void keydownContextSwitch(){
+		void keydownContextSwitch(unsigned char key, int mouseX, int mouseY){
                         switch(this->current_context){
                                 case 1:
                                         //login
                                         break;
                                 default:
-                                        //this->current_context = setupPage.runPage();
+                                        this->current_context = homePage.handleKeyDown(key, mouseX, mouseY);
                                         break;
                         }
                 }
 
-		void keyupContextSwitch(){
+		void keyupContextSwitch(unsigned char key, int mouseX, int mouseY){
                         switch(this->current_context){
                                 case 1:
                                         //login
