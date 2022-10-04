@@ -1,3 +1,7 @@
+struct ProjectStruct{
+	string name;
+
+};
 #include "./projectConfig.core.h"
 class Project{
 	private:
@@ -5,26 +9,38 @@ class Project{
 		ProjectConfig config;
 		const string projectStorage = "./projects";
 		const string projectConfig = "project.conf";
-		string projectName;
+		struct ProjectStruct data;
 		
 	public:
+		string getProjectDir(void){
+			return this->projectStorage+"/";
+		}
+		string getProjectPath(string pName){
+			return this->getProjectDir()+pName;
+		}
+		string getProjectConfigPath(string pName){
+			return this->getProjectPath(pName)+"/"+this->projectConfig;
+		}
+
 		bool create(string projectName){
-			this->projectName = projectName;
+			this->data.name = projectName;
 			if(!fileSnake.dirExists(this->projectStorage)){
 				fileSnake.makeDir(this->projectStorage);
 			}
 
-			if(fileSnake.dirExists(this->projectStorage+"/"+projectName)){
+			if(fileSnake.dirExists(this->projectStorage+"/"+this->data.name)){
 				fprintf(stderr, "[E] Project already exists.\n");
 				return false;
 			}
-			fileSnake.makeDir(this->projectStorage+"/"+projectName);
-			config.setConfigFile(this->projectStorage+"/"+projectName+"/"+this->projectConfig);
-			config.create(this->projectName);
+			fileSnake.makeDir(this->projectStorage+"/"+this->data.name);
+			config.setConfigFile(this->projectStorage+"/"+this->data.name+"/"+this->projectConfig);
+			config.create(this->data.name);
 			return true;
 
 		}
-		int load(string projectName){
-			return -1;	
+		bool load(string projectName){
+			config.load(this->getProjectConfigPath(projectName), &data);
+			printf("Project Data Name : %s\n", data.name.c_str());
+			return true;	
 		}
 }project;

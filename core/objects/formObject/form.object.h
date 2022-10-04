@@ -12,6 +12,7 @@ class ObjectForm : Object{
 	private:
 		size_t inputCount = 0;
 		size_t buttonCount = 0;
+		size_t selectListCount = 0;
 		string formTextureLocation = "";
 		bool textureLoaded = false;
 
@@ -34,6 +35,12 @@ class ObjectForm : Object{
 			}	
 		}
 
+		void createSelectList(void){
+			for(int i=0; i<this->selectListCount; i++){
+				this->selectLists[i].draw();
+			}
+		}
+
 		void createButtons(void){
                         for(int i=0; i<this->buttonCount; i++){
                                 this->formButtons[i].drawContained();
@@ -43,6 +50,7 @@ class ObjectForm : Object{
 	public:
 		ObjectFormButton *formButtons;
 		ObjectFormInput *formInputs;
+		FormSelectList *selectLists;
 		ObjectFormTitle title;
 		struct ObjectFormConfig config;
 		void mouseClickAction(int button, int state, float x, float y){
@@ -53,6 +61,10 @@ class ObjectForm : Object{
 				this->formButtons[i].passiveMouseAction(x, y);
 		}
 
+		void setSelectLists(FormSelectList *selectLists, size_t listCount){
+			this->selectLists = selectLists;
+			this->selectListCount = listCount;
+		}
 		void setInputs(ObjectFormInput *inputs, size_t inputCount){
 			this->formInputs = inputs;
                         this->inputCount = inputCount;
@@ -79,5 +91,6 @@ class ObjectForm : Object{
 			this->createTitle();
 			this->createInputs();
 			this->createButtons();
+			this->createSelectList();
 		}
 };

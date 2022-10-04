@@ -9,6 +9,7 @@
 class FileSnake{
 	private:
 		int _fd = -1;
+		DIR *_dirFd = NULL;
 		string openedFile = "";
 		size_t _fileSize = -1;
 		
@@ -94,6 +95,17 @@ class FileSnake{
 			close(_fd);
 			_fd = -1;
 		}
+
+		void _openDir(string target){
+			_dirFd = opendir(target.c_str());
+                	if(_dirFd == NULL){
+                	        fprintf(stderr, "[E] Failed to open Dir\n");
+                	}
+		}
+
+		void _closeDir(void){
+			closedir(_dirFd);
+		}
 	public:
 	size_t recentActivity = -1;
 	bool dirExists(string dir){
@@ -156,6 +168,44 @@ class FileSnake{
 			return false;
 		
 		return true;
+	}
+
+	string *listDir(string dirName){
+		struct dirent *entry;
+		_openDir(dirName.c_str());
+		if(_dirFd == NULL){
+			fprintf(stderr, "[E] Failed to open Dir\n");
+			return NULL;
+		}
+		size_t fileCount = 0;
+		while((entry = readdir(_dirFd)) != NULL){
+			string compare = entry->d_name;
+			if(compare == "." || compare == "..")
+				continue;
+			fileCount++;
+		}
+		_closeDir();
+
+		string *ret = new string[fileCount+1];
+		int cnt = 0;
+		
+		_openDir(dirName.c_str());
+                if(_dirFd == NULL){
+                        fprintf(stderr, "[E] Failed to open Dir\n");
+                        return NULL;
+                }
+		while((entry = readdir(_dirFd)) != NULL){
+			string compare = entry->d_name;
+                        if(compare == "." || compare == "..")
+                                continue;
+			ret[cnt] = entry->d_name;
+			cnt++;
+		}
+		ret[cnt] = "";
+		_closeDir();
+		return ret;
+			
+
 	}
 
 	int getFileType(string fileName){

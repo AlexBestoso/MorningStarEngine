@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 #include <X11/Xlib.h>
 #include <time.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 using namespace std;
 

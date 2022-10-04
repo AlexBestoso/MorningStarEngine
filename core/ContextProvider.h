@@ -9,7 +9,7 @@ class ContextProvider{
 		void displayContextSwitch(){
 			switch(this->current_context){
 				case 1:
-					//login
+					this->current_context = developerPage.runPage();
 					break;
 				default:
 					this->current_context = homePage.runPage();

@@ -1,3 +1,7 @@
+#define HOME_PAGE 0
+#define DEVELOPER_PAGE 1
+
+#include "./Function.core.h"
 #include "./objectLinker.h"
 #include "./Project.core.h"
 #include "./pageLinker.h"
