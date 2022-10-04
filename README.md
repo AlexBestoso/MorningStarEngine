@@ -1,5 +1,7 @@
 # MorningStarEngine
 
+run "make" from the terminal to compile the application.
+
 The Morning Star Engine is a graphical application created in OpenGL for the Linux Operating System. 
 
 As of writing this README, the foundation of the software has been laid, and is still subject to change.
