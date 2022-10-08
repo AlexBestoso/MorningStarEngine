@@ -20,7 +20,7 @@ class ContextProvider{
 		void mouseClickContextSwitch(int button, int state, int x, int y){
                         switch(this->current_context){
                                 case 1:
-                                        //login
+                                        this->current_context = developerPage.mouseClickAction(button, state, x, y);
                                         break;
                                 default:
                                         this->current_context = homePage.handleMouseClick(button, state, x, y);
@@ -42,7 +42,7 @@ class ContextProvider{
 		void mousePassiveContextSwitch(float x, float y){
                         switch(this->current_context){
                                 case 1:
-                                        //login
+					developerPage.passiveMouseAction(x, y);
                                         break;
                                 default:
                                         this->current_context = homePage.handleMousePassive(x, y);

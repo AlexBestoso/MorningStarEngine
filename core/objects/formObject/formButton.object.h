@@ -2,7 +2,7 @@ struct ObjectButtonStruct{
 	float x, y, z, w, h;
 	float textX, textY, textZ, textW, textH;
         float color[3] = {0, 0, 0};
-        float textColor[3] = {0, 0 , 0};
+        float textColor[3] = {0, 0, 0};
         float hoverColor[3] = {0, 0, 0};
         string label = "";
 };
@@ -10,7 +10,6 @@ struct ObjectButtonStruct{
 class ObjectFormButton : Object{
 	private:
 		bool isInHitbox(float x, float y){
-			
 			y = y * -1;
 			float b_x = Object::getX(this->config.x);
 			float b_y  = Object::getY(this->config.y);		
@@ -25,6 +24,7 @@ class ObjectFormButton : Object{
 
 		int mousePassiveHover = 0;
 	public:
+		void *fontBitMap = GLUT_BITMAP_HELVETICA_12;
 		struct ObjectButtonStruct config;
 		int (*buttonEvent)(void) = NULL;
 		int (*buttonEvent_int)(int) = NULL;
@@ -110,12 +110,12 @@ class ObjectFormButton : Object{
 			Object::drawRectangle(this->config.x, this->config.y, this->config.z, this->config.w, this->config.h);
 			
 			/* Button Text */
-			Object::setColor(0, 0, 0);
+			Object::setColor(this->config.textColor[0], this->config.textColor[1], this->config.textColor[2]);
 			Object::drawText(this->config.textX,
 					 this->config.textY,
 					 this->config.textZ,
 					 this->config.label, 
-					 GLUT_BITMAP_HELVETICA_12
+					 this->fontBitMap
 			);
 
 		}

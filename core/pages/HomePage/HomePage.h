@@ -42,7 +42,7 @@ class HomePage{
 			mainForm.config.h = s->height/2;
 			mainForm.config.color[0] = .5;
 			mainForm.config.color[1] = .647;
-			mainForm.config.color[0] = 0;
+			mainForm.config.color[2] = 0;
 			mainForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
 
 			/* Configure the title */
@@ -63,7 +63,7 @@ class HomePage{
 			mainButtons[0].setColor(1, 1, 0);
 			mainButtons[0].setHoverColor(.75,.75,0);
 			mainButtons[0].setButtonText("New");
-			mainButtons[0].setTextColor(1, 1, 1);
+			mainButtons[0].setTextColor(0, 0, 0);
 			mainButtons[0].setTextPosition(buttonX + 85, buttonY+20, 1);
 			mainButtons[0].buttonEvent = &newProjectButton;
 
@@ -74,7 +74,7 @@ class HomePage{
                         mainButtons[1].setColor(1, 1, 0);
 			mainButtons[1].setHoverColor(.75,.75,0);
                         mainButtons[1].setButtonText("Load");
-                        mainButtons[1].setTextColor(1, 1, 1);
+                        mainButtons[1].setTextColor(0, 0, 0);
                         mainButtons[1].setTextPosition(buttonX + 85, buttonY+20, 1);
 			mainButtons[1].buttonEvent = &loadProjectButton;
 
@@ -85,7 +85,7 @@ class HomePage{
                         mainButtons[2].setColor(1, 1, 0);
 			mainButtons[2].setHoverColor(.75,.75,0);
                         mainButtons[2].setButtonText("Exit");
-                        mainButtons[2].setTextColor(1, 1, 1);
+                        mainButtons[2].setTextColor(0, 0, 0);
                         mainButtons[2].setTextPosition(buttonX + 85, buttonY+20, 1);
 			mainButtons[2].buttonEvent = &exitButtonFunction;
 						      // button count
@@ -117,7 +117,7 @@ class HomePage{
                         newForm.config.h = s->height/2;
                         newForm.config.color[0] = .5;
                         newForm.config.color[1] = .647;
-                        newForm.config.color[0] = 0;
+                        newForm.config.color[2] = 0;
                         newForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
 
 			// form title
@@ -138,7 +138,7 @@ class HomePage{
                         newButtons[0].setColor(1, 1, 0);
                         newButtons[0].setHoverColor(.75,.75,0);
                         newButtons[0].setButtonText("Cancel");
-                        newButtons[0].setTextColor(1, 1, 1);
+                        newButtons[0].setTextColor(0, 0, 0);
                         newButtons[0].setTextPosition(buttonX + 85, buttonY+20, 1);
                         newButtons[0].buttonEvent = &newFormCancelButton;
 
@@ -149,7 +149,7 @@ class HomePage{
                         newButtons[1].setColor(1, 1, 0);
                         newButtons[1].setHoverColor(.75,.75,0);
                         newButtons[1].setButtonText("Create");
-                        newButtons[1].setTextColor(1, 1, 1);
+                        newButtons[1].setTextColor(0, 0, 0);
                         newButtons[1].setTextPosition(buttonX + 85, buttonY+20, 1);
                         newButtons[1].buttonEvent = &newFormCancelButton;
 
@@ -208,7 +208,7 @@ class HomePage{
                         loadForm.config.h = s->height/2;
                         loadForm.config.color[0] = .5;
                         loadForm.config.color[1] = .647;
-                        loadForm.config.color[0] = 0;
+                        loadForm.config.color[2] = 0;
                         loadForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
 			
 			// form title
@@ -229,7 +229,7 @@ class HomePage{
                         loadButtons[0].setColor(1, 1, 0);
                         loadButtons[0].setHoverColor(.75,.75,0);
                         loadButtons[0].setButtonText("Cancel");
-                        loadButtons[0].setTextColor(1, 1, 1);
+                        loadButtons[0].setTextColor(0, 0, 0);
                         loadButtons[0].setTextPosition(buttonX + 85, buttonY+20, 1);
                         loadButtons[0].buttonEvent = &newFormCancelButton;
 			
@@ -250,7 +250,7 @@ class HomePage{
                         loadSelectList[0].buttonTemplate.setNameAndId("selectButton", 2);
                         loadSelectList[0].buttonTemplate.setColor(1, 1, 0);
                         loadSelectList[0].buttonTemplate.setHoverColor(.75,.75,0);
-                        loadSelectList[0].buttonTemplate.setTextColor(1, 1, 1);
+                        loadSelectList[0].buttonTemplate.setTextColor(0, 0, 0);
                         loadSelectList[0].buttonTemplate.setTextPosition(loadSelectList[0].config.x + 10, loadSelectList[0].config.y+loadSelectList[0].config.h-25, 1);
                         loadSelectList[0].buttonTemplate.buttonEvent_int = &itemSelect;
 			

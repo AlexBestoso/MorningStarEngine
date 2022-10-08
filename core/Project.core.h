@@ -9,9 +9,9 @@ class Project{
 		ProjectConfig config;
 		const string projectStorage = "./projects";
 		const string projectConfig = "project.conf";
-		struct ProjectStruct data;
 		
 	public:
+		struct ProjectStruct data;
 		string getProjectDir(void){
 			return this->projectStorage+"/";
 		}

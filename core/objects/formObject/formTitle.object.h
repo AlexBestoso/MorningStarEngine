@@ -11,6 +11,8 @@ class ObjectFormTitle : Object{
 		int textY = 0;
 		float textColor[3] = {0, 0, 0};
 
+		void* titleFont = GLUT_BITMAP_TIMES_ROMAN_24;
+
 	public:
 		ObjectFormTitle(int id, string name){
 			Object::setObjectId(id);
@@ -18,6 +20,10 @@ class ObjectFormTitle : Object{
 		}
 		ObjectFormTitle(){
 		
+		}
+
+		void setTitleFont(void *fontBitMap){
+			this->titleFont = fontBitMap;
 		}
 		
 		void setIdAndName(int id, string name){
@@ -65,6 +71,6 @@ class ObjectFormTitle : Object{
 			Object::drawRectangle(this->x, this->y, 1, this->w, this->h);
 
 			Object::setColor(this->textColor[0], this->textColor[1], this->textColor[2]);
-			Object::drawText(this->textX, this->textY, 2, this->titleText, GLUT_BITMAP_TIMES_ROMAN_24);
+			Object::drawText(this->textX, this->textY, 2, this->titleText, this->titleFont);
 		}
 };

@@ -1,5 +1,7 @@
+#include "./ProjectBar.element.h"
 class DeveloperPage{
 	private:
+		ProjectBar projectBar;
 		int pageContext = 0;
 
                 void initPage(){
@@ -12,12 +14,24 @@ class DeveloperPage{
                         glClearColor(r, g, b, 1);
                 }
 
+		void drawPage(void){
+			this->projectBar.draw();
+		}
+
 	public:
+		void passiveMouseAction(float x, float y){
+			projectBar.passiveMouseAction(x, y);
+		}
+		int mouseClickAction(int button, int state, float x, float y){
+			projectBar.mouseClickAction(button, state, x, y);
+			return DEVELOPER_PAGE;
+		}
 		int runPage(void){
-                        this->initPage();
-                               switch(this->pageContext){
+			this->initPage();
+                        switch(this->pageContext){
                                 case 0: // main menu
-                                        break;
+                                        this->drawPage();
+					break;
                         }
                         return DEVELOPER_PAGE;
                 }
