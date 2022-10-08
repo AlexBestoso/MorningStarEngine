@@ -1,14 +1,11 @@
 To Do List
 
-Task 3 - Create Load Project page
+Task 1 - create an in-application compiler / Game Engine Product Hello World
+	- Create system for linking project configuration to the compiled game. 
+	- Create template openGL files for game compilation.
+	- Make the project name the window title for the compiled game.
 
-Task 2 - create an in-application compiler.
-	--- Basic requirements ---
-		~ Game / Project name
-		~ Game Version
-		~ build button.
-		~ Hello World template
-		~ Makefile templet
+Task 2 - create back button for leaving developer mode and going to main menue.
+Task 3 - Create a save button for storing changes to the loaded class.
 
-
-Task 1 - create version archetecture for displaying software version on the home page.
+Task 4 - create version archetecture for displaying game engine version on the home page.
