@@ -23,8 +23,7 @@ class DeveloperPage{
 			projectBar.passiveMouseAction(x, y);
 		}
 		int mouseClickAction(int button, int state, float x, float y){
-			projectBar.mouseClickAction(button, state, x, y);
-			return DEVELOPER_PAGE;
+			return projectBar.mouseClickAction(button, state, x, y);
 		}
 		int runPage(void){
 			this->initPage();

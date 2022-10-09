@@ -2,7 +2,13 @@ class ProjectBar{
 	private:
 		ObjectForm projectBarForm;
 		FormContextMenu fileContextMenu;
+		ObjectFormButton buttonTemplate;
+
                 bool projectBarInitalized = false;
+
+		static int button_backToHomePage(void){
+			return 2;
+		}
 
 		void init(void){
 			Display* d = XOpenDisplay(NULL);
@@ -12,7 +18,7 @@ class ProjectBar{
                         projectBarForm.config.id = 0;
                         projectBarForm.config.name = "Project Bar";
                         projectBarForm.config.x = 0; 
-                        projectBarForm.config.y = s->height - 105;
+                        projectBarForm.config.y = s->height - 90;
                         projectBarForm.config.w = s->width; 
                         projectBarForm.config.h = 25;
                         projectBarForm.config.color[0] = .5;
@@ -48,6 +54,23 @@ class ProjectBar{
 			fileContextMenu.config.dropDownW = 100;
 			fileContextMenu.config.dropDownH = 500;
 
+			fileContextMenu.config.buttonCount = 1;
+			fileContextMenu.config.buttons = new ObjectFormButton[fileContextMenu.config.buttonCount];
+			int buttonX = fileContextMenu.config.x;
+                        int buttonY = fileContextMenu.config.y - 25; 
+                        buttonTemplate.setPositionAndSize(buttonX, buttonY, 1, 100, 25);	
+                        buttonTemplate.setNameAndId("NewProject", 2);
+                        buttonTemplate.setColor(1, 1, 0);
+                        buttonTemplate.setHoverColor(.75,.75,0);
+                        buttonTemplate.setButtonText("Exit");
+                        buttonTemplate.setTextColor(0, 0, 0);
+                        buttonTemplate.setTextPosition(buttonX + 5, buttonY+14, 1);
+                        buttonTemplate.buttonEvent = &button_backToHomePage;
+			// button 0
+			fileContextMenu.config.buttons[0] = buttonTemplate;
+			
+
+
                         this->projectBarInitalized = true;
 		}
 	public:
@@ -55,9 +78,15 @@ class ProjectBar{
 			fileContextMenu.passiveMouseAction(x, y);	
 		}
 		int mouseClickAction(int button, int state, float x, float y){
-			if(fileContextMenu.mouseClickAction(button, state, x, y) == 1){
+			int res = DEVELOPER_PAGE;
+			if((res = fileContextMenu.mouseClickAction(button, state, x, y)) == 1){
 				fileContextMenu.config.showDropDown = true;
 			}
+			if(res == 2){
+				this->projectBarInitalized = false;
+				return HOME_PAGE;	
+			}
+			return DEVELOPER_PAGE;
 		}
 		void draw(void){
 			if(!this->projectBarInitalized)

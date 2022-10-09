@@ -5,7 +5,8 @@ Task 1 - create an in-application compiler / Game Engine Product Hello World
 	- Create template openGL files for game compilation.
 	- Make the project name the window title for the compiled game.
 
-Task 2 - create back button for leaving developer mode and going to main menue.
+Task 2 - Create popup message class.
+
 Task 3 - Create a save button for storing changes to the loaded class.
 
 Task 4 - create version archetecture for displaying game engine version on the home page.

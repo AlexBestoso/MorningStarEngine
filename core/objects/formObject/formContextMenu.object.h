@@ -19,12 +19,12 @@ struct FormContextMenuStruct{
 	void *fontBitMap = GLUT_BITMAP_HELVETICA_12;
 	string buttonText = "";
 	bool showDropDown = false;
-	
+
+	ObjectFormButton *buttons = NULL;
+	size_t buttonCount = 0;
 };
 class FormContextMenu : Object{
 	private:
-		ObjectFormButton *contextMenuButtons = NULL;
-		size_t contextMenuButtonCount = 0;
 		int mousePassiveHover = 0;
 		int mousePassiveHoverDropDown = 0;
 		
@@ -90,6 +90,9 @@ class FormContextMenu : Object{
 				mousePassiveHoverDropDown = 0;
 			}else if(this->config.showDropDown && (inside || !insideButton)){
 				mousePassiveHoverDropDown = 1;
+				for(int i=0; i<this->config.buttonCount; i++){
+					this->config.buttons[i].passiveMouseAction(x, y);
+				}
 			}else{
 				mousePassiveHoverDropDown = 0;
 			}
@@ -100,6 +103,14 @@ class FormContextMenu : Object{
                                 	return 1;     
                                 }
                         }
+			if(mousePassiveHoverDropDown == 1){
+				for(int i=0; i<this->config.buttonCount; i++){
+					int res = this->config.buttons[i].mouseClickAction(button, state, x, y);
+					if(res != -1){
+						return res;
+					}
+				}
+			}
                         return 0;
                 }
 		void draw(void){
@@ -113,6 +124,9 @@ class FormContextMenu : Object{
 			if(this->config.showDropDown){
 				Object::setColor(this->config.dropDownColor[0], this->config.dropDownColor[1], this->config.dropDownColor[2]);
 				Object::drawRectangle(this->config.dropDownX, this->config.dropDownY, this->config.dropDownZ, this->config.dropDownW, this->config.dropDownH);
+				for(int i=0; i<this->config.buttonCount; i++){
+					this->config.buttons[i].draw();
+				}
 			}
 		}
 };
