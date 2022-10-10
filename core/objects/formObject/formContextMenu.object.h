@@ -22,6 +22,8 @@ struct FormContextMenuStruct{
 
 	ObjectFormButton *buttons = NULL;
 	size_t buttonCount = 0;
+
+	bool noFormContainer = false;
 };
 class FormContextMenu : Object{
 	private:
@@ -41,8 +43,10 @@ class FormContextMenu : Object{
                         return false;
                 }
 		
+	public:
+		struct FormContextMenuStruct config;
 		bool isInDropDownBox(float x, float y){
-			y = y * -1;
+                        y = y * -1;
                         float b_x = Object::getX(this->config.dropDownX);
                         float b_y  = Object::getY(this->config.dropDownY);
                         float b_w = Object::getX(this->config.dropDownW + this->config.dropDownX);
@@ -52,9 +56,7 @@ class FormContextMenu : Object{
                                 return true;
                         }
                         return false;
-		}
-	public:
-		struct FormContextMenuStruct config;
+                }
 
 		void setColor(float r, float g, float b){
 			this->config.color[0] = r;
@@ -77,33 +79,39 @@ class FormContextMenu : Object{
 			this->config.dropDownColor[2] = b;
 		}
 		void passiveMouseAction(float x, float y){
-			bool insideButton = isInHitbox(x, y);
-			if(insideButton){
-                                this->mousePassiveHover = 1;
-                        }else{
-                                this->mousePassiveHover = 0;
-                        }
-
-			bool inside = isInDropDownBox(x, y);
-			if(this->config.showDropDown && (!inside && !insideButton)){
-				this->config.showDropDown = false;
-				mousePassiveHoverDropDown = 0;
-			}else if(this->config.showDropDown && (inside || !insideButton)){
-				mousePassiveHoverDropDown = 1;
-				for(int i=0; i<this->config.buttonCount; i++){
-					this->config.buttons[i].passiveMouseAction(x, y);
+			if(!this->config.noFormContainer){
+				bool insideButton = isInHitbox(x, y);
+				if(insideButton){
+                        	        this->mousePassiveHover = 1;
+                        	}else{
+                        	        this->mousePassiveHover = 0;
+                        	}
+	
+				bool inside = isInDropDownBox(x, y);
+				if(this->config.showDropDown && (!inside && !insideButton)){
+					this->config.showDropDown = false;
+					mousePassiveHoverDropDown = 0;
+				}else if(this->config.showDropDown && (inside || !insideButton)){
+					mousePassiveHoverDropDown = 1;
+					for(int i=0; i<this->config.buttonCount; i++){
+						this->config.buttons[i].passiveMouseAction(x, y);
+					}
+				}else{
+					mousePassiveHoverDropDown = 0;
 				}
 			}else{
-				mousePassiveHoverDropDown = 0;
+                        	for(int i=0; i<this->config.buttonCount; i++){
+                                	this->config.buttons[i].passiveMouseAction(x, y);
+                                }
 			}
                 }
 		int mouseClickAction(int button, int state, float x, float y){
-                        if(mousePassiveHover == 1){
+                        if(mousePassiveHover == 1 && !this->config.noFormContainer){
                                 if(button == 0 && state == 1){
                                 	return 1;     
                                 }
                         }
-			if(mousePassiveHoverDropDown == 1){
+			if(mousePassiveHoverDropDown == 1 || this->config.noFormContainer){
 				for(int i=0; i<this->config.buttonCount; i++){
 					int res = this->config.buttons[i].mouseClickAction(button, state, x, y);
 					if(res != -1){
@@ -114,13 +122,15 @@ class FormContextMenu : Object{
                         return 0;
                 }
 		void draw(void){
-			if(this->mousePassiveHover == 0)
-				Object::setColor(this->config.color[0], this->config.color[1], this->config.color[2]);
-			else
-				Object::setColor(this->config.hoverColor[0], this->config.hoverColor[1], this->config.hoverColor[2]);
-			Object::drawRectangle(this->config.x, this->config.y, this->config.z, this->config.w, this->config.h);
-			Object::setColor(this->config.textColor[0], this->config.textColor[1], this->config.textColor[2]);
-			Object::drawText(this->config.textX, this->config.textY, this->config.textZ, this->config.buttonText, this->config.fontBitMap);
+			if(!this->config.noFormContainer){
+				if(this->mousePassiveHover == 0)
+					Object::setColor(this->config.color[0], this->config.color[1], this->config.color[2]);
+				else
+					Object::setColor(this->config.hoverColor[0], this->config.hoverColor[1], this->config.hoverColor[2]);
+				Object::drawRectangle(this->config.x, this->config.y, this->config.z, this->config.w, this->config.h);
+				Object::setColor(this->config.textColor[0], this->config.textColor[1], this->config.textColor[2]);
+				Object::drawText(this->config.textX, this->config.textY, this->config.textZ, this->config.buttonText, this->config.fontBitMap);
+			}
 			if(this->config.showDropDown){
 				Object::setColor(this->config.dropDownColor[0], this->config.dropDownColor[1], this->config.dropDownColor[2]);
 				Object::drawRectangle(this->config.dropDownX, this->config.dropDownY, this->config.dropDownZ, this->config.dropDownW, this->config.dropDownH);

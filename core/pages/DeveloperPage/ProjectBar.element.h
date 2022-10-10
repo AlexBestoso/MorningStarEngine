@@ -73,7 +73,17 @@ class ProjectBar{
 
                         this->projectBarInitalized = true;
 		}
+
 	public:
+		void reset(void){
+			ObjectForm resetForm;
+			this->projectBarForm = resetForm;
+			FormContextMenu resetContextMenun;
+                	this->fileContextMenu = resetContextMenun;
+			ObjectFormButton resetFormButton;
+                	this->buttonTemplate = resetFormButton;
+			this->projectBarInitalized = false;
+		}
 		void passiveMouseAction(float x, float y){
 			fileContextMenu.passiveMouseAction(x, y);	
 		}
@@ -83,10 +93,10 @@ class ProjectBar{
 				fileContextMenu.config.showDropDown = true;
 			}
 			if(res == 2){
-				this->projectBarInitalized = false;
+				this->reset();
 				return HOME_PAGE;	
 			}
-			return DEVELOPER_PAGE;
+			return -1;
 		}
 		void draw(void){
 			if(!this->projectBarInitalized)

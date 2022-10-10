@@ -1,5 +1,6 @@
 struct ProjectStruct{
 	string name;
+	float startingBgColor[3] = {0, 0, 0};
 
 };
 #include "./projectConfig.core.h"
@@ -32,9 +33,11 @@ class Project{
 				fprintf(stderr, "[E] Project already exists.\n");
 				return false;
 			}
+
 			fileSnake.makeDir(this->projectStorage+"/"+this->data.name);
 			config.setConfigFile(this->projectStorage+"/"+this->data.name+"/"+this->projectConfig);
-			config.create(this->data.name);
+
+			config.create(data);
 			return true;
 
 		}

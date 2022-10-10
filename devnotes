@@ -1,12 +1,16 @@
 To Do List
 
+Task 0 - Create a popup menu class.
+	- create popup for setting an array of floats.
+		~ implement this popup so that it can be used to change window color.
+	- Create popup for setting a string
+		~ implement this popup so that it can be used to change project/game name.
+
 Task 1 - create an in-application compiler / Game Engine Product Hello World
-	- Create system for linking project configuration to the compiled game. 
-	- Create template openGL files for game compilation.
-	- Make the project name the window title for the compiled game.
+	- Create build projectBar button. Add a "compile" option.
+	- Create compiler class
+	- make class generate custom source code using the Project class.
 
-Task 2 - Create popup message class.
+Task 2 - Create a save button for storing changes to the loaded class. Place under the "File" ProjectBar drop down.
 
-Task 3 - Create a save button for storing changes to the loaded class.
-
-Task 4 - create version archetecture for displaying game engine version on the home page.
+Task 3 - create version archetecture for displaying game engine version on the home page.
