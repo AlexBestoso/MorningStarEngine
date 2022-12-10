@@ -14,12 +14,12 @@
 
 using namespace std;
 
-#include "./classes/fileSnake.class.h"
-#include "./classes/bmpParser.h"
-#include "./cryptography/base64.h"
-#include "./cryptography/aes128cbc.h"
+#include "./classes/tools/fileSnake.class.h"
+#include "./classes/tools/parsers/bmpParser.h"
+#include "./classes/cryptology/hashing/base64.h"
+#include "./classes/cryptology/cryptography/aes128cbc.h"
 #include "./classes/keyboard.h"
-#include "./core/MorningStarEngine.core.h"
+#include "./classes/core/MorningStarEngine.core.h"
 
 int main(int argc, char *argv[]){
 	MorningStarEngine engine;

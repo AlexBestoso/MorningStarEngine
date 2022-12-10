@@ -1,11 +1,11 @@
 #define HOME_PAGE 0
 #define DEVELOPER_PAGE 1
 
-#include "./objectLinker.h"
-#include "./Project.core.h"
-#include "./periferals.core.h"
-#include "./pageLinker.h"
-#include "./ContextProvider.h"
+#include "./objects/objectLinker.h"
+#include "./projects/Project.core.h"
+#include "./periferals/periferals.core.h"
+#include "./pages/pageLinker.h"
+#include "./context/ContextProvider.h"
 class MorningStarEngine{
 public:
 	int displayX = 0;

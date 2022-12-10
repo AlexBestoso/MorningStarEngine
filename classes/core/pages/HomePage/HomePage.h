@@ -43,7 +43,7 @@ class HomePage{
 			mainForm.config.color[0] = .5;
 			mainForm.config.color[1] = .647;
 			mainForm.config.color[2] = 0;
-			mainForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
+			mainForm.setFormTexture("./Assets/bitmaps/formBackground.bmp");
 
 			/* Configure the title */
 			int titleX = (mainForm.config.w + mainForm.config.x)-(500+(mainForm.config.w-500)/2);
@@ -118,7 +118,7 @@ class HomePage{
                         newForm.config.color[0] = .5;
                         newForm.config.color[1] = .647;
                         newForm.config.color[2] = 0;
-                        newForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
+                        newForm.setFormTexture("./Assets/bitmaps/formBackground.bmp");
 
 			// form title
 			int titleX = (newForm.config.w + newForm.config.x)-(500+(newForm.config.w-500)/2);
@@ -209,7 +209,7 @@ class HomePage{
                         loadForm.config.color[0] = .5;
                         loadForm.config.color[1] = .647;
                         loadForm.config.color[2] = 0;
-                        loadForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
+                        loadForm.setFormTexture("./Assets/bitmaps/formBackground.bmp");
 			
 			// form title
                         int titleX = (loadForm.config.w + loadForm.config.x)-(500+(loadForm.config.w-500)/2);
