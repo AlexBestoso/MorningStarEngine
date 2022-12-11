@@ -5,8 +5,11 @@ class DeveloperPage{
 		ProjectBar projectBar;
 		SimulationWindow simulationWindow;
 		int pageContext = 0;
+		int projectBarHandler = -1;
 
                 void initPage(){
+			projectBar.init();
+			simulationWindow.init();
                         this->setBackgroundColor(.25,0,.5);
                         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -22,11 +25,21 @@ class DeveloperPage{
 		}
 
 	public:
+		DeveloperPage(){
+			this->initPage();
+		}
+
+		void deconstruct(void){
+			projectBar.reset();
+			simulationWindow.reset();
+		}
 		void passiveMouseAction(float x, float y){
+			this->initPage();
 			projectBar.passiveMouseAction(x, y);
 			simulationWindow.passiveMouseAction(x, y);
 		}
 		int mouseClickAction(int button, int state, float x, float y){
+			this->initPage();
 			int res = projectBar.mouseClickAction(button, state, x, y);
 			if(res == HOME_PAGE){
 				projectBar.reset();

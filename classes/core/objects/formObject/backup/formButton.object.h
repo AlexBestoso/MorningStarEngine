@@ -9,7 +9,6 @@ struct ObjectButtonStruct{
 
 class ObjectFormButton : Object{
 	private:
-	public:
 		bool isInHitbox(float x, float y){
 			y = y * -1;
 			float b_x = Object::getX(this->config.x);
@@ -24,14 +23,15 @@ class ObjectFormButton : Object{
 		}
 
 		int mousePassiveHover = 0;
+	public:
 		void *fontBitMap = GLUT_BITMAP_HELVETICA_12;
 		struct ObjectButtonStruct config;
 		int (*buttonEvent)(void) = NULL;
 		int (*buttonEvent_int)(int) = NULL;
 
 		int mouseClickAction(int button, int state, float x, float y){
-			if(mousePassiveHover == 1 ){
-				if(button == 0 && state == 1){ // Left Click logic goes here.
+			if(mousePassiveHover == 1){
+				if(button == 0 && state == 1){
 					if(buttonEvent != NULL)
 						return buttonEvent();
 					else
@@ -102,7 +102,7 @@ class ObjectFormButton : Object{
 		}
 		void drawContained(){
 			/* Core Container.*/
-			if(this->mousePassiveHover == 0){
+			if(mousePassiveHover == 0){
 				Object::setColor(this->config.color[0], this->config.color[1], this->config.color[2]);
 			}else{
 				Object::setColor(this->config.hoverColor[0], this->config.hoverColor[1], this->config.hoverColor[2]);

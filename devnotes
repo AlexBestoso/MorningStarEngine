@@ -7,6 +7,7 @@ Task 0 - Create a popup menu class.
 		~ implement this popup so that it can be used to change project/game name.
 
 Task 1 - create an in-application compiler / Game Engine Product Hello World
+	+ Create Shared Object Loader class.
 	- Create build projectBar button. Add a "compile" option.
 	- Create compiler class
 	- make class generate custom source code using the Project class.

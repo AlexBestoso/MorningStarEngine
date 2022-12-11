@@ -1,6 +1,9 @@
 # ignore project files
 projects/
 
+# ignore compiled objects
+*.so
+
 # ignore swap files
 *.swp
 
