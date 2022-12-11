@@ -30,7 +30,7 @@ using namespace std;
 
 #include "./classes/core/objects/objectLinker.h"
 #include "./classes/core/soLoader/SoLoader.h"
-#include "./classes/core/projects/Project.core.h"
+#include "./classes/core/projects/project.core.h"
 #include "./classes/core/periferals/periferals.core.h"
 #include "./classes/core/pages/pageLinker.h"
 #include "./classes/core/context/ContextProvider.h"

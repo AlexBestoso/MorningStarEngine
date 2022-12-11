@@ -351,7 +351,7 @@ class HomePage{
 					/* create Button */
 					buttonOption = this->forms[HOME_NEW]->formButtons[1].mouseClickAction(button, state, x, y);
 					if(buttonOption != -1){
-						project.create(this->forms[HOME_LOAD]->formInputs[0].getInputData());
+						project.create(this->forms[HOME_NEW]->formInputs[0].getInputData());
 						return DEVELOPER_PAGE;
 					}
 					/* Project Name Input */
