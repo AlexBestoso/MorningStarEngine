@@ -37,6 +37,10 @@ class HomePage{
                         	forms[HOME_MAIN] = (ObjectForm*)this->functions.ObjectForm_create();
                         	forms[HOME_NEW] = (ObjectForm*)this->functions.ObjectForm_create();
                         	forms[HOME_LOAD] = (ObjectForm*)this->functions.ObjectForm_create();
+
+				this->configMainContext();
+                        	this->configNewContext();
+                        	this->configLoadContext();
 			}
 			this->setBackgroundColor(.25,0,.5);
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -290,13 +294,12 @@ class HomePage{
 		}
 
 		void deconstruct(void){
-			if(forms[0] != NULL || forms[1] != NULL || forms[2] != NULL){
-				for(int i=0; i<3; i++){
-					if(forms[i] != NULL)
-						this->functions.ObjectForm_destroy(forms[i]);
+			for(int i=0; i<3; i++){
+				if(forms[i] != NULL){
+					this->functions.ObjectForm_destroy(forms[i]);
+					forms[i] = NULL;
 				}
 			}
-
 			if(formObjectHandle > -1){
 				soLoader.closeHandle(formObjectHandle);
 			}
@@ -319,6 +322,7 @@ class HomePage{
 		}
 
 		int handleMouseClick(int button, int state, float x, float y){
+			this->initPage();
 			int buttonOption = -1;
                         switch(this->pageContext){
                         	case 0: // main menue
@@ -372,6 +376,7 @@ class HomePage{
 		} 
 
 		int handleKeyDown(unsigned char key, int mouseX, int mouseY){
+			this->initPage();
 			switch(this->pageContext){
 				case 0:
 					break;
@@ -385,6 +390,7 @@ class HomePage{
 		}
 
 		int handleMousePassive(float x, float y){
+			this->initPage();
 			switch(this->pageContext){
                         	case 0: // main menu
 					this->forms[HOME_MAIN]->formButtons[0].passiveMouseAction(x, y);

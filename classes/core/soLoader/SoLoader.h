@@ -24,9 +24,9 @@ class SoLoader{
 			return -1;
 		}
 
-		int openSlotId = 0;
+		int openSlotId = -1;
 		for(int i=0; i<SOLOADER_MAX_HANDLE; i++){
-			if(this->handleList[i] != NULL){
+			if(this->handleList[i] == NULL){
 				openSlotId = i;
 				break;
 			}

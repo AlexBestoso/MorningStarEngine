@@ -32,10 +32,12 @@ class DeveloperPage{
 			projectBar.reset();
 		}
 		void passiveMouseAction(float x, float y){
+			this->initPage();
 			projectBar.passiveMouseAction(x, y);
 		//	simulationWindow.passiveMouseAction(x, y);
 		}
 		int mouseClickAction(int button, int state, float x, float y){
+			this->initPage();
 			int res = projectBar.mouseClickAction(button, state, x, y);
 			if(res == HOME_PAGE){
 				projectBar.reset();

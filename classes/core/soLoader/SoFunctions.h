@@ -7,4 +7,7 @@ class SoFunctions{
 	public:
 		ObjectForm* (*ObjectForm_create)();
         	void (*ObjectForm_destroy)(ObjectForm*);
+
+		FormContextMenu* (*FormContextMenu_create)();
+		void (*FormContextMenu_destroy)(FormContextMenu*);
 };
