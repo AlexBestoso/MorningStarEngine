@@ -53,58 +53,13 @@ class ObjectForm : Object{
 		FormSelectList *selectLists;
 		ObjectFormTitle title;
 		struct ObjectFormConfig config;
-		void mouseClickAction(int button, int state, float x, float y){
-				
-		}
 
-		bool isInHitBox(float x, float y){
-                        y = y * -1;
-                        float b_x = Object::getX(this->config.x);
-                        float b_y  = Object::getY(this->config.y);
-                        float b_w = Object::getX(this->config.w + this->config.x);
-                        float b_h  = Object::getY(this->config.h + this->config.y);
-
-                        if((x > b_x && x < b_w) && (y > b_y && y < b_h)){
-                                return true;
-                        }
-                        return false;
-                }
-		void passiveMouseAction(float x, float y){
-			for(int i=0; i<this->buttonCount; i++)
-				this->formButtons[i].passiveMouseAction(x, y);
-		}
-
-		void setSelectLists(FormSelectList *selectLists, size_t listCount){
-			this->selectLists = selectLists;
-			this->selectListCount = listCount;
-		}
-		void setInputs(ObjectFormInput *inputs, size_t inputCount){
-			this->formInputs = inputs;
-                        this->inputCount = inputCount;
-		}
-
-		void setButtons(ObjectFormButton *buttons, size_t buttonCount){
-                        this->formButtons = buttons;
-                        this->buttonCount = buttonCount;
-                }
-
-		void setFormTexture(string textureLocation){
-			this->formTextureLocation = textureLocation;
-		}
-
-		ObjectForm(){}
-		ObjectForm(struct ObjectFormConfig config, ObjectFormTitle title, ObjectFormInput *inputs, size_t inputCount){
-			Object::setObjectId(config.id);
-			Object::setObjectName(config.name);
-			this->config = config;
-			this->title = title;
-		}
-		void draw(){
-			this->createFormContainer();
-			if(!this->config.ignoreTitle)
-				this->createTitle();
-			this->createInputs();
-			this->createButtons();
-			this->createSelectList();
-		}
+		virtual void mouseClickAction(int button, int state, float x, float y);
+		virtual bool isInHitBox(float x, float y);
+		virtual void passiveMouseAction(float x, float y);
+		virtual void setSelectLists(FormSelectList *selectLists, size_t listCount);
+		virtual void setInputs(ObjectFormInput *inputs, size_t inputCount);
+		virtual void setButtons(ObjectFormButton *buttons, size_t buttonCount);
+		virtual void setFormTexture(string textureLocation);
+		virtual void draw(void);
 };

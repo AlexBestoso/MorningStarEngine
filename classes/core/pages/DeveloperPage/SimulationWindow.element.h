@@ -1,6 +1,6 @@
 class SimulationWindow : Periferals{
 	private:
-		ObjectForm simulationForm;
+	//	ObjectForm simulationForm;
 		FormContextMenu rightClickMenu;
 		ObjectFormButton rightClickButtonTemplate;
 		bool simulationFormInitalized = false;
@@ -16,7 +16,7 @@ class SimulationWindow : Periferals{
                         Screen* s = DefaultScreenOfDisplay(d);
 
 			/* Form Background */
-                        simulationForm.config.w = s->width/3*2;
+                /*        simulationForm.config.w = s->width/3*2;
                         simulationForm.config.h = s->height/3*2;
                         simulationForm.config.x = (s->width/4)*2 - simulationForm.config.w/2;
                         simulationForm.config.y = s->height - 90 - simulationForm.config.h - 5;
@@ -60,15 +60,15 @@ class SimulationWindow : Periferals{
 		}
 	public:
 		void passiveMouseAction(float x, float y){
-			if((!simulationForm.isInHitBox(x, y) && !rightClickMenu.isInDropDownBox(x, y)) || !this->rightClicked){
+		/*	if((!simulationForm.isInHitBox(x, y) && !rightClickMenu.isInDropDownBox(x, y)) || !this->rightClicked){
 				this->rightClicked = false;
 				rightClickMenu.config.showDropDown = false;
 			}else{
 				rightClickMenu.passiveMouseAction(x, y);
-			}
+			}*/
                 }
                 int mouseClickAction(int button, int state, float x, float y){
-			if(simulationForm.isInHitBox(Periferals::getX(x), Periferals::getY(y)) && Periferals::rightClick(button, state)){
+		/*	if(simulationForm.isInHitBox(Periferals::getX(x), Periferals::getY(y)) && Periferals::rightClick(button, state)){
 				this->setRightClickCoords(x, y);
 				rightClickMenu.config.showDropDown = true;
 				this->rightClicked = true;
@@ -83,12 +83,12 @@ class SimulationWindow : Periferals{
 				this->popUpId = rightClickMenu.mouseClickAction(button, state, x, y);
 			}
 			
-                        return -1;
+                        return -1;*/
                 }
 		void draw(void){
 			if(!simulationFormInitalized)
 				this->init();
-			simulationForm.draw();
+			//simulationForm.draw();
 			rightClickMenu.draw();
 			if(this->popUpId > 0){
 				switch(this->popUpId){

@@ -1,8 +1,22 @@
 class ProjectBar{
 	private:
-		ObjectForm projectBarForm;
+		SoLoader soLoader;
+		ObjectForm *projectBarForm;
+		int projectBarHandle = -1;
 		FormContextMenu fileContextMenu;
 		ObjectFormButton buttonTemplate;
+		int displayX = 0;
+		int displayY = 0;
+
+		void getDisplayResolution(void){
+                        if(this->displayX == 0 && this->displayY == 0){
+                                Display* d = XOpenDisplay(NULL);
+                                Screen*  s = DefaultScreenOfDisplay(d);
+                                this->displayX = s->width;
+                                this->displayY = s->height;
+                                XCloseDisplay(d);
+                        }
+                }
 
                 bool projectBarInitalized = false;
 
@@ -10,36 +24,50 @@ class ProjectBar{
 			return 2;
 		}
 
+	public:
 		void init(void){
-			Display* d = XOpenDisplay(NULL);
-                        Screen* s = DefaultScreenOfDisplay(d);
+			if(projectBarForm == NULL){
+                                projectBarHandle = soLoader.openLazy("./objects/forms/formObject/form.object.so");
+                                if(projectBarHandle <= -1){
+                                        fprintf(stderr, "[E] Failed to load ./objects/forms/formObject/form.object.so");
+                                        return;
+                                }
+
+                                this->soLoader.functions.ObjectForm_create = (ObjectForm*(*)())soLoader.loadSymbol(projectBarHandle, "create_object");
+                                this->soLoader.functions.ObjectForm_destroy = (void(*)(ObjectForm*))soLoader.loadSymbol(projectBarHandle, "destroy_object");
+
+                                projectBarForm = (ObjectForm*)this->soLoader.functions.ObjectForm_create();
+                        }
+
+			this->getDisplayResolution();
+
 
                         /* Form Background */
-                        projectBarForm.config.id = 0;
-                        projectBarForm.config.name = "Project Bar";
-                        projectBarForm.config.x = 0; 
-                        projectBarForm.config.y = s->height - 90;
-                        projectBarForm.config.w = s->width; 
-                        projectBarForm.config.h = 25;
-                        projectBarForm.config.color[0] = .5;
-                        projectBarForm.config.color[1] = .647;
-                        projectBarForm.config.color[2] = 0;
+                        projectBarForm->config.id = 0;
+                        projectBarForm->config.name = "Project Bar";
+                        projectBarForm->config.x = 0; 
+                        projectBarForm->config.y = this->displayY-25;
+                        projectBarForm->config.w = this->displayX; 
+                        projectBarForm->config.h = 25;
+                        projectBarForm->config.color[0] = .5;
+                        projectBarForm->config.color[1] = .647;
+                        projectBarForm->config.color[2] = 0;
                         //projectBarForm.setFormTexture("./core/pages/HomePage/Assets/formBackground.bmp");
 
                         /* Configure the title */
-                        projectBarForm.title.setIdAndName(1, "projectBarTitle");
-                        projectBarForm.title.setTitle(project.data.name);
-                        projectBarForm.title.setPositionAndSize(projectBarForm.config.x, projectBarForm.config.y, 100, 100);
-                        projectBarForm.title.setColor(1, .647, 0);
-                        projectBarForm.title.setTextColor(0, 0, 0);
-                        projectBarForm.title.setTextPosition(projectBarForm.config.x, projectBarForm.config.y + 10);
-                        projectBarForm.title.setTitleFont(GLUT_BITMAP_HELVETICA_12);
+                       	projectBarForm->title.setIdAndName(1, "projectBarTitle");
+                        projectBarForm->title.setTitle(project.data.name);
+                        projectBarForm->title.setPositionAndSize(projectBarForm->config.x, projectBarForm->config.y, 100, 25);
+                        projectBarForm->title.setColor(1, .647, 0);
+                        projectBarForm->title.setTextColor(0, 0, 0);
+                        projectBarForm->title.setTextPosition(projectBarForm->config.x, projectBarForm->config.y + 10);
+                        projectBarForm->title.setTitleFont(GLUT_BITMAP_HELVETICA_12);
 
-			fileContextMenu.config.x = projectBarForm.config.x + 100 + 3;
-			fileContextMenu.config.y = projectBarForm.config.y;
+			fileContextMenu.config.x = projectBarForm->config.x + 100 + 3;
+			fileContextMenu.config.y = projectBarForm->config.y;
 			fileContextMenu.config.z = 1;
 			fileContextMenu.config.w = 75;
-			fileContextMenu.config.h = 100;
+			fileContextMenu.config.h = 25;
 			fileContextMenu.setColor(.5, .3, 0);
 			fileContextMenu.config.textX = fileContextMenu.config.x + 5;
 			fileContextMenu.config.textY = fileContextMenu.config.y + 10;
@@ -59,7 +87,7 @@ class ProjectBar{
 			int buttonX = fileContextMenu.config.x;
                         int buttonY = fileContextMenu.config.y - 25; 
                         buttonTemplate.setPositionAndSize(buttonX, buttonY, 1, 100, 25);	
-                        buttonTemplate.setNameAndId("NewProject", 2);
+                        buttonTemplate.setNameAndId("Exit", 2);
                         buttonTemplate.setColor(1, 1, 0);
                         buttonTemplate.setHoverColor(.75,.75,0);
                         buttonTemplate.setButtonText("Exit");
@@ -69,15 +97,24 @@ class ProjectBar{
 			// button 0
 			fileContextMenu.config.buttons[0] = buttonTemplate;
 			
-
-
                         this->projectBarInitalized = true;
 		}
 
-	public:
+		ProjectBar(){
+			this->init();
+		}
 		void reset(void){
-			ObjectForm resetForm;
-			this->projectBarForm = resetForm;
+			//ObjectForm resetForm;
+			//this->projectBarForm = resetForm;
+			if(this->projectBarForm != NULL){
+                               this->soLoader.functions.ObjectForm_destroy(this->projectBarForm);
+			       this->projectBarForm = NULL;
+                        }
+
+                        if(this->projectBarHandle > -1){
+                                soLoader.closeHandle(this->projectBarHandle);
+				this->projectBarHandle = -1;
+                        }
 			FormContextMenu resetContextMenun;
                 	this->fileContextMenu = resetContextMenun;
 			ObjectFormButton resetFormButton;
@@ -99,9 +136,9 @@ class ProjectBar{
 			return -1;
 		}
 		void draw(void){
-			if(!this->projectBarInitalized)
+			if(this->projectBarForm == NULL)
 				this->init();
-                        projectBarForm.draw();
+                        projectBarForm->draw();
 			fileContextMenu.draw();
                 }
 

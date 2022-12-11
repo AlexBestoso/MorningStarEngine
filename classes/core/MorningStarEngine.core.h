@@ -1,11 +1,3 @@
-#define HOME_PAGE 0
-#define DEVELOPER_PAGE 1
-
-#include "./objects/objectLinker.h"
-#include "./projects/Project.core.h"
-#include "./periferals/periferals.core.h"
-#include "./pages/pageLinker.h"
-#include "./context/ContextProvider.h"
 class MorningStarEngine{
 public:
 	int displayX = 0;
@@ -16,6 +8,7 @@ public:
 		Screen*  s = DefaultScreenOfDisplay(d);
 		this->displayX = s->width;
 		this->displayY = s->height;
+		XCloseDisplay(d);
 	}
 
 	int startEngine(int argc, char *argv[]){
