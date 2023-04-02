@@ -2,7 +2,12 @@ class ContextProvider{
 	private:
 		int current_context = 0;
 		bool systemInitialized = false;
+		HomePage *homePage = NULL;
 	public:
+		ContextProvider(){
+			float bgColor[4] = {0.25, 0.0, 0.5, 1};
+			homePage = new HomePage(0, bgColor);
+		}
 		void setContext(int newContext){
 			this->current_context = newContext;
 		}
@@ -16,10 +21,11 @@ class ContextProvider{
                                         }
 					break;
 				default:
-					this->current_context = homePage.runPage();
-					if(this->current_context != previousContext){
-                                                homePage.deconstruct();
-                                        }
+				//	this->current_context = homePage.runPage();
+				//	if(this->current_context != previousContext){
+                                 //               homePage.deconstruct();
+                                 //       }
+					this->current_context = homePage->run();
 					break;
 			}
 		}
@@ -34,10 +40,11 @@ class ContextProvider{
                                         }
                                         break;
                                 default:
-                                        this->current_context = homePage.handleMouseClick(button, state, x, y);
-					if(this->current_context != previousContext){
-                                                homePage.deconstruct();
-                                        }
+                                        //this->current_context = homePage.handleMouseClick(button, state, x, y);
+					//if(this->current_context != previousContext){
+                                        //        homePage.deconstruct();
+                                        //}
+					this->current_context = homePage->mouseClick(button, state, x, y);
                                         break;
                         }
                 }
@@ -61,10 +68,11 @@ class ContextProvider{
 					developerPage.passiveMouseAction(x, y);
                                         break;
                                 default:
-                                        this->current_context = homePage.handleMousePassive(x, y);
-					if(this->current_context != previousContext){
-                                                homePage.deconstruct();
-                                        }
+                                       // this->current_context = homePage.handleMousePassive(x, y);
+				///	if(this->current_context != previousContext){
+                                   //             homePage.deconstruct();
+                                    //    }
+				    	this->current_context = homePage->mousePassive(x, y);
                                         break;
                         }
                 }
@@ -88,10 +96,11 @@ class ContextProvider{
                                         //login
                                         break;
                                 default:
-                                        this->current_context = homePage.handleKeyDown(key, mouseX, mouseY);
-					if(this->current_context != previousContext){
-						homePage.deconstruct();
-					}
+                                        //this->current_context = homePage.handleKeyDown(key, mouseX, mouseY);
+					//if(this->current_context != previousContext){
+					//	homePage.deconstruct();
+					//}
+					this->current_context = homePage->keyDown(key, mouseX, mouseY);
                                         break;
                         }
                 }
