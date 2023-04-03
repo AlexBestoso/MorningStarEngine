@@ -5,6 +5,8 @@ class HomePageNewProject : public Form{
 	FormButton *buttons = new FormButton[2];
 	FormButton backButton;
 	FormButton createButton;
+
+	FormTextInput *inputs = new FormTextInput[1];
 	FormTextInput projectName;
 
 	public:
@@ -51,6 +53,37 @@ class HomePageNewProject : public Form{
 		Form::setButtons(buttons, 2);
 
 		// Create Text Input 
-		// TODO: configure the text input for "new project"
+		projectName.setCoords(
+			background.getBgX()+.150,
+			background.getBgY()+.600,
+			background.getBgZ()
+		);
+		projectName.setWidthHeight(.70, .104);
+
+		projectName.setLabelCoords(
+			projectName.getX(),
+			projectName.getY()+.05,
+			projectName.getZ()		
+		);
+		projectName.setLabel("Project Name :");
+		projectName.setInputCoords(
+			projectName.getX()+.1,
+                        projectName.getY()+.05,
+                        projectName.getZ()		
+		);
+		
+		inputs[0] = projectName;
+		Form::setTextInputs(inputs, 1);
+	}
+
+	string getProjectName(){
+		return inputs[0].getInputData();
+	}
+
+	void resetMenu(void){
+		for(int i=0; i<1; i++){
+			inputs[0].reset();
+		}
+		Form::setTextInputs(inputs, 1);
 	}
 };

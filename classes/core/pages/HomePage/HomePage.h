@@ -1,7 +1,3 @@
-#define HOME_PAGE 0
-#define HOME_MAIN 0
-#define HOME_NEW  1
-#define HOME_LOAD 2
 #include "./HomePage.mainMenu.h"
 #include "./HomePage.aboutMenu.h"
 #include "./HomePage.newProject.h"
@@ -79,9 +75,16 @@ class HomePage : public Page{
 				int clickCode = newProjectMenu.mouseClick(button, state, x, y);
                                 if(clickCode != -1 && (clickCode&0b1) == 1 && (clickCode>>1) == 0){
                                         switch(newProjectMenu.getClickedButton()){
-                                                case 0:
+                                                case 0: // exit button
                                                         pageContext = 0;
+							newProjectMenu.resetMenu();
                                                         break;
+						case 1: // Create Project
+							pageContext = 0;
+							project.create(newProjectMenu.getProjectName());
+							newProjectMenu.resetMenu();
+							return 1; // Dev page
+							break;
                                         }
                                 }
 			}else if(pageContext == 2){
@@ -105,4 +108,21 @@ class HomePage : public Page{
 			}
 			return getPageId();
 		}
+		
+		int keyDown(unsigned char key, int mouseX, int mouseY){
+                	switch(pageContext){
+                                case 1:
+                                        newProjectMenu.keyDown(key, mouseX, mouseY);
+                                        break;
+                                case 2:
+                           //             loadProjectMenu.mousePassive(x, y);
+                                        break;
+                                case 3:
+                             //           aboutMenu.mousePassive(x, y);
+                                default:
+                               //         mainMenu.mousePassive(x, y);
+                                        break;
+                        }
+                	return getPageId();
+        	}
 };
