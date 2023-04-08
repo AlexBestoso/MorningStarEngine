@@ -2,6 +2,7 @@
 #include "./formTitle.h"
 #include "./formButton.h"
 #include "./formTextInput.h"
+#include "./formDropDown.h"
 class Form : public CoreObject{
 	private:
 	int formContext = 0;
@@ -11,9 +12,14 @@ class Form : public CoreObject{
 	size_t buttonCount = 0;
 	FormTextInput *textInputs;
 	size_t textInputCount = 0;
+	FormDropDown *dropDowns;
+	size_t dropDownCount = 0;
 	bool hideTitle = false;
 	
 	int clickedButtonId = -1;
+	int clickedDropdownId = -1;
+	int clickedDropdownOptionId = -1;
+
 	public:
 	Form(FormBackground background){
 		this->background = background;
@@ -24,6 +30,12 @@ class Form : public CoreObject{
 	
 	int getClickedButton(){
 		return clickedButtonId;
+	}
+	int getClickedDropDown(){
+		return clickedDropdownId;
+	}
+	int getClickedDropDownOption(){
+		return clickedDropdownOptionId;
 	}
 	void setContext(int context){
 		this->formContext = context;
@@ -56,6 +68,10 @@ class Form : public CoreObject{
 		this->textInputCount = inputCount;
 		this->textInputs = inputs;
 	}
+	void setDropDowns(FormDropDown *drops, size_t count){
+		this->dropDowns = drops;
+		this->dropDownCount = count;
+	}
 
 	void setHideTitle(bool hide){
 		hideTitle = hide;
@@ -71,6 +87,9 @@ class Form : public CoreObject{
 		for(int i=0; i<textInputCount; i++){
 			textInputs[i].run();
                 }
+		for(int i=0; i<dropDownCount; i++){
+			dropDowns[i].run();
+		}
 		return this->formContext;
 	}
 
@@ -80,6 +99,9 @@ class Form : public CoreObject{
                 }
 		for(int i=0; i<textInputCount; i++){
 			textInputs[i].mousePassive(x, y);
+		}
+		for(int i=0; i<dropDownCount; i++){
+			dropDowns[i].mousePassive(x, y);
 		}
 		return this->formContext;
 	}
@@ -93,10 +115,25 @@ class Form : public CoreObject{
 			}
 			clickedButtonId = -1;
                 }
-		// TODO : Finish this.
 		for(int i=0; i<textInputCount; i++){
-			
+			textInputs[i].mouseClick(button, state, x, y);	
                 }
+
+		for(int i=0; i<dropDownCount; i++){
+			int val = dropDowns[i].mouseClick(button, state, x, y);
+			if(val != -1){
+				clickedDropdownId = i;
+				clickedDropdownOptionId = dropDowns[i].getClickedOption();
+				return val;
+			}
+		}
                 return -1;
+	}
+
+	virtual int keyDown(unsigned char key, float x, float y){
+		for(int i=0; i<textInputCount; i++){
+			textInputs[i].keyDown(key, x, y);
+		}
+		return -1;
 	}
 };

@@ -1,16 +1,18 @@
 #include "./ProjectBar.element.h"
 #include "./SimulationWindow.element.h"
-class DeveloperPage{
+#include "./DeveloperPage.projectBar.h"
+class DeveloperPage : public Page{
 	private:
-		ProjectBar projectBar;
+		//ProjectBar projectBar;
 		SimulationWindow simulationWindow;
+		DeveloperPageProjectBar projectBar;
 		int pageContext = 0;
 		int projectBarHandler = -1;
 
                 void initPage(){
-			projectBar.init();
-			simulationWindow.init();
-                        this->setBackgroundColor(.25,0,.5);
+			//projectBar.init();
+			//simulationWindow.init();
+                        //this->setBackgroundColor(.25,0,.5);
                         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
                 }
@@ -20,42 +22,40 @@ class DeveloperPage{
                 }
 
 		void drawMainContext(void){
-			this->projectBar.draw();
-			this->simulationWindow.draw();
+			//this->projectBar.draw();
+			//this->simulationWindow.draw();
 		}
 
 	public:
-		DeveloperPage(){
-			this->initPage();
+		DeveloperPage(int pageId, float bgColor[4]) : Page(pageId, bgColor){
+			//this->initPage();
 		}
 
-		void deconstruct(void){
-			projectBar.reset();
-			simulationWindow.reset();
-		}
-		void passiveMouseAction(float x, float y){
+		int mousePassive(float x, float y){
 			this->initPage();
-			projectBar.passiveMouseAction(x, y);
-			simulationWindow.passiveMouseAction(x, y);
+			projectBar.mousePassive(x, y);
+			//simulationWindow.passiveMouseAction(x, y);
+			return Page::getPageId();
 		}
-		int mouseClickAction(int button, int state, float x, float y){
+		int mouseClick(int button, int state, float x, float y){
 			this->initPage();
-			int res = projectBar.mouseClickAction(button, state, x, y);
-			if(res == HOME_PAGE){
-				projectBar.reset();
-				return HOME_PAGE;
+			int res = projectBar.mouseClick(button, state, x, y);
+			if(projectBar.getClickedDropDown() == 0 && projectBar.getClickedDropDownOption() == 2 && res == 1){
+				return 0; // home page
 			}
-			res = simulationWindow.mouseClickAction(button, state, x, y);
-			return DEVELOPER_PAGE;
+			//res = simulationWindow.mouseClickAction(button, state, x, y);
+			return Page::getPageId();
 		}
-		int runPage(void){
-			this->initPage();
-                        switch(this->pageContext){
-                                case 0: // main menu
-                                        this->drawMainContext();
-					break;
-                        }
-                        return DEVELOPER_PAGE;
+		int run(void){
+			Page::run();
+			projectBar.run();
+			//	this->initPage();
+                 //       switch(this->pageContext){
+                  //              case 0: // main menu
+                   //                     this->drawMainContext();
+		//			break;
+                 //       }
+                        return Page::getPageId();
                 }
 
-}developerPage;
+};
