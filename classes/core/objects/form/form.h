@@ -3,22 +3,35 @@
 #include "./formButton.h"
 #include "./formTextInput.h"
 #include "./formDropDown.h"
+#include "./formSelectList.h"
 class Form : public CoreObject{
 	private:
 	int formContext = 0;
 	FormBackground background;
-	FormTitle title;
-	FormButton *buttons;
-	size_t buttonCount = 0;
-	FormTextInput *textInputs;
-	size_t textInputCount = 0;
-	FormDropDown *dropDowns;
-	size_t dropDownCount = 0;
-	bool hideTitle = false;
 	
+	FormTitle title;
+	
+	FormButton *buttons = NULL;
+	size_t buttonCount = 0;
+	
+	FormTextInput *textInputs = NULL;
+	size_t textInputCount = 0;
+	
+	FormDropDown *dropDowns = NULL;
+	size_t dropDownCount = 0;
+
+	FormSelectList *selectLists = NULL;
+	size_t selectListCount = 0;
+	
+	bool hideTitle = false;
+
 	int clickedButtonId = -1;
+
 	int clickedDropdownId = -1;
 	int clickedDropdownOptionId = -1;
+
+	int clickedSelectListId = -1;
+        int clickedSelectListOptionId = -1;
 
 	public:
 	Form(FormBackground background){
@@ -37,6 +50,13 @@ class Form : public CoreObject{
 	int getClickedDropDownOption(){
 		return clickedDropdownOptionId;
 	}
+	int getClickedSelectList(){
+                return clickedSelectListId;
+        }
+        int getClickedSelectListOption(){
+                return clickedSelectListOptionId;
+        }
+
 	void setContext(int context){
 		this->formContext = context;
 	}
@@ -73,6 +93,11 @@ class Form : public CoreObject{
 		this->dropDownCount = count;
 	}
 
+	void setSelectLists(FormSelectList *lists, size_t count){
+		this->selectLists = lists;
+		this->selectListCount = count;
+	}
+
 	void setHideTitle(bool hide){
 		hideTitle = hide;
 	}
@@ -90,6 +115,9 @@ class Form : public CoreObject{
 		for(int i=0; i<dropDownCount; i++){
 			dropDowns[i].run();
 		}
+		for(int i=0; i<selectListCount; i++){
+			selectLists[i].run();
+		}
 		return this->formContext;
 	}
 
@@ -103,6 +131,9 @@ class Form : public CoreObject{
 		for(int i=0; i<dropDownCount; i++){
 			dropDowns[i].mousePassive(x, y);
 		}
+		for(int i=0; i<selectListCount; i++){
+                        selectLists[i].mousePassive(x, y);
+                }
 		return this->formContext;
 	}
 
@@ -127,6 +158,14 @@ class Form : public CoreObject{
 				return val;
 			}
 		}
+		for(int i=0; i<selectListCount; i++){
+                        int val = selectLists[i].mouseClick(button, state, x, y);
+			if(val != -1){
+				clickedSelectListId = i;
+				clickedSelectListOptionId = selectLists[i].getClickedOption();
+				return val;
+			}
+                }
                 return -1;
 	}
 

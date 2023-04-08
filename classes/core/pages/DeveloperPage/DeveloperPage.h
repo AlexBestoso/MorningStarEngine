@@ -1,10 +1,10 @@
-#include "./ProjectBar.element.h"
-#include "./SimulationWindow.element.h"
+//#include "./ProjectBar.element.h"
+//#include "./SimulationWindow.element.h"
 #include "./DeveloperPage.projectBar.h"
 class DeveloperPage : public Page{
 	private:
 		//ProjectBar projectBar;
-		SimulationWindow simulationWindow;
+	//	SimulationWindow simulationWindow;
 		DeveloperPageProjectBar projectBar;
 		int pageContext = 0;
 		int projectBarHandler = -1;

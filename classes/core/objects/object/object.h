@@ -232,6 +232,7 @@ class CoreObject{
                 }
 };
 
+/*
 class Object{
 	private:
 		int objectId = -1;
@@ -257,7 +258,7 @@ class Object{
 		/*
 		 * Setters and Getters.
 		 * */
-		void setConstraints(float x, float y, float w, float h){
+/*		void setConstraints(float x, float y, float w, float h){
 			this->constraintX = this->getX(x);
 			this->constraintY = this->getY(y);
 			this->constraintW = w;
@@ -303,7 +304,7 @@ class Object{
 		/*
 		 * Configuration Functions.
 		 * */
-		float getX(float x){
+/*		float getX(float x){
 			this->getDisplayResolution();
                         if(x >=0 && x < this->displayX/2){
                                 x = -1 + (x*((9999999/(this->displayX/2))*0.0000001));
@@ -346,7 +347,7 @@ class Object{
 		/*
 		 * Virtual Drawing Functions 
 		 * */
-		virtual void drawContainedTextArray(float x, float y, float z, float w, float h, string text, void* bitmap, float spacing, int maxXOverflow){
+/*		virtual void drawContainedTextArray(float x, float y, float z, float w, float h, string text, void* bitmap, float spacing, int maxXOverflow){
                         if(text.empty())
                                 return;
 
@@ -462,4 +463,4 @@ class Object{
                         this->setVertex(x, y+h, z);
                         this->stopDrawing();
                 }
-};
+};*/
