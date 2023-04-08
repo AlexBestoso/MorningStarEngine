@@ -31,10 +31,6 @@ class DeveloperPage : public Page{
 			//this->initPage();
 		}
 
-		void deconstruct(void){
-		//	projectBar.reset();
-			//simulationWindow.reset();
-		}
 		int mousePassive(float x, float y){
 			this->initPage();
 			projectBar.mousePassive(x, y);
@@ -44,8 +40,7 @@ class DeveloperPage : public Page{
 		int mouseClick(int button, int state, float x, float y){
 			this->initPage();
 			int res = projectBar.mouseClick(button, state, x, y);
-			if(res == 0){
-			//	projectBar.reset();
+			if(projectBar.getClickedDropDown() == 0 && projectBar.getClickedDropDownOption() == 2 && res == 1){
 				return 0; // home page
 			}
 			//res = simulationWindow.mouseClickAction(button, state, x, y);

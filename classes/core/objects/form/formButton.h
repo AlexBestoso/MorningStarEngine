@@ -54,6 +54,15 @@ class FormButton : public CoreObject{
 	float getButtonH(){
 		return h;
 	}
+	float getTextX(){
+		return textX;
+	}
+	float getTextY(){
+		return textY;
+	}
+	float getTextZ(){
+		return textZ;
+	}
 
 	void setShowButtonText(bool val){
 		showButtonText = val;

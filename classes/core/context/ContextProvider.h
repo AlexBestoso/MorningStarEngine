@@ -40,7 +40,6 @@ class ContextProvider{
 					initDeveloperPage();
 					this->current_context = developerPage->run();
 					if(this->current_context != developerPage->getPageId()){
-                                                developerPage->deconstruct();
                                                 destroyDeveloperPage();
                                         }
 					break;
@@ -60,7 +59,6 @@ class ContextProvider{
 					initDeveloperPage();
                                         this->current_context = developerPage->mouseClick(button, state, x, y);
 					if(this->current_context != developerPage->getPageId()){
-                                                developerPage->deconstruct();
 						destroyDeveloperPage();
                                         }
                                         break;
