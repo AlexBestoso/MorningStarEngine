@@ -6,8 +6,10 @@ class ContextProvider{
 
 		HomePage *homePage = NULL;
 		void initHomePage(void){
-			if(homePage == NULL)
+			if(homePage == NULL){
 				homePage = new HomePage(0, bgColor);
+				glutSetWindowTitle("Morning Star Engine");
+			}
 		}
 		void destroyHomePage(void){
 			if(homePage != NULL){
@@ -21,6 +23,7 @@ class ContextProvider{
 		void initDeveloperPage(void){
 			if(developerPage == NULL){
 				developerPage = new DeveloperPage(1, bgColor);
+				glutSetWindowTitle(project.data.name.c_str());
 			}
 		}
 		void destroyDeveloperPage(void){

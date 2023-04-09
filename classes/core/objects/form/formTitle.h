@@ -7,8 +7,8 @@ class FormTitle : public CoreObject{
 	float green = 0;
 	float blue = 0;
 
-	float fontHeightOffset = 24;
-	float fontWidthOffset = 125;
+	float fontHeightOffset = 0;
+	float fontWidthOffset = 0;
 
 	float boundsX = 0;
 	float boundsY = 0;
@@ -47,8 +47,8 @@ class FormTitle : public CoreObject{
 
 	void run(){
 		CoreObject::setColor(red, green, blue);
-		float x = (boundsX +boundsW) - ((boundsX +boundsW)/100)*fontWidthOffset;
-		float y = (boundsY + boundsH)-((boundsY + boundsH)/100)*fontHeightOffset;
+		float x = boundsX + (boundsW/2) - fontWidthOffset;
+		float y = boundsY + (boundsH) - fontHeightOffset;
 		float z = boundsZ + .001;
 		CoreObject::setColor(red, green, blue);
 		CoreObject::drawText(x, y, z, titleText, titleFont);
