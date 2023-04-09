@@ -61,6 +61,7 @@ class HomePage : public Page{
 							pageContext = 1;
 							break;
 						case 1:
+							loadProjectMenu.fetchListOptions();
 							pageContext = 2;
 							break;
 						case 2:
@@ -96,6 +97,11 @@ class HomePage : public Page{
                                                         break;
                                         }
                                 }
+				if(clickCode == 1 && loadProjectMenu.getClickedSelectList() == 0 && loadProjectMenu.getClickedSelectListOption() != -1){
+					if(loadProjectMenu.useSelectedProject(loadProjectMenu.getClickedSelectListOption())){
+						return 1;
+					}
+				}
 			}else if(pageContext == 3){
 				int clickCode = aboutMenu.mouseClick(button, state, x, y);
                                 if(clickCode != -1 && (clickCode&0b1) == 1 && (clickCode>>1) == 0){

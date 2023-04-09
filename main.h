@@ -29,7 +29,7 @@ using namespace std;
 #include "./classes/keyboard.h"
 
 #include "./classes/core/objects/objectLinker.h"
-#include "./classes/core/soLoader/SoLoader.h"
+//#include "./classes/core/soLoader/SoLoader.h"
 #include "./classes/core/projects/project.core.h"
 #include "./classes/core/periferals/periferals.core.h"
 #include "./classes/core/pages/pageLinker.h"
