@@ -13,16 +13,14 @@
 #include <dirent.h>
 #include <dlfcn.h>
 #include <typeinfo>
+#include <libxml/encoding.h>
+#include <libxml/xmlwriter.h>
+#include <libxml/xmlreader.h>
 
 using namespace std;
 
-#define HOME_PAGE 0
-#define DEVELOPER_PAGE 1
-
-//Display *X11_display = NULL;
-//Screen *X11_screen = NULL;
-
 #include "./classes/tools/fileSnake.class.h"
+#include "./classes/tools/xmlSnake.class.h"
 #include "./classes/tools/parsers/bmpParser.h"
 #include "./classes/cryptology/hashing/base64.h"
 #include "./classes/cryptology/cryptography/aes128cbc.h"
