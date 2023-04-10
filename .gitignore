@@ -1,5 +1,5 @@
 # ignore project files
-projects/
+./projects/
 
 # ignore compiled objects
 *.so
