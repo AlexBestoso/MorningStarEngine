@@ -12,6 +12,7 @@ The following changes have been made to the software:
 <li>Created edit menu popup window.</li>
 <li>Updated FileSnake class to allow for recurisve Dir deletion</li>
 <li>Added the ability to delete projects from the development page.</li>
+<li>Overhauled the project management classes, implement xml parsing functionality for project and global configuration and standardization.</li>
 </ul>
 
 <b>What's Coming Next?</b>
@@ -20,7 +21,6 @@ The following changes have been made to the software:
 </p>
 <ul>
 <li>[New] The "Edit" option in the dev page 'File' drop down will be modified to allow you to change the project's name.</li>
-<li>[New] Overhaul the project management classes, implement xml parsing functionality for project and global configuration and standardization.</li>
 <li>The compile button will be created which will allow you to generate standalone binaries for the projects you made.</li>
 <li>Will implment TCP/IP socket server and client compatibility to allow for the creation of networked applications.</li>
 <li>Might update the color scheme so that it's actually visually pleasing on the eyes.</li>
