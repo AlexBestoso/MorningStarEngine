@@ -13,6 +13,7 @@ class Project{
 		ProjectConfig config;
 		const string projectStorage = "./projects";
 		const string projectConfig = "project.conf";
+		string currentProjectName;
 		
 	public:
 		struct ProjectStruct data;
@@ -26,19 +27,27 @@ class Project{
 			return this->getProjectPath(pName)+"/"+this->projectConfig;
 		}
 
+		void clearDataStruct(){
+			data.author = "";
+        		data.description = "";
+        		data.name = "";
+	        	data.version = "";
+		}
+
 		bool create(string projectName){
 			this->data.name = projectName;
+			currentProjectName = projectName;
 			if(!fileSnake.dirExists(this->projectStorage)){
 				fileSnake.makeDir(this->projectStorage);
 			}
 
-			if(fileSnake.dirExists(this->projectStorage+"/"+this->data.name)){
+			if(fileSnake.dirExists(getProjectPath(data.name))){
 				fprintf(stderr, "[E] Project already exists.\n");
 				return false;
 			}
 
-			fileSnake.makeDir(this->projectStorage+"/"+this->data.name);
-			config.setConfigFile(this->projectStorage+"/"+this->data.name+"/"+this->projectConfig);
+			fileSnake.makeDir(getProjectPath(data.name));
+			config.setConfigFile(getProjectConfigPath(data.name));
 
 			config.create(data);
 			return true;
@@ -46,15 +55,23 @@ class Project{
 		}
 
 		bool update(void){
+			if(currentProjectName != data.name){
+				rename(getProjectPath(currentProjectName).c_str(), getProjectPath(data.name).c_str());
+				currentProjectName = data.name;
+			}
+			config.setConfigFile(getProjectConfigPath(data.name).c_str());
 			config.create(data);
 		}
 		bool load(string projectName){
 			config.load(this->getProjectConfigPath(projectName), &data);
-			printf("Project Data Name : %s\n", data.name.c_str());
+			currentProjectName = projectName;
 			return true;	
 		}
 
 		bool remove(string projectName){
-			return config.remove(getProjectPath(projectName));
+			currentProjectName = "";
+			bool ret = config.remove(getProjectPath(projectName));
+			clearDataStruct();
+			return ret;
 		}
 }project;

@@ -85,6 +85,13 @@ class DeveloperPageProjectBar : public Form{
 		setupFileDropDown();
 	}
 
+	int keyDown(unsigned char key, int mouseX, int mouseY){
+		int ret = Form::keyDown(key, mouseX, mouseY);
+		if(!editPopup.getHidden()){
+			editPopup.keyDown(key, mouseX, mouseY);
+		}
+		return ret;
+	}
 	int mouseClick(int button, int state, float x, float y){
 		int ret = Form::mouseClick(button, state, x, y);
 		
@@ -93,6 +100,8 @@ class DeveloperPageProjectBar : public Form{
 			// close edit popup 
 			if(editPopup.getClickedButton() == 0 && ((ret>>1)&0b1111) == 0 && (ret&1) == 1){
 				editPopup.setHidden(true);	
+				editPopup.refresh();
+				return -1;
 			}
 
 			if(editPopup.getClickedButton() == 1 && ((ret>>1)&0b1111) == 0 && (ret&1) == 1){
@@ -100,6 +109,13 @@ class DeveloperPageProjectBar : public Form{
 				goToHomePage = true;
 				return -1;
                         }
+
+			if(editPopup.getClickedButton() == 2 && ((ret>>1)&0b1111) == 0 && (ret&1) == 1){
+                        	editPopup.applyChanges();
+				editPopup.setHidden(true);
+				return -1;
+			}
+
 		}else{
 			if(getClickedDropDown() == 0 && getClickedDropDownOption() == 2 && ret == 1){
 				goToHomePage = true;

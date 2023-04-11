@@ -43,10 +43,16 @@ class FormTextInput : public CoreObject{
 	float inputY = 0;
 	float inputZ = 0;
 
+	bool dirSafeInput = true;
+
 	public:
 
 	FormTextInput(){
 	
+	}
+
+	void setDirSafeInput(bool val){
+		dirSafeInput = val;
 	}
 
 	void reset(){
@@ -73,6 +79,10 @@ class FormTextInput : public CoreObject{
 
 	string getInputData(void){
 		return inputData;
+	}
+
+	void setInputData(string data){
+		inputData = data;
 	}
 
 	void setShowButtonText(bool val){
@@ -211,10 +221,14 @@ class FormTextInput : public CoreObject{
 			if(key == 0x08){
 				if(this->inputData.size() > 0)
 					this->inputData.pop_back();
-			}else if((key >= 0x61 && key <= 0x7a) || (key >= 0x41 && key <= 0x5a) || (key >= 0x30 && key <= 0x39) || key == 0x20){
-				this->inputData += key;
 			}else if(key == 0x0d){
-				this->focused = false;
+                                this->focused = false;
+                        }else if(dirSafeInput){
+				if((key >= 0x61 && key <= 0x7a) || (key >= 0x41 && key <= 0x5a) || (key >= 0x30 && key <= 0x39) || key == 0x20){
+					this->inputData += key;
+				}
+			}else if(!dirSafeInput){
+				this->inputData += key;
 			}
 		}
 }

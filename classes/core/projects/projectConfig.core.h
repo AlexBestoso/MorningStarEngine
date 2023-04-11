@@ -45,6 +45,10 @@ class ProjectConfig{
 		void setConfigFile(string location){
 			this->configFileLocation = location;
 		}
+
+		string getConfigFileLocation(){
+			return configFileLocation;
+		}
 		
 		bool create(struct ProjectStruct data){
 			if(this->configFileLocation == ""){
@@ -53,7 +57,7 @@ class ProjectConfig{
 			}
 
 			if(!xmlSnake.openFileWriter(this->configFileLocation)){
-				fprintf(stderr, "[E] Failed to create project config file");
+				fprintf(stderr, "[E] Failed to create project config file (%s)\n", this->configFileLocation.c_str());
 				return false;
 			}
 
@@ -71,15 +75,15 @@ class ProjectConfig{
 				fprintf(stderr, "Failed to write project name element.\n");
 				return false;
 			}
-			if(!xmlSnake.writeElement(data.authorElement, "Project Author")){
+			if(!xmlSnake.writeElement(data.authorElement, data.author)){
                                 fprintf(stderr, "Failed to write project name element.\n");
                                 return false;
                         }
-			if(!xmlSnake.writeElement(data.descriptionElement, "Project Description")){
+			if(!xmlSnake.writeElement(data.descriptionElement, data.description)){
                                 fprintf(stderr, "Failed to write project name element.\n");
                                 return false;
                         }
-			if(!xmlSnake.writeElement(data.versionElement, "0.0.0")){
+			if(!xmlSnake.writeElement(data.versionElement, data.version)){
                                 fprintf(stderr, "Failed to write project name element.\n");
                                 return false;
                         }

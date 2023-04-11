@@ -116,7 +116,8 @@ class ContextProvider{
 		void keydownContextSwitch(unsigned char key, int mouseX, int mouseY){
                         switch(this->current_context){
                                 case 1:
-                                        //login
+					initDeveloperPage();
+					developerPage->keyDown(key, mouseX, mouseY);
                                         break;
                                 default:
 					initHomePage();
