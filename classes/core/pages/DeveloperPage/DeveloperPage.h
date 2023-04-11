@@ -34,6 +34,11 @@ class DeveloperPage : public Page{
 
 			return Page::getPageId();
 		}
+		int keyDown(unsigned char key, int mouseX, int mouseY){
+			this->initPage();
+			projectBar.keyDown(key, mouseX, mouseY);
+			return Page::getPageId();
+		}
 		int run(void){
 			Page::run();
 			projectBar.run();

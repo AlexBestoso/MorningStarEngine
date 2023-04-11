@@ -1,4 +1,7 @@
+COMPILE=g++ main.cc -lglut -lGL -lX11 -ldl -lxml2 -o msge
 all:
-	g++ main.cc -lglut -lGL -lX11 -ldl -lxml2 -o msge
+	$(COMPILE) 
+run:
+	$(COMPILE); ./msge
 clean:
 	rm ./msge
