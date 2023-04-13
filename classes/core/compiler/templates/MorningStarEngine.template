@@ -20,7 +20,7 @@ public:
 		//keyboard.width = this->displayX;
 		//keyboard.height = this->displayY;
         	glutInitWindowPosition(0, 0);
-        	glutCreateWindow("Morning Star Engine");
+        	glutCreateWindow("[>>project_name<<]");
 		glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 
         	glutDisplayFunc(display);
