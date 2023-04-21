@@ -4,8 +4,7 @@ class DeveloperPageProjectBar : public Form{
 	 * Form Components
 	 * */
 	FormBackground background;
-	FormDropDown fileDropdown;
-	FormDropDown *dropDowns = new FormDropDown[1];
+	FormDropDown *dropDowns = new FormDropDown[2];
 	DeveloperPageEditPopup editPopup;
 	FormButton *buttons = new FormButton[1];
 	size_t buttonCount = 1;
@@ -15,6 +14,7 @@ class DeveloperPageProjectBar : public Form{
 	 * Setup Functions
 	 * */
 	void setupFileDropDown(){
+		FormDropDown fileDropdown;
                 FormButton button;
                 button.setShowButtonText(true);
                 button.setButtonText("File");
@@ -65,7 +65,65 @@ class DeveloperPageProjectBar : public Form{
                 fileDropdown.setSectionButtonOptions(buttons, 3);
 
                 dropDowns[0] = fileDropdown;
-                Form::setDropDowns(dropDowns, 1);
+	}
+	
+	void setupBuildDropDown(){
+		FormDropDown fileDropdown;
+                FormButton button;
+                button.setShowButtonText(true);
+                button.setButtonText("Build");
+                button.setCoords(
+			background.getBgX() + .090, 
+			background.getBgY(), 
+			background.getBgZ()
+		);
+                button.setButtonTextCoords(
+                        button.getButtonX() + .015,
+                        button.getButtonY() + .025,
+                        button.getButtonZ()
+                );
+                button.setWidthHeight(.08, background.getBgH());
+                button.setButtonColor(.1, .1, .1);
+                button.setHoverColor(.2, .2, .2);
+                button.setTextColor(.3, .3, .3);
+                fileDropdown.setSectionButton(button);
+                fileDropdown.setMenuWidthHeight(.3, .5);
+                fileDropdown.setMenuCoords(
+                        button.getButtonX(),
+                        button.getButtonY() - button.getButtonH() - fileDropdown.getMenuH() + .075,
+                        button.getButtonZ()
+                );
+                fileDropdown.setMenuColor(.2, .2, .2);
+                fileDropdown.setMaxVisibleOptions(3);
+                fileDropdown.setOptionsOffset(.025);
+
+                FormButton *buttons = new FormButton[3];
+                buttons[0].setShowButtonText(true);
+                buttons[0].setButtonText("Compile");
+                buttons[0].setButtonColor(.1, .1, .1);
+                buttons[0].setHoverColor(.2, .2, .2);
+                buttons[0].setTextColor(.3, .3, .3);
+                buttons[0].setWidthHeight(fileDropdown.getMenuW(), button.getButtonH());
+                buttons[0].setCoords(
+                        fileDropdown.getMenuX(),
+                        fileDropdown.getMenuY()+fileDropdown.getMenuH()-buttons[0].getButtonH(),
+                        fileDropdown.getMenuZ()
+                );
+		buttons[0].setButtonTextCoords(
+                        buttons[0].getButtonX() + .025,
+                        buttons[0].getButtonY() + .025,
+                        buttons[0].getButtonZ()
+                );
+		
+		for(int i=1; i<3;i++){
+                        buttons[i] = buttons[0];
+                }
+                buttons[1].setButtonText("Run");
+                buttons[2].setButtonText("Compile & Run");
+
+		fileDropdown.setSectionButtonOptions(buttons, 3);
+                
+		dropDowns[1] = fileDropdown;
 	}
 
 	void setupBackground(){
@@ -98,6 +156,12 @@ class DeveloperPageProjectBar : public Form{
 		Form::setButtons(buttons, buttonCount);
 	}
 
+	void buildDropDowns(){
+		setupFileDropDown();
+		setupBuildDropDown();
+                Form::setDropDowns(dropDowns, 2);
+	}
+
 	public:
 	bool goToHomepage(){
 		return goToHomePage;
@@ -105,8 +169,8 @@ class DeveloperPageProjectBar : public Form{
 
 	DeveloperPageProjectBar() : Form(){
 		setupBackground();
-		setupFileDropDown();
-		setupButtons();
+		buildDropDowns();
+		//setupButtons();
 	}
 
 	int keyDown(unsigned char key, int mouseX, int mouseY){
@@ -141,7 +205,7 @@ class DeveloperPageProjectBar : public Form{
 			}
 
 		}else{
-			
+			// Exit project
 			if(getClickedDropDown() == 0 && getClickedDropDownOption() == 2 && ret == 1){
 				goToHomePage = true;
 				return -1;
@@ -152,9 +216,20 @@ class DeveloperPageProjectBar : public Form{
 			}
 
 			// Compile Project
-			if(getClickedButton() == 0 && ((ret>>1)&0b1111) == 0 && (ret&1) == 1){
+			if(getClickedDropDown() == 1 && getClickedDropDownOption() == 0 && ret == 1){
 				Compiler compiler;
 				compiler.compile();
+			}
+			// Run Project
+			if(getClickedDropDown() == 1 && getClickedDropDownOption() == 1 && ret == 1){
+				Compiler compiler;
+				compiler.run();
+			}
+			// Compile and Run Project
+			if(getClickedDropDown() == 1 && getClickedDropDownOption() == 2 && ret == 1){
+				Compiler compiler;
+				compiler.compile();
+				compiler.run();
 			}
 		}
 		return ret;

@@ -16,6 +16,7 @@
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xmlreader.h>
+#include <sys/wait.h>
 
 using namespace std;
 
