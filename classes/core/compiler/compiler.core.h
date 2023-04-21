@@ -155,8 +155,39 @@ class Compiler{
 			printf("Compile Failed.\n");
 			return false;
 		}
-		
-		printf("Compile Successful.\n");
+		string command = "./"+srcLocation+"Makefile";
+		char *args[] = {
+			(char *)"/usr/bin/make",
+			(char *)"-f",
+			(char *)command.c_str(),
+			NULL
+		};
+		pid_t cpid;
+		if(fork() == 0){
+			execvp(args[0], args);
+			exit(0);
+		}else{
+			cpid = wait(NULL);
+		}
+		printf("Compile Complete\n");
 		return true;
+	}
+
+	bool run(){
+		projectName = project.data.name;
+		projectLocation = project.getProjectPath(projectName);
+		setSrcLocation();
+		string command = "./"+srcLocation+projectName;
+                char *args[] = {
+                        (char *)command.c_str(),
+                        NULL
+                };
+                pid_t cpid;
+                if(fork() == 0){
+                        execvp(args[0], args);
+                        exit(0);
+                }else{  
+                        cpid = wait(NULL);
+                }
 	}
 };
