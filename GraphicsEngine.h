@@ -10,11 +10,21 @@
 #include "./testObjects/testLight.h"
 #include "./importedObjTest.h"
 
+#include "./core/core.h"
+#define MASTER_OBJECT_ARRAY_MAX 10
+GraphicsObject masterObjectArray[MASTER_OBJECT_ARRAY_MAX];
+
 class GraphicsEngine{
 	private:
-		GLFWwindow* window;
+		GLFWwindow* window = NULL;
 		GraphicsCamera *activeCamera = NULL;
+		GraphicsContext *context = NULL;
 	public:
+
+		void setContext(GraphicsContext *ctx){
+			context = ctx;
+			this->contextInit();
+		}
 		GLFWwindow* getWindow(void){
 			return window;
 		}
@@ -33,6 +43,61 @@ class GraphicsEngine{
 			glEnable(GL_DEPTH_TEST);
     			return true;
 		}
+
+		void contextInit(){
+			if(context != NULL){
+				context[0].init();
+			}
+		}
+		void contextDestroy(){
+			if(context != NULL){
+				context[0].destroy();
+			}
+		}
+		
+
+		void setWindow(GLFWwindow* w){
+			this->window = w;
+		}
+
+		int exec(void){
+			int context = 0;
+			if(this->context != NULL){
+				context = this->context[0].exec(window);
+			}
+			swapAndPoll();
+			return context;
+		}
+
+		bool setFrameBufferSizeCallback(void (*callback)(GLFWwindow*, int, int)){
+			if(this->window == NULL){
+				return false;
+			}
+			glfwSetFramebufferSizeCallback(this->window, callback);
+			return true;
+		}
+
+		bool setMouseCursorPosCallback(void(*callback)(GLFWwindow*, double, double)){
+			if(this->window == NULL){
+				return false;
+			}
+			glfwSetCursorPosCallback(this->window, callback);
+			return true;
+		}
+
+		bool disableMouseCursor(void){
+			if(this->window == NULL)
+				return false;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			return true;
+		}
+
+		bool emableMouseCursor(void){
+                        if(this->window == NULL)
+                                return false;
+                        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                        return true;
+                }
 
 		void setActiveCamera(GraphicsCamera *cam){
 			activeCamera = cam;
@@ -93,4 +158,4 @@ class GraphicsEngine{
 			glClearColor(r, g, b, a);
                 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
-};
+}ge;

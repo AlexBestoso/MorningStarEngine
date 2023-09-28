@@ -126,6 +126,7 @@ class TestObject : public GraphicsObject{
 			this->generateObjectIds(true, true, false);
 			this->bindVao();
 			this->bindVbo();
+			printf("Importing cat.\n");
 			if(!this->objImporter.import("./12221_Cat_v1_l3.obj")){
 				printf("Failed to import Cube object.\n");
 				return false;
