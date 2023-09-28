@@ -1,7 +1,0 @@
-COMPILE=g++ "[>>main_location<<]main.cc" -lglut -lGL -lX11 -ldl -lxml2 -o "[>>main_location<<][>>project_name<<]"
-all:
-	$(COMPILE) 
-run:
-	$(COMPILE); "./[>>main_location<<][>>project_name<<]"
-clean:
-	rm "./[>>main_location<<][>>project_name<<]"
