@@ -42,6 +42,7 @@ class GraphicsTexture{
 				if(activeParam2D[i] != -1)
 					glTexParameteri(GL_TEXTURE_2D, paramName2D[i], param2D[i]);
 			}
+			stbi_set_flip_vertically_on_load(true);
 			data = stbi_load(textureLoc, &width, &height, &nrChannels, 0);
 			if(!data)
 				return false;

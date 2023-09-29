@@ -76,6 +76,12 @@ class GraphicsEngine{
 			glfwSetFramebufferSizeCallback(this->window, callback);
 			return true;
 		}
+	
+		bool setMouseClickCallback(void(*callback)(GLFWwindow*, int, int, int)){
+			
+			glfwSetMouseButtonCallback(this->window, callback);
+			return true;
+		}
 
 		bool setMouseCursorPosCallback(void(*callback)(GLFWwindow*, double, double)){
 			if(this->window == NULL){

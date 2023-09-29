@@ -48,9 +48,13 @@ class GraphicsShader{
                         return true;
                 }
 
+		void getUniform(const char *varName, int *ret){
+			glGetUniformiv(glGetUniformLocation(programHandle, varName), 1, ret);
+		}
 		void setUniform(const char *varName, int val){
 			glUniform1i(glGetUniformLocation(programHandle, varName), val);
 		}
+
 		void setUniform(const char *varName, float val){
 			glUniform1f(glGetUniformLocation(programHandle, varName), val);
 		}
@@ -60,6 +64,9 @@ class GraphicsShader{
 		}
 		void setUniform(const char *varName, glm::vec3 val){
 			glUniform3fv(glGetUniformLocation(programHandle, varName), 1, &val[0]);
+		}
+		void setUniform(const char *varName, glm::vec2 val){
+			glUniform2fv(glGetUniformLocation(programHandle, varName), 1, &val[0]);
 		}
 		
 		bool addFragmentShader(const char *fname, int shaderId){

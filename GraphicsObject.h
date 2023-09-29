@@ -105,6 +105,9 @@ class GraphicsObject{
 		void setUniform(const char *name, glm::vec3 val){
 			shader.setUniform(name, val);
 		}
+		void setUniform(const char *name, glm::vec2 val){
+			shader.setUniform(name, val);
+		}
 
 		void destroy(void){
 			glDeleteVertexArrays(1, &vertexArrayObject);

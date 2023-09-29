@@ -104,13 +104,13 @@ typedef struct guiEngineKeyboard{
 }gui_engine_keyboard_t;
 
 typedef struct guiEngineMouse{
-	int mouseX = 0;
-	int mouseY = 0;
-	int click_left = false;
-	int click_right = false;
-	int click_middle = false;
-	int scroll_up = false;
-	int scroll_down = false;
+	double mouseX = 0;
+	double mouseY = 0;
+	bool click_left = false;
+	bool click_right = false;
+	bool click_middle = false;
+	bool scroll_up = false;
+	bool scroll_down = false;
 }gui_engine_mouse_t;
 
 struct GuiEngineStruct{

@@ -1,11 +1,10 @@
 class CustomTestContext : public GraphicsContext{
 	private:
-	
-
 	        TestTerrain terrain;
 	        TestObject testObj;
 	        FpsPlayer playerOne;
 		TestLight testLight;
+		Menu2D menu;
 
 		void processInput(GLFWwindow *window){
 		        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -63,6 +62,8 @@ class CustomTestContext : public GraphicsContext{
 		        }
 
 			this->activeCamera = &playerOne.camera;
+			
+			this->context = 1;
 		}
 
 		void destroy(){
