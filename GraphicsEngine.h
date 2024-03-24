@@ -1,9 +1,9 @@
-#include "GraphicsShader.h"
+/*#include "GraphicsShader.h"
 #include "GraphicsTexture.h"
 #include "GraphicsCamera.h"
 
-#include "GraphicsObject.h"
-
+#include "./GraphicsObject.h"
+*/
 #include "./test.obj.h"
 #include "./testObjects/testTerrain.h"
 #include "./testObjects/fpsPlayer.h"

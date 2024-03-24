@@ -32,6 +32,15 @@ class GraphicsObject{
 		graphics_light_t light;
 		WavefrontImport objImporter;
 
+		size_t calcVertexFileSize(std::string vertexFile){
+                        size_t ret = 0;
+
+                        return ret;
+                }
+                void loadVertexFile(std::string vertextFile, float *ret, size_t retSize){
+
+                }
+
 		bool addVertexShader(const char *fileLoc, int id){
 			return shader.addVertexShader(fileLoc, id);
 		}

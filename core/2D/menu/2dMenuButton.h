@@ -11,7 +11,6 @@ class Menu2DButton : public GraphicsObject{
 
 		int hovered = 0;
 
-
 		float x_min=2, y_min=2, x_max=-2, y_max=-2;
 		float vertices[8*6*6] = {
         		-1.0f, -1.0f, -0.5f,     0.0f, 0.0f,    0.0f, 0.0f, -1.0f,
@@ -156,6 +155,10 @@ class Menu2DButton : public GraphicsObject{
 			}
 
 
+		}
+		
+		bool isHovered(void){
+			return (hovered == 0) ? false : true;
 		}
 		void draw(){
 			if(texturePath != "")

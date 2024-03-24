@@ -90,6 +90,10 @@ class Menu2D : public GraphicsObject{
 			activeMenuButtons[index] = index;
 		}
 
+		Menu2DButton getButtonX(int index){
+			return menuButtons[index];
+		}
+
 		bool create(void){
 			if(!this->addVertexShader(vertexShaderPath.c_str(), 0)){
                                 printf("Failed to compile vertex shader '%s'.\n", vertexShaderPath.c_str());

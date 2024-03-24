@@ -34,6 +34,18 @@ class CustomMainMenuContext : public GraphicsContext{
 		                gui_engine_global.keyboard.key_space = false;
 			}
 
+			Menu2DButton btn = this->menu.getButtonX(0);
+			if(btn.isHovered() && gui_engine_global.mouse.click_left){
+				printf("Clicked Button 0\n");
+				glfwSetWindowShouldClose(window, true);
+			}
+
+			btn = this->menu.getButtonX(1);
+			if(btn.isHovered() && gui_engine_global.mouse.click_left){
+                                printf("Clicked Button 1\n");
+				this->context = 1;
+                        }
+
 		}
 
 

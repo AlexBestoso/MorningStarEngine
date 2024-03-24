@@ -30,7 +30,9 @@ float lastX = 400, lastY = 300;
 float pitch, yaw;
 
 
-#include "./guiEngineStruct.struct.h"
+#include "./core/structs/structs.h"
+#include "./core/peripherals/peripherals.h"
+#include "./core/graphics/graphics.h"
 #include "./GraphicsEngine.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -48,9 +50,7 @@ int main(void){
 	SCR_HEIGHT = s->height;
 	XCloseDisplay(d);
 
-
-
-	ge.init("MSGE III", SCR_WIDTH, SCR_HEIGHT);
+	ge.init("MSGE A 0.0.0", SCR_WIDTH, SCR_HEIGHT);
 	GLFWwindow* window = ge.getWindow();
     	ge.setFrameBufferSizeCallback(framebuffer_size_callback);
 	ge.setMouseCursorPosCallback(mouse_callback);
