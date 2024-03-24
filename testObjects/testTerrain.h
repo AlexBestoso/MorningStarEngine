@@ -9,8 +9,6 @@ class TestTerrain : public GraphicsObject{
 		int terrainY = 1;
 		size_t objCount = 1;
 
-		
-		
 		GraphicsTexture cobbleTexture;
 
 		unsigned int transformLocation;

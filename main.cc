@@ -66,9 +66,9 @@ int main(void){
 			previous = ctx;
 
 			switch(ctx){
-				case 0:
+				case 0: // Main Menu
 				       	
-				case 1:
+				case 1: // Scene One
 					ge.contextDestroy();
 					ge.setContext(&customTestContext);
 					ge.disableMouseCursor();

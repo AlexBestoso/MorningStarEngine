@@ -290,7 +290,7 @@ class TestObject : public GraphicsObject{
 
 				glDrawArrays(GL_TRIANGLES, 0, objImporter.objCount);
                                 //glDrawArrays(GL_TRIANGLES, 0, 36);
-				model = glm::rotate(model, (float)glfwGetTime()*glm::radians(-50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+				//model = glm::rotate(model, (float)glfwGetTime()*glm::radians(-50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 				//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 				this->setUniform("model", model);
 

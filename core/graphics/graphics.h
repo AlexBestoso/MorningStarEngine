@@ -4,3 +4,4 @@
 
 #include "./GraphicsObject.h"
 
+#include "./GraphicsScene.h"

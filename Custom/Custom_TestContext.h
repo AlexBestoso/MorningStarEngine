@@ -1,5 +1,6 @@
 class CustomTestContext : public GraphicsContext{
 	private:
+		GraphicsScene scene;
 	        TestTerrain terrain;
 	        TestObject testObj;
 	        FpsPlayer playerOne;
@@ -45,6 +46,11 @@ class CustomTestContext : public GraphicsContext{
 		                printf("Failed to build terrain\n");
 		                exit(EXIT_FAILURE);
 		        }
+
+			if(!scene.create("./scenes/sampleScene/SampleScene.obj")){
+				printf("Failed to build scene.\n");
+				exit(EXIT_FAILURE);
+			}
 	
 		        if(!testObj.create()){
 		                printf("Failed to create test object.\n");
@@ -69,6 +75,7 @@ class CustomTestContext : public GraphicsContext{
 		void destroy(){
 			terrain.destroy();
 			testObj.destroy();
+			scene.destroy();
 			playerOne.destroy();
 			testLight.destroy();
 		}
@@ -87,6 +94,10 @@ class CustomTestContext : public GraphicsContext{
 	                terrain.camera = this->activeCamera[0];
 	                terrain.lightPos = testLight.getPos();
 	                terrain.draw();
+
+			scene.camera = this->activeCamera[0];
+			scene.lightPos = testLight.getPos();
+			scene.draw();
 			return this->context;
 		}
 }customTestContext;
