@@ -40,9 +40,9 @@ uniform int useTexture = 0;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
-/*void main(){
+void main(){
 	
-	General display of lightings
+	//General display of lightings;
 	if(useTexture == 1){
 
 		// Ambient
@@ -71,10 +71,10 @@ uniform vec3 viewPos;
 		FragColor = vec4(result, 1.0);
 		//FragColor = mix(texture(trippyTexture, oTexturePos), texture(containerTexture, oTexturePos), 0.50) * vec4(result, 1.0);
 	}
-}*/
+}
 
 // Flash light example
-void main()
+/*void main()
 {
     vec3 lightDir = normalize(light.position - FragPos);
     
@@ -113,4 +113,4 @@ void main()
         // else, use ambient light so scene isn't completely dark outside the spotlight.
         FragColor = vec4(light.ambient * texture(material.diffuseMap, oTexturePos).rgb, 1.0);
     }
-} 
+}*/ 

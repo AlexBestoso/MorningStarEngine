@@ -47,7 +47,7 @@ class CustomTestContext : public GraphicsContext{
 		                exit(EXIT_FAILURE);
 		        }
 
-			if(!scene.create("./scenes/sampleScene/SampleScene.obj")){
+			if(!scene.create("./scenes/sampleScene/SampleScene.obj", "./scenes/sampleScene/SampleScene.mtl")){
 				printf("Failed to build scene.\n");
 				exit(EXIT_FAILURE);
 			}

@@ -31,9 +31,9 @@ class GraphicsScene : public GraphicsObject{
                         this->setUniform("light.constant", light.constant);
                         this->setUniform("light.linear", light.linear);
                         this->setUniform("light.quadratic", light.quadratic);
-
+*/
                         this->setUniform("useTexture", 1);
-                        this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+  /*                      this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
                         this->setUniform("lightPos", lightPos);
                         this->setUniform("viewPos", camera.getPos())*/;
 
@@ -49,13 +49,13 @@ class GraphicsScene : public GraphicsObject{
 			this->setUniform("model", model);
 		}
 
-		bool create(std::string sceneLoc){
-			if(!this->addVertexShader("./glsl/vertexShader.glsl", 0)){
+		bool create(std::string sceneLoc, std::string sceneMtlLoc){
+			if(!this->addVertexShader("./glsl/vertexShaderScene.glsl", 0)){
                                 printf("Failed to compile vertex shader.\n");
                                 return false;
                         }
 
-                        if(!this->addFragmentShader("./glsl/fragmentShader.glsl", 1)){
+                        if(!this->addFragmentShader("./glsl/fragmentShaderScene.glsl", 1)){
                                 printf("Failed to compile fragment shader\n");
                                 return false;
                         }
@@ -69,14 +69,22 @@ class GraphicsScene : public GraphicsObject{
                         this->bindVao();
                         this->bindVbo();
 
+			this->importer.setMaterialFile(sceneMtlLoc);
 			if(!this->importer.import(sceneLoc.c_str())){
                                 printf("Failed to import Cube object.\n");
                                 return false;
                         }
                         this->storeVertexData(sizeof(float)*this->importer.glObjBufferSize, this->importer.glObjBuffer, GL_STATIC_DRAW);
 
-			this->setAttributePointer(0, 3, 8, (void *)0);
+			this->setAttributePointer(0, 3, 11, (void *)0);
                         this->enableArrayAttribute(0);
+			this->setAttributePointer(1, 2, 11, (void *)(3*sizeof(float)));
+                        this->enableArrayAttribute(1);
+                        this->setAttributePointer(2, 3, 11, (void *)(5*sizeof(float)));
+                        this->enableArrayAttribute(2);
+			this->setAttributePointer(3, 3, 11, (void *)(8*sizeof(float)));
+                        this->enableArrayAttribute(3);
+
 
 			this->unbindVbo();
 			this->unbindVao();
