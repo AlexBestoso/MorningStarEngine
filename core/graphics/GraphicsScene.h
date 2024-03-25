@@ -5,6 +5,12 @@ class GraphicsScene : public GraphicsObject{
 
 	public:
 		glm::vec3 lightPos;
+		size_t getObjectCount(void){
+			return importer.objCount;
+		}
+		obj_data_t *getObjectPointer(void){
+			return importer.obj;
+		}
 		void draw(void){
 			this->bindVao();
                         this->use();

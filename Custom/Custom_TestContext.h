@@ -57,6 +57,7 @@ class CustomTestContext : public GraphicsContext{
 		                exit(EXIT_FAILURE);
 		        }
 
+			playerOne.setSceneData(scene.getObjectPointer(), scene.getObjectCount());
 		        if(!playerOne.create()){
 		                printf("Failed to create main character\n");
 		                exit(EXIT_FAILURE);

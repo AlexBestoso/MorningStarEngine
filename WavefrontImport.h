@@ -2,6 +2,7 @@ typedef struct obj_data{
 	float vertex[3];
 	float texture[2];
 	float normal[3];
+	float material_color[3];
 }obj_data_t;
 
 typedef struct obj_face_data{
@@ -537,7 +538,6 @@ class WavefrontImport{
 						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
                                                 glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
                                                 glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						printf("(%d | %d) Color : %f, %f, %f\n", i, materialMap[i], materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
 						tracker += 11;
 					}else{
                                         	tracker +=8;
@@ -558,7 +558,6 @@ class WavefrontImport{
 						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
                                                 glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
                                                 glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						printf("(%d | %d) Color : %f, %f, %f\n", i, materialMap[i], materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
 						tracker += 11;
                                         }else{
 						tracker +=8;
@@ -576,7 +575,6 @@ class WavefrontImport{
 						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
                                                 glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
                                                 glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						printf("(%d | %d) Color : %f, %f, %f\n", i, materialMap[i], materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
 						tracker += 11;
                                         }else{
 						tracker += 8;
@@ -594,7 +592,6 @@ class WavefrontImport{
 						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
                                                 glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
                                                 glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						printf("(%d | %d) Color : %f, %f, %f\n", i, materialMap[i], materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
 						tracker += 11;
                                         }else{
 						tracker += 8;
@@ -615,7 +612,6 @@ class WavefrontImport{
 						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
                                                 glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
                                                 glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						printf("(%d | %d) Color : %f, %f, %f\n", i, materialMap[i], materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
 						tracker+=11;
                                         }else{
                                         	tracker += 8;
