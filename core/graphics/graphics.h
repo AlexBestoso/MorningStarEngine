@@ -4,4 +4,6 @@
 
 #include "./GraphicsObject.h"
 
+#include "./GraphicsSkybox.h"
+
 #include "./GraphicsScene.h"

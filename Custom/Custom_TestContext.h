@@ -2,6 +2,7 @@ class CustomTestContext : public GraphicsContext{
 	private:
 		GraphicsScene scene;
 	        TestTerrain terrain;
+		GraphicsSkybox skybox;
 	        TestObject testObj;
 	        FpsPlayer playerOne;
 		TestLight testLight;
@@ -51,11 +52,16 @@ class CustomTestContext : public GraphicsContext{
 				printf("Failed to build scene.\n");
 				exit(EXIT_FAILURE);
 			}
+
+			if(!skybox.create("./scenes/sampleScene/sampleSkyBox.obj", "./scenes/sampleScene/skyboxTexture.jpg")){
+                                printf("Failed to load skybox.\n");
+                                exit(EXIT_FAILURE);
+                        }
 	
-		        if(!testObj.create()){
-		                printf("Failed to create test object.\n");
-		                exit(EXIT_FAILURE);
-		        }
+		        //if(!testObj.create()){
+		        //        printf("Failed to create test object.\n");
+		        //        exit(EXIT_FAILURE);
+		        //}
 
 			playerOne.setSceneData(scene.getObjectPointer(), scene.getObjectCount());
 		        if(!playerOne.create()){
@@ -84,13 +90,17 @@ class CustomTestContext : public GraphicsContext{
 			this->processInput(window);
 			playerOne.draw();
 
+
         	        testLight.camera = this->activeCamera[0];
-        	        testLight.draw();
+        	        //testLight.draw();
 
+	                skybox.lightPos = testLight.getPos();
+			skybox.camera = this->activeCamera[0];
+			skybox.draw();
 
-	                testObj.lightPos = testLight.getPos();
-	                testObj.camera = this->activeCamera[0];
-	                testObj.draw();
+	                //testObj.lightPos = testLight.getPos();
+	               // testObj.camera = this->activeCamera[0];
+	                //testObj.draw();
 
 	                terrain.camera = this->activeCamera[0];
 	                terrain.lightPos = testLight.getPos();

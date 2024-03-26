@@ -9,20 +9,6 @@ class TestObject : public GraphicsObject{
 		glm::vec3 cubePositions[20]; // ={ glm::vec3(-1.3f, 1.0f, -1.5f) };
 		int activeObjectPositions[20];
 		
-		/*float vertices[32] = {
-                	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-                	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-                	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 0.5f,   0.0f, 0.0f, // bottom left
-                	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
-        	};*/
-
-		/*float vertices[20] = {
-                         0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-                         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-                        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-                        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left
-                };*/
-
 		// Coordinates |  Texuxture map|   Normalized to plane coordinates|
 		float vertices[8*6*6] = {
         		-0.5f, -0.5f, -0.5f,     0.0f, 0.0f,    0.0f, 0.0f, -1.0f,
@@ -108,7 +94,8 @@ class TestObject : public GraphicsObject{
         		metalBoxTexture.add2DParameter(2, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         		metalBoxTexture.add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         		metalBoxTexture.setTextureUnit(0);
-        		if(!metalBoxTexture.loadTexture2D("./Cat_bump.jpg")){
+        		//if(!metalBoxTexture.loadTexture2D("./Cat_bump.jpg")){
+        		if(!metalBoxTexture.loadTexture2D("./scenes/sampleScene/skyboxTexture.jpg")){
                 		printf("Failed to import trippy texture.\n");
 				return false;
         		}
@@ -118,7 +105,8 @@ class TestObject : public GraphicsObject{
         		metalBoxSpecMap.add2DParameter(2, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         		metalBoxSpecMap.add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         		metalBoxSpecMap.setTextureUnit(1);
-        		if(!metalBoxSpecMap.loadTexture2D("./Cat_diffuse.jpg")){
+        		//if(!metalBoxSpecMap.loadTexture2D("./Cat_diffuse.jpg")){
+        		if(!metalBoxSpecMap.loadTexture2D("./scenes/sampleScene/skyboxTexture.jpg")){
                 		printf("Failed to import container texture.\n");
 				return false;
         		}
@@ -127,7 +115,8 @@ class TestObject : public GraphicsObject{
 			this->bindVao();
 			this->bindVbo();
 			printf("Importing cat.\n");
-			if(!this->objImporter.import("./12221_Cat_v1_l3.obj")){
+			//if(!this->objImporter.import("./12221_Cat_v1_l3.obj")){
+			if(!this->objImporter.import("./scenes/sampleScene/sampleSkyBox.obj")){
 				printf("Failed to import Cube object.\n");
 				return false;
 			}

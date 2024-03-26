@@ -7,7 +7,7 @@ class FpsPlayer : public GraphicsObject{
 		size_t sceneDataSize = 0;
 
 		float gravity = 0.05;
-		float playerHeight = 0.36;
+		float playerHeight = 0.10;
 		float playerWidth = 1;
 		float playerBredth = 1;
 		bool grounded = false;
@@ -66,7 +66,6 @@ class FpsPlayer : public GraphicsObject{
 						this->camera.setPos(camera);
 						grounded = true;
 					}
-					printf("MIN: (%f, %f, %f) | MAX (%f, %f, %f) | Player (%f, %f, %f) | %s\n", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z, camera.x, camera.y, camera.z, (inXzBound) ? "true" : "false");
 				}
 			}	
 		}
