@@ -62,12 +62,12 @@ class GraphicsSkybox : public GraphicsObject{
 		}
 
 		bool create(std::string skyboxLoc, std::string skyboxTextureLoc){
-			if(!this->addVertexShader("./glsl/vertexShader.glsl", 0)){
+			if(!this->addVertexShader("./glsl/vertexShaderSkybox.glsl", 0)){
                                 printf("Failed to compile vertex shader.\n");
                                 return false;
                         }
 
-                        if(!this->addFragmentShader("./glsl/fragmentShader.glsl", 1)){
+                        if(!this->addFragmentShader("./glsl/fragmentShaderSkybox.glsl", 1)){
                                 printf("Failed to compile fragment shader\n");
                                 return false;
                         }
@@ -83,7 +83,6 @@ class GraphicsSkybox : public GraphicsObject{
                         skyBoxTexture.add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                         skyBoxTexture.setTextureUnit(0);
                         if(!skyBoxTexture.loadTexture2D(skyboxTextureLoc.c_str())){
-			//if(!skyBoxTexture.loadTexture2D("./scenes/sampleScene/skyboxTexture.jpg")){
                                 printf("Failed to import '%s' texture.\n", skyboxTextureLoc.c_str());
                                 return false;
                         }
@@ -93,8 +92,6 @@ class GraphicsSkybox : public GraphicsObject{
                         skyBoxSpaceMap.add2DParameter(2, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                         skyBoxSpaceMap.add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                         skyBoxSpaceMap.setTextureUnit(1);
-                        //if(!metalBoxSpecMap.loadTexture2D("./Cat_diffuse.jpg")){
-			//if(!skyBoxSpaceMap.loadTexture2D("./scenes/sampleScene/skyboxTexture.jpg")){
                         if(!skyBoxSpaceMap.loadTexture2D(skyboxTextureLoc.c_str())){
                                 printf("Failed to import container texture.\n");
                                 return false;
@@ -105,7 +102,6 @@ class GraphicsSkybox : public GraphicsObject{
                         this->bindVbo();
 
                         if(!this->objImporter.import(skyboxLoc.c_str())){
-			//if(!this->objImporter.import("./scenes/sampleScene/sampleSkyBox.obj")){
                                 printf("Failed to import Cube object.\n");
                                 return false;
                         }

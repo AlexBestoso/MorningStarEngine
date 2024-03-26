@@ -1,19 +1,20 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 texturePos;
-layout (location = 2) in vec3 normalizedPos;
+layout (location = 2) in vec3 aNormal;
 
-out vec2 GTexturePos;
+out vec2 oTexturePos;
 out vec3 FragPos;
-out vec3 Normalized;
+out vec3 Normal;
 
+//uniform mat4 transform;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main(){
-        gl_Position = projection * view * model * vec4(aPos, 1.0);
-        GTexturePos = texturePos;
+   	gl_Position = projection * view * model * vec4(aPos, 1.0);
+	oTexturePos = vec2(texturePos.x, texturePos.y);
 	FragPos = vec3(model * vec4(aPos, 1.0));
-	Normalized = mat3(transpose(inverse(model))) * normalizedPos;
+	Normal = mat3(transpose(inverse(model))) * aNormal;
 }
