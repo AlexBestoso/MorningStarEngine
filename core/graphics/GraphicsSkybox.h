@@ -13,8 +13,6 @@ class GraphicsSkybox : public GraphicsObject{
 			return objImporter.obj;
 		}
 		void draw(void){
-			this->skyBoxTexture.bind2D();
-                        this->skyBoxSpaceMap.bind2D();
                         this->bindVao();
                         this->use();
 
@@ -57,8 +55,14 @@ class GraphicsSkybox : public GraphicsObject{
                         unsigned int projectionLoc = this->getUniformLoc("projection");
                         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
+			this->skyBoxTexture.bind2D();
+                        this->skyBoxSpaceMap.bind2D();
+
 			glDrawArrays(GL_TRIANGLES, 0, objImporter.objCount);
 			this->setUniform("model", model);
+
+			this->skyBoxTexture.unbind2D();
+                        this->skyBoxSpaceMap.unbind2D();
 		}
 
 		bool create(std::string skyboxLoc, std::string skyboxTextureLoc){

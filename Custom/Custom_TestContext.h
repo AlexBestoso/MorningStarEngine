@@ -102,9 +102,9 @@ class CustomTestContext : public GraphicsContext{
 	               // testObj.camera = this->activeCamera[0];
 	                //testObj.draw();
 
-	                //terrain.camera = this->activeCamera[0];
-	                //terrain.lightPos = testLight.getPos();
-	                //terrain.draw();
+	                terrain.camera = this->activeCamera[0];
+	                terrain.lightPos = testLight.getPos();
+	                terrain.draw();
 
 			scene.camera = this->activeCamera[0];
 			scene.lightPos = testLight.getPos();

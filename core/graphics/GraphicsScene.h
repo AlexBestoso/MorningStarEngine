@@ -24,7 +24,31 @@ class GraphicsScene : public GraphicsObject{
                         model = glm::scale(model, glm::vec3(1.0f));
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
+
+			this->setUniform("material.ambient", material.ambient);
+                        this->setUniform("material.diffuse", material.diffuse);
+                        this->setUniform("material.specular", material.specular);
+                        this->setUniform("material.shininess", material.shininess);
+
+
+                        this->setUniform("light.ambient", light.ambient);
+                        this->setUniform("light.diffuse", light.diffuse);
+                        this->setUniform("light.specular", light.specular);
+                        //this->setUniform("light.direction", light.direction);
+
+                        //Flashling configs
+                        this->setUniform("light.position", camera.cameraPosition);
+                        this->setUniform("light.direction", camera.cameraFront);
+                        this->setUniform("light.cuttOff", glm::cos(glm::radians(12.5f)));
+
+                        this->setUniform("light.constant", light.constant);
+                        this->setUniform("light.linear", light.linear);
+                        this->setUniform("light.quadratic", light.quadratic);
+
                         this->setUniform("useTexture", 1);
+                        this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+                        this->setUniform("lightPos", lightPos);
+                        this->setUniform("viewPos", camera.getPos());
 
 			view = camera.getView();
                         unsigned int viewLoc = this->getUniformLoc("view");
@@ -36,9 +60,14 @@ class GraphicsScene : public GraphicsObject{
 
 			if(objs != NULL){
 				for(int i=0; i<this->importer.getObjectCount(); i++){
+					if(objs[i].textureLocation != "")
+						objectTextures[i].bind2D();
 					this->storeVertexData(sizeof(float)*objs[i].buffer_size, this->importer.glObjBuffer+objs[i].buffer_start, GL_STATIC_DRAW);
 					glDrawArrays(GL_TRIANGLES, 0, objs[i].buffer_count);
 					this->setUniform("model", model);
+
+					if(objs[i].textureLocation != "")
+						objectTextures[i].unbind2D();
 				}
 			}else{
 				printf("Error, No objects loaded.\n");
@@ -80,11 +109,49 @@ class GraphicsScene : public GraphicsObject{
 			this->setAttributePointer(3, 3, 11, (void *)(8*sizeof(float))); // material color
                         this->enableArrayAttribute(3);
 
+			objectTextureCount = this->importer.getObjectCount();
+			objectTextures = new GraphicsTexture[objectTextureCount];
+
+			for(int i=0; i<objectTextureCount; i++){
+				if(objs[i].textureLocation == ""){
+					continue;
+				}
+				objectTextures[i].add2DParameter(0, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                        	objectTextures[i].add2DParameter(1, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                        	objectTextures[i].add2DParameter(2, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                        	objectTextures[i].add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                        	objectTextures[i].setTextureUnit(0);
+                        	if(!objectTextures[i].loadTexture2D(objs[i].textureLocation.c_str())){
+                        	        printf("Failed to load texture for object '%s'\n", objs[i].name.c_str());
+                        	        return false;
+                        	}
+			}
+
 
 			this->unbindVbo();
 			this->unbindVao();
 
 			this->use();
+
+			this->material.ambient = glm::vec3(1.0f, 0.5f, 0.3f);
+                        this->material.diffuse = glm::vec3(1.0f, 0.5f, 0.3f);
+                        this->material.specular = glm::vec3(0.5f, 0.5f, 0.3f);
+                        this->material.shininess = 32.0f;
+
+                        this->light.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+                        this->light.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+                        this->light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+                        this->light.constant = 1.0f;
+                        this->light.linear = 0.09f;
+                        this->light.quadratic = 0.032f;
+
+                        // Flashlight configurations
+                        this->light.position = camera.cameraPosition;
+                        this->light.direction = camera.cameraFront;
+                        this->light.cutOff = glm::cos(glm::radians(12.5f));
+
+                        setUniform("material.diffuseMap", 0);
+                        setUniform("material.specularMap", 0);
 
 			return true;
 		}

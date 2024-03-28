@@ -58,4 +58,9 @@ class GraphicsTexture{
 			glActiveTexture(GL_TEXTURE0+textureUnit);
 			glBindTexture(GL_TEXTURE_2D, texture);
 		}
+
+		void unbind2D(void){
+			glActiveTexture(GL_TEXTURE0+textureUnit);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 };
