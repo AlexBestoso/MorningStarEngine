@@ -2,6 +2,9 @@ class GraphicsScene : public GraphicsObject{
 	private:
 		GLFWwindow* window = NULL;
 		WavefrontImport importer;
+		GraphicsTexture *objectTextures = NULL;
+		size_t objectTextureCount = 0;
+		obj_t *objs = NULL;
 
 	public:
 		glm::vec3 lightPos;
@@ -13,6 +16,7 @@ class GraphicsScene : public GraphicsObject{
 		}
 		void draw(void){
 			this->bindVao();
+			this->bindVbo();
                         this->use();
 
 			glm::mat4 model = glm::mat4(1.0f);
@@ -20,28 +24,7 @@ class GraphicsScene : public GraphicsObject{
                         model = glm::scale(model, glm::vec3(1.0f));
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
-/*
-			this->setUniform("material.ambient", material.ambient);
-                        this->setUniform("material.diffuse", material.diffuse);
-                        this->setUniform("material.specular", material.specular);
-                        this->setUniform("material.shininess", material.shininess);
-
-			this->setUniform("light.ambient", light.ambient);
-                        this->setUniform("light.diffuse", light.diffuse);
-                        this->setUniform("light.specular", light.specular);
-
-			this->setUniform("light.position", camera.cameraPosition);
-                        this->setUniform("light.direction", camera.cameraFront);
-                        this->setUniform("light.cuttOff", glm::cos(glm::radians(12.5f)));
-
-                        this->setUniform("light.constant", light.constant);
-                        this->setUniform("light.linear", light.linear);
-                        this->setUniform("light.quadratic", light.quadratic);
-*/
                         this->setUniform("useTexture", 1);
-  /*                      this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-                        this->setUniform("lightPos", lightPos);
-                        this->setUniform("viewPos", camera.getPos())*/;
 
 			view = camera.getView();
                         unsigned int viewLoc = this->getUniformLoc("view");
@@ -51,11 +34,18 @@ class GraphicsScene : public GraphicsObject{
                         unsigned int projectionLoc = this->getUniformLoc("projection");
                         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
-			glDrawArrays(GL_TRIANGLES, 0, importer.objCount);
-			this->setUniform("model", model);
+			if(objs != NULL){
+				for(int i=0; i<this->importer.getObjectCount(); i++){
+					this->storeVertexData(sizeof(float)*objs[i].buffer_size, this->importer.glObjBuffer+objs[i].buffer_start, GL_STATIC_DRAW);
+					glDrawArrays(GL_TRIANGLES, 0, objs[i].buffer_count);
+					this->setUniform("model", model);
+				}
+			}else{
+				printf("Error, No objects loaded.\n");
+			}
 		}
 
-		bool create(std::string sceneLoc, std::string sceneMtlLoc){
+		bool create(std::string sceneDir, std::string sceneName){
 			if(!this->addVertexShader("./glsl/vertexShaderScene.glsl", 0)){
                                 printf("Failed to compile vertex shader.\n");
                                 return false;
@@ -75,20 +65,19 @@ class GraphicsScene : public GraphicsObject{
                         this->bindVao();
                         this->bindVbo();
 
-			this->importer.setMaterialFile(sceneMtlLoc);
-			if(!this->importer.import(sceneLoc.c_str())){
+			if(!this->importer.importComplex(sceneDir, sceneName)){
                                 printf("Failed to import Cube object.\n");
                                 return false;
                         }
-                        this->storeVertexData(sizeof(float)*this->importer.glObjBufferSize, this->importer.glObjBuffer, GL_STATIC_DRAW);
+			objs = this->importer.getImportedObjects();
 
-			this->setAttributePointer(0, 3, 11, (void *)0);
+			this->setAttributePointer(0, 3, 11, (void *)0); // vertex
                         this->enableArrayAttribute(0);
-			this->setAttributePointer(1, 2, 11, (void *)(3*sizeof(float)));
+			this->setAttributePointer(1, 2, 11, (void *)(3*sizeof(float))); // texture
                         this->enableArrayAttribute(1);
-                        this->setAttributePointer(2, 3, 11, (void *)(5*sizeof(float)));
+                        this->setAttributePointer(2, 3, 11, (void *)(5*sizeof(float))); // normals
                         this->enableArrayAttribute(2);
-			this->setAttributePointer(3, 3, 11, (void *)(8*sizeof(float)));
+			this->setAttributePointer(3, 3, 11, (void *)(8*sizeof(float))); // material color
                         this->enableArrayAttribute(3);
 
 
@@ -97,27 +86,6 @@ class GraphicsScene : public GraphicsObject{
 
 			this->use();
 
-/*			this->material.ambient = glm::vec3(1.0f, 0.5f, 0.3f);
-                        this->material.diffuse = glm::vec3(1.0f, 0.5f, 0.3f);
-                        this->material.specular = glm::vec3(0.5f, 0.5f, 0.3f);
-                        this->material.shininess = 32.0f;
-
-			this->light.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
-                        //this->light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
-                        //this->light.direction = glm::vec3(-8.0f, -8.0f, -8.0f);
-                        this->light.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-                        this->light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-                        this->light.constant = 1.0f;
-                        this->light.linear = 0.09f;
-                        this->light.quadratic = 0.032f;
-                        // Flashlight configurations
-                        this->light.position = camera.cameraPosition;
-                        this->light.direction = camera.cameraFront;
-                        this->light.cutOff = glm::cos(glm::radians(12.5f));
-
-                        setUniform("material.diffuseMap", 0);
-                        setUniform("material.specularMap", 1);
-			*/
 			return true;
 		}
 };

@@ -48,12 +48,12 @@ class CustomTestContext : public GraphicsContext{
 		                exit(EXIT_FAILURE);
 		        }
 
-			if(!scene.create("./scenes/sampleScene/SampleScene.obj", "./scenes/sampleScene/SampleScene.mtl")){
+			if(!scene.create("./scenes/sampleScene", "SampleScene")){
 				printf("Failed to build scene.\n");
 				exit(EXIT_FAILURE);
 			}
 
-			if(!skybox.create("./scenes/sampleScene/sampleSkyBox.obj", "./scenes/sampleScene/skyboxTexture.jpg")){
+			if(!skybox.create("./scenes/sampleSkyBox/sampleSkyBox.obj", "./scenes/sampleSkyBox/skyboxTexture.jpg")){
                                 printf("Failed to load skybox.\n");
                                 exit(EXIT_FAILURE);
                         }
@@ -102,9 +102,9 @@ class CustomTestContext : public GraphicsContext{
 	               // testObj.camera = this->activeCamera[0];
 	                //testObj.draw();
 
-	                terrain.camera = this->activeCamera[0];
-	                terrain.lightPos = testLight.getPos();
-	                terrain.draw();
+	                //terrain.camera = this->activeCamera[0];
+	                //terrain.lightPos = testLight.getPos();
+	                //terrain.draw();
 
 			scene.camera = this->activeCamera[0];
 			scene.lightPos = testLight.getPos();
