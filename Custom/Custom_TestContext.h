@@ -1,7 +1,6 @@
 class CustomTestContext : public GraphicsContext{
 	private:
 		GraphicsScene scene;
-	        TestTerrain terrain;
 		GraphicsSkybox skybox;
 	        TestObject testObj;
 	        FpsPlayer playerOne;
@@ -38,16 +37,31 @@ class CustomTestContext : public GraphicsContext{
 		        else
 		                gui_engine_global.keyboard.key_space = false;
 
+			if (glfwGetKey(window, GLFW_KEY_E))
+                                gui_engine_global.keyboard.key_e = true;
+                        else
+                                gui_engine_global.keyboard.key_e = false;
+
+			if (glfwGetKey(window, GLFW_KEY_1))
+                                gui_engine_global.keyboard.key_1 = true;
+                        else
+                                gui_engine_global.keyboard.key_1 = false;
+
+			if (glfwGetKey(window, GLFW_KEY_2))
+                                gui_engine_global.keyboard.key_2 = true;
+                        else
+                                gui_engine_global.keyboard.key_2 = false;
+
+			if (glfwGetKey(window, GLFW_KEY_3))
+                                gui_engine_global.keyboard.key_3 = true;
+                        else
+                                gui_engine_global.keyboard.key_3 = false;
+
 		}
 
 	public:
 		void init(){	
 			printf("Trying to build...\n");
-		        if(!terrain.create()){
-		                printf("Failed to build terrain\n");
-		                exit(EXIT_FAILURE);
-		        }
-
 			if(!scene.create("./scenes/sampleScene", "SampleScene")){
 				printf("Failed to build scene.\n");
 				exit(EXIT_FAILURE);
@@ -58,12 +72,9 @@ class CustomTestContext : public GraphicsContext{
                                 exit(EXIT_FAILURE);
                         }
 	
-		        //if(!testObj.create()){
-		        //        printf("Failed to create test object.\n");
-		        //        exit(EXIT_FAILURE);
-		        //}
 
 			playerOne.setSceneData(scene.getObjectPointer(), scene.getObjectCount());
+			playerOne.setCollisionObjects(scene.getObjs(), scene.getObjsCount());
 		        if(!playerOne.create()){
 		                printf("Failed to create main character\n");
 		                exit(EXIT_FAILURE);
@@ -80,8 +91,6 @@ class CustomTestContext : public GraphicsContext{
 		}
 
 		void destroy(){
-			terrain.destroy();
-			testObj.destroy();
 			scene.destroy();
 			playerOne.destroy();
 			testLight.destroy();
@@ -97,14 +106,6 @@ class CustomTestContext : public GraphicsContext{
 	                skybox.lightPos = testLight.getPos();
 			skybox.camera = this->activeCamera[0];
 			skybox.draw();
-
-	                //testObj.lightPos = testLight.getPos();
-	               // testObj.camera = this->activeCamera[0];
-	                //testObj.draw();
-
-	                terrain.camera = this->activeCamera[0];
-	                terrain.lightPos = testLight.getPos();
-	                terrain.draw();
 
 			scene.camera = this->activeCamera[0];
 			scene.lightPos = testLight.getPos();

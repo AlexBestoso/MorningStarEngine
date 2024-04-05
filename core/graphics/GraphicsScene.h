@@ -7,6 +7,12 @@ class GraphicsScene : public GraphicsObject{
 		obj_t *objs = NULL;
 
 	public:
+		obj_t *getObjs(void){
+			return objs;
+		}
+		size_t getObjsCount(void){
+			return this->importer.getObjectCount();
+		}
 		glm::vec3 lightPos;
 		size_t getObjectCount(void){
 			return importer.objCount;
@@ -21,7 +27,7 @@ class GraphicsScene : public GraphicsObject{
 
 			glm::mat4 model = glm::mat4(1.0f);
                         model = glm::translate(model, glm::vec3(0.0f, -0.7f, 0.0f));
-                        model = glm::scale(model, glm::vec3(1.0f));
+                        //model = glm::scale(model, glm::vec3(1.0f));
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
 

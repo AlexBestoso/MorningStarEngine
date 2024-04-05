@@ -1,15 +1,54 @@
-w = 1000
-h = 800
+Player Location : (0.000000, 0.000000, 0.000000)
+	Notice how the player location is at (0, 0, 0.).
+	x=0, y=0, z=0;
+	
 
-center = (500, 400)
+Scene Point'a Location : (6.980382, 1.903437, -6.995522)
+	notice that these coordinates are the default location of thw 
+	first atom of the first object in the world, which is titled "Floor"
+	
+	So what I want to do is kinda like going there. If I cam move myself
+	to that location, then I can also know ast which point I should stop 
+	travling. And if I know when to stop travleing, then I know when I'm at 
+	the object!
 
-desired coord system = -1 to 1.
+	So I need to craft an algorithm, or even an equation, that will allow me 	to plot points along the way to the location. Like hanzel and gretal.
 
-desired coords difference is 2.
+	
+Magical Unknown Value : (6.980382, 1.903437, -6.995522)
+	So now we have this value. A representation of me wanting to travel to 
+	the witches house. Lets compair the numbers. The operation we did was 
+	add some vectors togeather.
+	
+	6.980382  1.903437  -6.995522
+	6.980382  1.903437  -6.995522
 
-aspect ratio of screen, aspc = 1.25
+	Sd er can see, the values are identical. Meaning that we went directly to the witches house. As we added position 0 with possition X. In this instance 0 + x = x. Where 0 and the 2nd x are actually a variables. makig b + x = m
+	x is the position of the actial location. 
+	b is the position of the camera.
+	m is the final iteration of travel. Where m = m0...x
+	
+	so if I want a position somewhere between witches house and current location,..
+	it's important to note that a, b, and m are all vertecies of 3.
+	
+	x + b 
 
 
+We need to divide inorder to remove from the values...but what do we divide by...
 
-x_ = 
-y_ = 
+
+13.991044, 14.034648, 19.817181
+13.991044, 14.034648, 19.817181
+13.991044, 14.034648, 19.817181
+13.991044, 14.034648, 19.817181
+
+0.141912, 13.991044, 13.991764
+0.141912, 13.991044, 13.991764
+0.141912, 13.991044, 13.991764
+0.141912, 13.991044, 13.991764
+
+0.141912, 14.034648, 14.035365
+0.141912, 14.034648, 14.035365
+0.141912, 14.034648, 14.035365
+0.141912, 14.034648, 14.035365
+

@@ -1,104 +1,255 @@
+typedef struct triangle{
+	int hypotIndex = -1;
+	glm::vec3 points[3];
+	glm::vec3 centroid;
+	glm::vec3 edgeCenters[3];
+	glm::vec3 direction[2];
+	float lengths[3];
+	float angles[3];
+	float height = 0;
+	float semiperimiter = 0;
+	bool equilateral = false;
+	bool isosceles = false;
+	bool orthogonal = false;
+	bool scalene = false;
+
+}triangle_t;
+
+typedef struct collision_vars{
+	glm::vec3 origin;
+
+}collision_t;
+
 class FpsPlayer : public GraphicsObject{
 	private:
+		GraphicsGeometry geometry;
+
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
+		
 		obj_data_t *sceneData = NULL;
 		size_t sceneDataSize = 0;
+		obj_t *objs = NULL;
+		size_t objsCount = 0;
 
-		float gravity = 0.05;
+		//float gravity = 0.000001;
+		float gravity = 0.0667408;
+		float jumpStrength = 0.05;
+		//float jumpStrength = 0.000001;
 		float playerHeight = 0.10;
-		float playerWidth = 1;
-		float playerBredth = 1;
+		float playerWidth = 0.10;
+		float playerBredth = 0.10;
+		float playerSize = 0.10;
 		bool grounded = false;
 		bool inXzBound = false;
+		glm::vec3 previousCoords;
+
+		bool jumping = false;
+		float jumpHeight = 1.75;
+		float jumpBase = 0;
+		float jumpPeak = 0;
+		float cameraSpeed = 0.05f;
+
+		bool generalCollision(glm::vec3 camera, triangle3_t surface){
+			float area = surface.area;
+			triangle3_t a = geometry.createTriangle(surface.vertecies[0], surface.vertecies[1], camera);
+                        triangle3_t b = geometry.createTriangle(surface.vertecies[1], surface.vertecies[2], camera);
+                        triangle3_t c = geometry.createTriangle(surface.vertecies[2], surface.vertecies[0], camera);
+			
+			float areap = (a.area + b.area + c.area);
+                        if(areap == area){
+				return true;
+			}else{
+                        	if(areap > area){
+                        		areap = areap - area;
+                        	}else{
+                        		areap = area - areap;
+                        	}
+
+                        	return areap >= 0 && areap < 10;
+                        }
+		}
+		
+		bool wallCollision(glm::vec3 camera, triangle3_t surface){
+			
+			return false;
+		}
 
 		void calculateCollision(void){
 			grounded = false;
+			bool invertJump = false;
+			bool invertFall = false;
+			bool invertForward = false;
+			bool invertBack = false;
+			bool invertLeft = false;
+			bool invertRight = false;
 			if(sceneData == NULL || sceneDataSize <= 0)
 				return;
-			glm::vec3 trianglePoints[3];
+
+			glm::vec3 pointa;
+			glm::vec3 pointb;
+			glm::vec3 pointc;
 			glm::vec3 camera = this->camera.getPos();
+			
+			int objIndex = 0, tracker=0;
+			int objTrack = objs[objIndex].buffer_count;
 			for(int i=0; i<sceneDataSize; i++){
-				trianglePoints[i%3] = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
-				if((i%3) == 2){
-					float maxX=0, maxZ=0, minX=0, minZ=0, minY=0, maxY=0;
-					minX = trianglePoints[0].x;
-					maxX = trianglePoints[0].x;
-					minZ = trianglePoints[0].z;
-					maxZ = trianglePoints[0].z;
-					minY = trianglePoints[0].y;
-					maxY = trianglePoints[0].y;
-					for(int j=1; j<3; j++){
-						if(trianglePoints[j].x < minX){
-							minX = trianglePoints[j].x;
-						}
-						if(trianglePoints[j].x > maxX){
-							maxX = trianglePoints[j].x;
-						}
+				int test = (i%3);
+				if(tracker >= objs[objIndex].buffer_count){
+					objIndex ++;
+					tracker = 0;
+				}
+				if(test == 0){
+					pointa = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
+					tracker++;
+					continue;
+				}
+				if(test == 1){
+					pointb = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
+					tracker++;
+                                        continue;
+				}
 
-						if(trianglePoints[j].z < minZ){
-							minZ = trianglePoints[j].z;
-						}
-						if(trianglePoints[j].z > maxZ){
-							maxZ = trianglePoints[j].z;
-						}
+				pointc = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
 
-						if(trianglePoints[j].y < minY){
-                                                        minY = trianglePoints[j].y;
-                                                }
-                                                if(trianglePoints[j].y > maxY){
-                                                        maxY = trianglePoints[j].y;
-                                                }
+				tracker++;
+				if(tracker >= objs[objIndex].buffer_count){
+					tracker = 0;
+					objIndex++;
+				}
+				
+				triangle3_t triangle = geometry.createTriangle(pointa, pointb, pointc);
+				glm::vec3 down = glm::vec3(0, -1, 0);
+				glm::vec3 up = glm::vec3(0, 1, 0);
+				glm::vec3 right = glm::vec3(1, 0, 0);
+				glm::vec3 left = glm::vec3(-1, 0, 0);
+				glm::vec3 forward = glm::vec3(0, 0, 1);
+				glm::vec3 backward = glm::vec3(0, 0, -1);
+				triangle3_t triangleY = geometry.createTriangle(pointa*down, pointb*down, pointc*down);
+				triangle3_t triangleYn = geometry.createTriangle(pointa*up, pointb*up, camera*up);
+				triangle3_t triangleX = geometry.createTriangle(pointa*right, pointb*right, camera*right);
+				triangle3_t triangleXn = geometry.createTriangle(pointa*left, pointb*left, camera*left);
+				triangle3_t triangleZ = geometry.createTriangle(pointa*forward, pointb*forward, camera*forward);
+				triangle3_t triangleZn = geometry.createTriangle(pointa*backward, pointb*backward, camera*backward);
+
+				triangle3_t testA = geometry.createTriangle(pointa*down, pointb*down, camera*down);
+
+				bool hit = generalCollision(camera, triangle);
+				if(tracker == 3 && objs[objIndex].name == "WallThree_Cube.004"){
+						printf("==================================\n");
+						printf("object Name (%d): %s\n", tracker, objs[objIndex].name.c_str());
+						printf("test : %f, %f, %f\n", testA.line_a.distance, testA.line_b.distance,testA.line_c.distance);
+						printf("up : %f, %f, %f\n", triangleYn.line_a.distance, triangleYn.line_b.distance,triangleYn.line_c.distance);
+						printf("left : %f, %f, %f\n", triangleXn.line_a.distance, triangleXn.line_b.distance,triangleXn.line_c.distance);
+						printf("right : %f, %f, %f\n", triangleX.line_a.distance, triangleX.line_b.distance,triangleX.line_c.distance);
+						printf("forward : %f, %f, %f\n", triangleZ.line_a.distance, triangleZ.line_b.distance,triangleZ.line_c.distance);
+						printf("back : %f, %f, %f\n", triangleZn.line_a.distance, triangleZn.line_b.distance,triangleZn.line_c.distance);
+				}
+				if(hit){ 
+					 if(tracker == 3 && objs[objIndex].name == "WallThree_Cube.004"){
+                                                printf("==================================\n");
+                                                printf("object Name (%d): %s\n", tracker, objs[objIndex].name.c_str());
+                                                printf("test : %f, %f, %f\n", testA.line_a.distance, testA.line_b.distance,testA.line_c.distance);
+                                                printf("up : %f, %f, %f\n", triangleYn.line_a.distance, triangleYn.line_b.distance,triangleYn.line_c.distance);
+                                                printf("left : %f, %f, %f\n", triangleXn.line_a.distance, triangleXn.line_b.distance,triangleXn.line_c.distance);
+                                                printf("right : %f, %f, %f\n", triangleX.line_a.distance, triangleX.line_b.distance,triangleX.line_c.distance);
+                                                printf("forward : %f, %f, %f\n", triangleZ.line_a.distance, triangleZ.line_b.distance,triangleZ.line_c.distance);
+                                                printf("back : %f, %f, %f\n", triangleZn.line_a.distance, triangleZn.line_b.distance,triangleZn.line_c.distance);
+                                }
+					
+					if(testA.line_a.distance >= 0  && testA.line_a.distance <= 3 && triangleYn.line_a.distance >= 0 && triangleYn.line_a.distance <= 3){
+						camera.y += gravity;
 					}
 					
-					glm::vec3 minPoint = glm::vec3(minX, minY, minZ);
-					glm::vec3 maxPoint = glm::vec3(maxX, maxY, maxZ);
 
-					//glm::vec3 test = glm::cross(glm::vec3(maxX-minX, maxY-minY, maxZ-minZ), camera);
-					inXzBound = false;
-					if((camera.x >= minPoint.x && camera.x <= maxPoint.x) &&
-					   (camera.z >= minPoint.z && camera.z <= maxPoint.z)){
-						inXzBound = true;
+					if(triangleXn.line_a.distance >= 0 && triangleXn.line_a.distance <=3 && triangleX.line_a.distance >= 0 && triangleX.line_a.distance <=3){
+						if (gui_engine_global.keyboard.key_w){
+                        			        float y = camera.y;
+							float x = camera.x;
+                        			        camera -= cameraSpeed * this->camera.cameraFront;
+                        			        camera.y = y;
+							camera.x = x;
+                        			}
+                        			if (gui_engine_global.keyboard.key_s){
+                        			        float y = camera.y;
+							float x = camera.x;
+                        			        camera += cameraSpeed * this->camera.cameraFront;
+                        			        camera.y = y;
+							camera.x = x;
+                        			}
+                        			if (gui_engine_global.keyboard.key_a){
+                        			        float y = camera.y;
+							float x = camera.x;
+                        			        camera += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                        			        camera.y = y;
+							camera.x = x;
+                        			}
+                        			if (gui_engine_global.keyboard.key_d){
+                        			        float y = camera.y;
+							float x = camera.x;
+                        			        camera -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+							camera.x = x;
+                        			        camera.y = y;
+                        			}
+						camera += glm::vec3(playerSize, 0, playerSize);
 					}
-					if(inXzBound && (camera.y >= minY && camera.y <= minY+playerHeight) && !jumping){
-						camera.y = minY;
-						this->camera.setPos(camera);
-						grounded = true;
+
+					if(triangleXn.line_a.distance >= 0 && triangleXn.line_a.distance <=3 && triangleX.line_a.distance >= 0 && triangleX.line_a.distance <=3){
+						if (gui_engine_global.keyboard.key_w){
+                                                        float y = camera.y;
+                                                        float x = camera.z;
+                                                        camera -= cameraSpeed * this->camera.cameraFront;
+                                                        camera.y = y;
+                                                        camera.z = x;
+                                                }
+                                                if (gui_engine_global.keyboard.key_s){
+                                                        float y = camera.y;
+                                                        float x = camera.z;
+                                                        camera += cameraSpeed * this->camera.cameraFront;
+                                                        camera.y = y;
+                                                        camera.z = x;
+                                                }
+						if (gui_engine_global.keyboard.key_a){
+                                                        float y = camera.y;
+                                                        float x = camera.z;
+                                                        camera += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                                                        camera.y = y;
+                                                        camera.z = x;
+                                                }
+                                                if (gui_engine_global.keyboard.key_d){
+                                                        float y = camera.y;
+                                                        float x = camera.z;
+                                                        camera -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                                                        camera.z = x;
+                                                        camera.y = y;
+                                                }
+						camera += glm::vec3(playerSize, 0, playerSize);
 					}
 				}
-			}	
+				
+				this->camera.cameraPosition = camera;
+				if(hit){
+					break;
+				}
+			}
 		}
 	public:
 		void setSceneData(obj_data_t *d, size_t s){
 			sceneData = d;
 			sceneDataSize = s;
 		}
+
+		void setCollisionObjects(obj_t *objs, size_t objsCount){
+			this->objs = objs;
+			this->objsCount = objsCount;
+		}
 		bool create(void){
-	/*		if(!this->addVertexShader("./testObjects/fpsPlayer.vs", 0)){
-                                printf("Failed to compile vertex shader.\n");
-                                return false;
-                        }
-
-                        if(!this->addFragmentShader("./testObjects/fpsPlayer.fs", 1)){
-                                printf("Failed to compile fragment shader\n");
-                                return false;
-                        }
-
-                        if(!this->linkShaders()){
-                                printf("Faild to link shader.\n");
-                                return false;
-                        }
-*/
 			return true;
 		}
 		
-		bool jumping = false;
-		float jumpStrength = 0.05;
-		float jumpHeight = 1.75;
-		float jumpBase = 0;
-		float jumpPeak = 0;
-		float cameraSpeed = 0.05f;
+		
+		bool firstLoad = true;
 		void fpsControls(void){
 			/*
 			 * Account for player's head position.
@@ -107,7 +258,10 @@ class FpsPlayer : public GraphicsObject{
                         front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
                         front.y = sin(glm::radians(pitch));
                         front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-                        this->camera.cameraFront = glm::normalize(front);
+                        this->camera.cameraFront = front;//glm::normalize(front);
+			previousCoords = this->camera.cameraPosition;
+
+			calculateCollision();
 
 			/*
 			 * Manage horizontal movement
@@ -133,6 +287,10 @@ class FpsPlayer : public GraphicsObject{
 				this->camera.cameraPosition.y = y;
 			}
 
+			if (gui_engine_global.keyboard.key_e){
+                                this->camera.cameraPosition.y -= jumpStrength;
+                        }
+
 			// Error correction for invalid camera possitions
 			if(isnan(this->camera.cameraPosition.x)){
 				this->camera.cameraPosition.x = 0.000001;
@@ -153,8 +311,16 @@ class FpsPlayer : public GraphicsObject{
 			}else{
 				jumping = false;
 			}
+
+			if (gui_engine_global.keyboard.key_1){
+                                this->camera.cameraPosition = glm::vec3(5.980382, 5.903437, 5.995522);
+                        }else if(gui_engine_global.keyboard.key_2){
+				this->camera.cameraPosition = glm::vec3(-7.010662, 1.903437, -6.995522);	
+			}else if(gui_engine_global.keyboard.key_3){
+				this->camera.cameraPosition.x += cameraSpeed;
+			}
 			
-			calculateCollision();
+
 			if(!jumping && !grounded){
                       		this->camera.cameraPosition.y -= this->gravity;
 			}else{
