@@ -98,7 +98,7 @@ class GraphicsGeometry{
 			if(ret.y != ret.m*ret.x+ret.b){
 				error = true;
 			}else{
-			//	error = false;
+				error = false;
 			}
 			return ret;
 		}
@@ -246,10 +246,27 @@ class GraphicsGeometry{
         		ret.perspective_z_y = create2dLine(glm::vec2(a.z, a.y), glm::vec2(b.z, b.y));
 
 			ret.distance = distance(a, b);
-			ret.direction = ret.distance == 0 ? glm::vec3(0) : (b-a)/ret.distance;
+			ret.direction = glm::normalize(glm::cross(a, b));
+			if(isnan(ret.direction.x))
+				ret.direction.x = -0;
+			if(isnan(ret.direction.y))
+				ret.direction.y = -0;
+			if(isnan(ret.direction.z))
+				ret.direction.z = -0;
+
+				//ret.distance == 0 ? glm::vec3(0) : (b-a)/ret.distance;
+			//ret.direction = b - a;
+			
 			ret.start = a;
 			ret.end = ret.start + ret.distance*ret.direction;
-			if(ret.end.x != b.x && ret.end.y != b.y && ret.end.z != b.z){
+			if(isnan(ret.end.x))
+				ret.end.x = -0;
+			if(isnan(ret.end.y))
+				ret.end.y = 0;
+			if(isnan(ret.end.z))
+				ret.end.z = 0;
+
+			if((ret.end.x != b.x && ret.end.y != b.y && ret.end.z != b.z) || error){
 				error = true;
 			}else{
 				//error = false;
