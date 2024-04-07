@@ -66,8 +66,8 @@ int main(void){
 			previous = ctx;
 
 			switch(ctx){
-				case 0: // Main Menu
-				       	
+				case 0: // Main eenu
+					break;
 				case 1: // Scene One
 					ge.contextDestroy();
 					ge.setContext(&customTestContext);

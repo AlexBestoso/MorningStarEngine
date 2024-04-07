@@ -67,23 +67,23 @@ class CustomTestContext : public GraphicsContext{
 				exit(EXIT_FAILURE);
 			}
 
-			if(!skybox.create("./scenes/sampleSkyBox/sampleSkyBox.obj", "./scenes/sampleSkyBox/skyboxTexture.jpg")){
-                                printf("Failed to load skybox.\n");
-                                exit(EXIT_FAILURE);
-                        }
+			//if(!skybox.create("./scenes/sampleSkyBox/sampleSkyBox.obj", "./scenes/sampleSkyBox/skyboxTexture.jpg")){
+                        //        printf("Failed to load skybox.\n");
+                        //        exit(EXIT_FAILURE);
+                        //}
 	
 
 			playerOne.setSceneData(scene.getObjectPointer(), scene.getObjectCount());
-			playerOne.setCollisionObjects(scene.getObjs(), scene.getObjsCount());
+			playerOne.setCollisionObjects(scene.getObjects(), scene.getObjectCount());
 		        if(!playerOne.create()){
 		                printf("Failed to create main character\n");
 		                exit(EXIT_FAILURE);
 		        }
 	
-		        if(!testLight.create()){
+		        /*if(!testLight.create()){
 		                printf("Failed to create light source.\n");
 		                exit(EXIT_FAILURE);
-		        }
+		        }*/
 
 			this->activeCamera = &playerOne.camera;
 			
@@ -91,24 +91,25 @@ class CustomTestContext : public GraphicsContext{
 		}
 
 		void destroy(){
+			printf("Destroying Scene.\n");
 			scene.destroy();
 			playerOne.destroy();
-			testLight.destroy();
+			//testLight.destroy();
 		}
 		int exec(GLFWwindow* window){
 			this->processInput(window);
 			playerOne.draw();
 
 
-        	        testLight.camera = this->activeCamera[0];
+        	        //testLight.camera = this->activeCamera[0];
         	        //testLight.draw();
 
-	                skybox.lightPos = testLight.getPos();
-			skybox.camera = this->activeCamera[0];
-			skybox.draw();
+	                //skybox.lightPos = testLight.getPos();
+			//skybox.camera = this->activeCamera[0];
+			//skybox.draw();
 
 			scene.camera = this->activeCamera[0];
-			scene.lightPos = testLight.getPos();
+			//scene.lightPos = testLight.getPos();
 			scene.draw();
 			return this->context;
 		}

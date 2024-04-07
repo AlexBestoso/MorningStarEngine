@@ -82,8 +82,6 @@ class FpsPlayer : public GraphicsObject{
 			bool invertBack = false;
 			bool invertLeft = false;
 			bool invertRight = false;
-			if(sceneData == NULL || sceneDataSize <= 0)
-				return;
 
 			glm::vec3 pointa;
 			glm::vec3 pointb;
@@ -92,146 +90,126 @@ class FpsPlayer : public GraphicsObject{
 			
 			int objIndex = 0, tracker=0;
 			int objTrack = objs[objIndex].buffer_count;
-			for(int i=0; i<sceneDataSize; i++){
-				int test = (i%3);
-				if(tracker >= objs[objIndex].buffer_count){
-					objIndex ++;
-					tracker = 0;
-				}
-				if(test == 0){
-					pointa = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
-					tracker++;
-					continue;
-				}
-				if(test == 1){
-					pointb = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
-					tracker++;
-                                        continue;
-				}
 
-				pointc = glm::vec3(sceneData[i].vertex[0], sceneData[i].vertex[1], sceneData[i].vertex[2]);
-
-				tracker++;
-				if(tracker >= objs[objIndex].buffer_count){
-					tracker = 0;
-					objIndex++;
-				}
-				
-				triangle3_t triangle = geometry.createTriangle(pointa, pointb, pointc);
-				glm::vec3 down = glm::vec3(0, -1, 0);
-				glm::vec3 up = glm::vec3(0, 1, 0);
-				glm::vec3 right = glm::vec3(1, 0, 0);
-				glm::vec3 left = glm::vec3(-1, 0, 0);
-				glm::vec3 forward = glm::vec3(0, 0, 1);
-				glm::vec3 backward = glm::vec3(0, 0, -1);
-				triangle3_t triangleY = geometry.createTriangle(pointa*down, pointb*down, pointc*down);
-				triangle3_t triangleYn = geometry.createTriangle(pointa*up, pointb*up, camera*up);
-				triangle3_t triangleX = geometry.createTriangle(pointa*right, pointb*right, camera*right);
-				triangle3_t triangleXn = geometry.createTriangle(pointa*left, pointb*left, camera*left);
-				triangle3_t triangleZ = geometry.createTriangle(pointa*forward, pointb*forward, camera*forward);
-				triangle3_t triangleZn = geometry.createTriangle(pointa*backward, pointb*backward, camera*backward);
-
-				triangle3_t testA = geometry.createTriangle(pointa*down, pointb*down, camera*down);
-
-				line3_t fart = geometry.createLine(previousCoords, camera);
-				bool hit = generalCollision(camera, triangle);
-				if(tracker == 3 && objs[objIndex].name == "WallThree_Cube.004"){
-						printf("1==================================\n");
-						printf("object Name (%d): %s\n", tracker, objs[objIndex].name.c_str());
-						printf("Direction : %f\n", fart.direction.x);
-				}
-				if(hit){ 
-					 if(tracker == 3 && objs[objIndex].name == "WallThree_Cube.004"){
-                                                printf("2==================================\n");
-                                                printf("object Name (%d): %s\n", tracker, objs[objIndex].name.c_str());
-						printf("Direction : %f\n", fart.direction.x);
+			obj_data_t *pA = NULL; 
+			for(int i=0; i<objsCount; i++){
+				pA = (obj_data_t  *)objs[i].glut_data;
+				for(int j=0; j<objs[i].element_count; j++){
+				 	int test = (j%3);
+					if(test == 0){
+                                        	pointa = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
+                                        	tracker++;
+                                        	continue;
                                 	}
-					
-					if(testA.line_a.distance >= 0  && testA.line_a.distance <= 3 && triangleYn.line_a.distance >= 0 && triangleYn.line_a.distance <= 3){
-						camera.y += gravity;
-					}
-					
+                                	if(test == 1){
+                                	        pointb = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
+                                	        tracker++;
+                                	        continue;
+                                	}
 
-					if(triangleXn.line_a.distance >= 0 && triangleXn.line_a.distance <=3 && triangleX.line_a.distance >= 0 && triangleX.line_a.distance <=3){
-						glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
-						if (gui_engine_global.keyboard.key_w){
-                        			        float y = camera.y;
-							float x = camera.x;
-                        			        camera -= cameraSpeed * ff * this->camera.cameraFront;
-                        			        camera.y = y;
-							camera.x = x;
-                        			}
-                        			if (gui_engine_global.keyboard.key_s){
-                        			        float y = camera.y;
-							float x = camera.x;
-                        			        camera += cameraSpeed * ff * this->camera.cameraFront;
-                        			        camera.y = y;
-							camera.x = x;
-                        			}
-                        			if (gui_engine_global.keyboard.key_a){
-                        			        float y = camera.y;
-							float x = camera.x;
-                        			        camera += ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
-                        			        camera.y = y;
-							camera.x = x;
-                        			}
-                        			if (gui_engine_global.keyboard.key_d){
-                        			        float y = camera.y;
-							float x = camera.x;
-                        			        camera -= ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
-							camera.x = x;
-                        			        camera.y = y;
-                        			}
-                        			float y = camera.y;
-						float x = camera.x;
-						camera += playerSize * ff;
-						//camera.x = x;
-                        			camera.y = y;
-					}
-
-					if(triangleXn.line_a.distance >= 0 && triangleXn.line_a.distance <=3 && triangleX.line_a.distance >= 0 && triangleX.line_a.distance <=3){
-						glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
-						if (gui_engine_global.keyboard.key_w){
-                                                        float y = camera.y;
-                                                        float x = camera.z;
-                                                        camera -= cameraSpeed * ff * this->camera.cameraFront;
-                                                        camera.y = y;
-                                                        camera.z = x;
-                                                }
-                                                if (gui_engine_global.keyboard.key_s){
-                                                        float y = camera.y;
-                                                        float x = camera.z;
-                                                        camera += cameraSpeed * ff * this->camera.cameraFront;
-                                                        camera.y = y;
-                                                        camera.z = x;
-                                                }
-						if (gui_engine_global.keyboard.key_a){
-                                                        float y = camera.y;
-                                                        float x = camera.z;
-                                                        camera += ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
-                                                        camera.y = y;
-                                                        camera.z = x;
-                                                }
-                                                if (gui_engine_global.keyboard.key_d){
-                                                        float y = camera.y;
-                                                        float x = camera.z;
-                                                        camera -= ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
-                                                        camera.z = x;
-                                                        camera.y = y;
-                                                }
-                                                float y = camera.y;
-                                                float x = camera.z;
-						camera += playerSize * ff;
-						//camera.z = x;
-						camera.y = y;
-					}
+					pointc = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
 					
-				}
-				
-				if(hit){
-					printf("Updating position.\n");
-					this->camera.cameraPosition = camera;
-					break;
+                                	glm::vec3 down = glm::vec3(0, -1, 0);
+                                	glm::vec3 up = glm::vec3(0, 1, 0);
+                                	glm::vec3 right = glm::vec3(1, 0, 0);
+                                	glm::vec3 left = glm::vec3(-1, 0, 0);
+                                	glm::vec3 forward = glm::vec3(0, 0, 1);
+                                	glm::vec3 backward = glm::vec3(0, 0, -1);
+
+					triangle3_t triangle = geometry.createTriangle(pointa, pointb, pointc);
+                                	triangle3_t triangleY = geometry.createTriangle(pointa*down, pointb*down, pointc*down);
+                                	triangle3_t triangleYn = geometry.createTriangle(pointa*up, pointb*up, camera*up);
+                                	triangle3_t triangleX = geometry.createTriangle(pointa*right, pointb*right, camera*right);
+                                	triangle3_t triangleXn = geometry.createTriangle(pointa*left, pointb*left, camera*left);
+                                	triangle3_t triangleZ = geometry.createTriangle(pointa*forward, pointb*forward, camera*forward);
+                                	triangle3_t triangleZn = geometry.createTriangle(pointa*backward, pointb*backward, camera*backward);
+
+                                	triangle3_t testA = geometry.createTriangle(pointa*down, pointb*down, camera*down);
+					line3_t fart = geometry.createLine(previousCoords, camera);
+                                	bool hit = generalCollision(camera, triangle);
+                                	if(hit){
+						if(testA.line_a.distance >= 0  && testA.line_a.distance <= 3 && triangleYn.line_a.distance >= 0 && triangleYn.line_a.distance <= 3){
+                                                	camera.y += gravity;
+                                        	}
+						if(triangleXn.line_a.distance >= 0 && triangleXn.line_a.distance <=3 && triangleX.line_a.distance >= 0 && triangleX.line_a.distance <=3){
+                                                	glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
+                                                	if (gui_engine_global.keyboard.key_w){
+                                                	        float y = camera.y;
+                                                	        float x = camera.x;
+                                                	        camera += cameraSpeed * ff * this->camera.cameraFront;
+                                                	        camera.y = y;
+                                                	        camera.x = x;
+                                                	}
+                                                	if (gui_engine_global.keyboard.key_s){
+                                                	        float y = camera.y;
+                                                	        float x = camera.x;
+                                                	        camera -= cameraSpeed * ff * this->camera.cameraFront;
+                                                	        camera.y = y;
+                                                	        camera.x = x;
+                                                	}
+	
+							if (gui_engine_global.keyboard.key_a){
+	                                                        float y = camera.y;
+	                                                        float x = camera.x;
+	                                                        camera -= ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+	                                                        camera.y = y;
+	                                                        camera.x = x;
+	                                                }
+	                                                if (gui_engine_global.keyboard.key_d){
+	                                                        float y = camera.y;
+	                                                        float x = camera.x;
+	                                                        camera += ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+	                                                        camera.x = x;
+	                                                        camera.y = y;
+	                                                }
+
+                                                	float y = camera.y;
+                                                	float x = camera.x;
+                                                	camera += playerSize ;
+                                                	//camera.x = x;
+                                                	camera.y = y;
+						}
+						if(triangleXn.line_a.distance >= 0 && triangleXn.line_a.distance <=3 && triangleX.line_a.distance >= 0 && triangleX.line_a.distance <=3){
+                                                	glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
+                                                	if (gui_engine_global.keyboard.key_w){
+                                                	        float y = camera.y;
+                                                	        float x = camera.z;
+                                                	        camera += cameraSpeed * ff * this->camera.cameraFront;
+                                                	        camera.y = y;
+                                                	        camera.z = x;
+                                                	}
+                                                	if (gui_engine_global.keyboard.key_s){
+                                                	        float y = camera.y;
+                                                	        float x = camera.z;
+                                                	        camera -= cameraSpeed * ff * this->camera.cameraFront;
+                                                	        camera.y = y;
+                                                	        camera.z = x;
+                                                	}
+                                                	if (gui_engine_global.keyboard.key_a){
+								float y = camera.y;
+                                                	        float x = camera.z;
+                                                	        camera -= ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                                                	        camera.y = y;
+                                                	        camera.z = x;
+                                                	}
+                                                	if (gui_engine_global.keyboard.key_d){
+                                                	        float y = camera.y;
+                                                	        float x = camera.z;
+                                                	        camera += ff * glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                                                	        camera.z = x;
+                                                	        camera.y = y;
+                                                	}
+
+                                                	float y = camera.y;
+                                                	float x = camera.z;
+							camera += playerSize;
+							//camera.z = x;
+							camera.y = y;
+						}
+
+						this->camera.cameraPosition = camera;
+						break;
+					}
 				}
 			}
 		}

@@ -5,12 +5,6 @@ typedef struct obj_data{
 	float material_color[3];
 }obj_data_t;
 
-typedef struct obj_face_data{
-	int vector;
-	int texture;
-	int normal;
-}obj_face_data_t;
-
 typedef struct obj_materia{
 	std::string name = "";
 	float Ka[3] = {0, 0, 0};
@@ -28,15 +22,14 @@ typedef struct obj{
 	std::string name = "";
 	std::string textureLocation = "";
 	obj_material_t material;
-	
-	float *vertex_set = NULL;
-        float *texture_set = NULL;
-	float *normal_set = NULL;
+	float *glut_data = NULL;
+	size_t glut_size = 0;
 	
 	size_t vertex_count = 0;
 	size_t texture_count = 0;
 	size_t normal_count = 0;
 	size_t face_count = 0;
+	size_t element_count = 0;
 	
 	size_t buffer_size = 0;
 	int buffer_start = 0;
@@ -51,10 +44,11 @@ typedef struct obj{
 	int normal_end = 0;
 }obj_t;
 
-
 class WavefrontImport{
 	private:
 		std::string materialFileLoc = "";
+		std::string objectDirectory = "";
+		std::string objectName = "";
 		obj_var_tracker_t varTracker;
 		obj_t *importedObjects = NULL;
 
@@ -345,6 +339,8 @@ class WavefrontImport{
 
 		}
 
+		
+
 		bool parseMaterials(void){
 			fd = open(materialFileLoc.c_str(), O_RDONLY);
                         if(!fd){
@@ -443,12 +439,11 @@ class WavefrontImport{
 		void calculateOffsets(void){
 			int o = 0;
 			int faceTracker = 0;
-			printf("Offset Debug, Face count : %ld\n", varTracker.face_count);
 			for(int i=0; i<varTracker.face_count; i++){
-				int val = (faceArrayLens[i]%3) == 1 ? 2 : (faceArrayLens[i]%3) == 2 ? 1 : 0; // Magical line that corrects a flaw in the population of this array.
+				//int val = (faceArrayLens[i]%3) == 1 ? 2 : (faceArrayLens[i]%3) == 2 ? 1 : 0; // Magical line that corrects a flaw in the population of this array.
 				if(o > varTracker.object_count)
 					break;
-				importedObjects[o].buffer_size += (faceArrayLens[i]+val)*11; // 8 becase 3v / 2t/ 3n
+				importedObjects[o].buffer_size += (faceArrayLens[i]/*+val*/)*11; // 8 becase 3v / 2t/ 3n
 				if(faceTracker >= importedObjects[o].face_count){
 					importedObjects[o].buffer_count = importedObjects[o].buffer_size / 11;
 					if(o == 0){
@@ -472,144 +467,141 @@ class WavefrontImport{
 			}
 		}
 
-		void createGlBuffer(void){
-			glObjBufferSize = 0;
-			for(int i=0; i<varTracker.face_count; i++){
-				int val = (faceArrayLens[i]%3) == 1 ? 2 : (faceArrayLens[i]%3) == 2 ? 1 : 0;
-				if(materialFileLoc == "")
-					glObjBufferSize += 8*(faceArrayLens[i]+val);
-				else
-					glObjBufferSize += 11*(faceArrayLens[i]+val);
+		int getObjectIndexByFace(int faceIndex){
+			int ret = -1;
+			std::string grabber = "";
+			int faceCount = 0;
+			for(int i=0; i<objFileSize; i++){
+                                if(objFileData[i] == '\n'){
+					if(grabber.rfind("o ", 0) == 0){
+						ret++;
+					}else if(grabber.rfind("f ", 0) == 0){
+						faceCount++;
+					}
+					grabber = "";
+				}else{
+					grabber += objFileData[i];
+				}
+				if(faceCount == faceIndex){
+					return ret == -1 ? 0 : ret;
+				}
 			}
-                	glObjBuffer = new float[glObjBufferSize];
+			return ret;
+		}
+
+		int getObjectVectorOffsetByIndex(int objIndex){
+			int ret = 0;
+			if(objIndex <= -1 || objIndex >= varTracker.object_count)
+				return 0;
+			for(int i=0; i<varTracker.object_count; i++){
+				if(i == objIndex){
+					break;
+				}else{
+					ret += importedObjects[i].vertex_count;
+				}
+			}
+			return ret;
+		}
+		
+		int getObjectTextureOffsetByIndex(int objIndex){
+                        int ret = 0;
+                        if(objIndex <= -1 || objIndex >= varTracker.object_count)
+                                return 0;
+                        for(int i=0; i<varTracker.object_count; i++){
+                                if(i == objIndex){
+                                        break;
+                                }else{
+                                        ret += importedObjects[i].texture_count;
+                                }
+                        }
+                        return ret;
+		}
+
+		int getObjectNormalOffsetByIndex(int objIndex){
+			int ret = 0;
+                        if(objIndex <= -1 || objIndex >= varTracker.object_count)
+                                return 0;
+                        for(int i=0; i<varTracker.object_count; i++){
+                                if(i == objIndex){
+                                        break;
+                                }else{
+                                        ret += importedObjects[i].normal_count;
+                                }
+                        }
+                        return ret;
+		}
+
+		size_t calculateBufferSize(void){
+			glObjBufferSize = 0;
+                        for(int i=0; i<varTracker.object_count; i++){
+                                if(materialFileLoc == "")
+                                        glObjBufferSize += 8 * importedObjects[i].buffer_count;
+                                else
+                                        glObjBufferSize += 11 * importedObjects[i].buffer_count;
+                        }
+			return glObjBufferSize;
+		}
+
+		void createGlBuffer(void){
+			glObjBufferSize = glObjBufferSize;
+			printf("Buffer Size : %ld\n", glObjBufferSize);
+                	this->glObjBuffer = new float[glObjBufferSize];
 			int tracker = 0;
 			int faceTrack = 0;
 			for(int i=0; i<varTracker.face_count; i++){
-				int vec_a=0, vec_b=0, vec_c=0;
-				int tex_a=0, tex_b=0, tex_c=0;
-				int norm_a=0, norm_b=0, norm_c=0;
-				int vec=0, tex=0, norm=0;
-				int correct = faceArrayLens[i] % 3;
-				for(int j=0; j<3*faceArrayLens[i]; j++){
-					vec_c = vec_b;
-					tex_c = tex_b;
-					norm_c = norm_b;
+				if(tracker > glObjBufferSize)
+					break;
+				int objectIndex = getObjectIndexByFace(i);
+				if(objectIndex <= -1)
+					continue;
+				int objectVectorOffset = getObjectVectorOffsetByIndex(objectIndex);
+				int objectTextureOffset = getObjectTextureOffsetByIndex(objectIndex);
+				int objectNormalOffset = getObjectNormalOffsetByIndex(objectIndex);
+				glm::vec3 vert;
+				glm::vec2 texture;
+				glm::vec3 normal;
+				glm::vec3 color;
 
-					vec_b = vec_a;
-					tex_b = tex_a;
-					norm_b = norm_a;
-
-					vec_a = vec;
-					tex_a = tex;
-					norm_a = norm;
-
-					vec = (faceArray[faceTrack] - 1)*vertexMultiplyer;
-                                        tex = (faceArray[faceTrack+1] - 1)*textureMultiplyer;
-                                        norm = (faceArray[faceTrack+2] - 1)*normalMultiplyer;
-
-					faceTrack+=3;
-
-					if(correct == 1 && j-3 >= faceArrayLens[i] || correct == 2 && j-6 >=faceArrayLens[i]){
+				// what vector indecies does the first face use?
+				int faceCounter = 0;
+				for(int j=0; j<faceArrayLens[j]; j++){
+					if(i+3 >= varTracker.face_count || tracker > glObjBufferSize)
 						break;
+				
+					int vertIndex = objectVectorOffset+faceArray[(i*j)+j];
+					int textureIndex = objectTextureOffset+faceArray[(i*j)+j+1];
+					int normalIndex = objectNormalOffset+faceArray[(i*j)+j+2];
+					if(vertIndex+2 >= varTracker.vertex_count*vertexMultiplyer)
+						break;
+					if(textureIndex+1 >= varTracker.texture_count*textureMultiplyer)
+						break;
+					if(normalIndex+2 >= varTracker.normal_count*normalMultiplyer)
+						break;
+					vert = glm::vec3(vertexArray[vertIndex], vertexArray[vertIndex+1], vertexArray[vertIndex+2]);
+					texture = glm::vec2(textureArray[textureIndex], textureArray[textureIndex+1]);
+					normal = glm::vec3(normalArray[normalIndex], normalArray[normalIndex+1], normalArray[normalIndex+2]);
 					
-					}
-					if(correct == 0){
-						printf("In thirds %d %d\n", i, j);
-						printf("\t%f, %f, %f\n", vertexArray[vec], vertexArray[vec+1], vertexArray[vec+1]);
-					}
-					
-					glObjBuffer[tracker] = vertexArray[vec];
-                                        glObjBuffer[tracker+1] = vertexArray[vec+1];
-                                        glObjBuffer[tracker+2] = vertexArray[vec+2];
-                                        glObjBuffer[tracker+3] = textureArray[tex];
-                                        glObjBuffer[tracker+4] = textureArray[tex+1];
-                                        glObjBuffer[tracker+5] = normalArray[norm];
-                                        glObjBuffer[tracker+6] = normalArray[norm+1];
-                                        glObjBuffer[tracker+7] = normalArray[norm+2];
+
+					glObjBuffer[tracker] = vert.x; tracker++;
+					glObjBuffer[tracker] = vert.y; tracker++;
+					glObjBuffer[tracker] = vert.z; tracker++;
+					glObjBuffer[tracker] = texture.x; tracker++;
+					glObjBuffer[tracker] = texture.x; tracker++;
+					glObjBuffer[tracker] = normal.x; tracker++;
+					glObjBuffer[tracker] = normal.y; tracker++;
+					glObjBuffer[tracker] = normal.z; tracker++;
 					if(materialFileLoc != ""){
-						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
-                                                glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
-                                                glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						tracker += 11;
+						color = glm::vec3(materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
+						glObjBuffer[tracker] = color.x; tracker++;
+						glObjBuffer[tracker] = color.y; tracker++;
+						glObjBuffer[tracker] = color.z; tracker++;
+						tracker+= 11;
 					}else{
-                                        	tracker +=8;
-					}
-                                        	j+=2;
-				}
-
-				if(correct == 1){ // We have one vertex placed and need to place 2 more.
-					glObjBuffer[tracker] = vertexArray[vec_a];
-                                        glObjBuffer[tracker+1] = vertexArray[vec_a+1];
-                                        glObjBuffer[tracker+2] = vertexArray[vec_a+2];
-                                        glObjBuffer[tracker+3] = textureArray[tex_a];
-                                        glObjBuffer[tracker+4] = textureArray[tex_a+1];
-                                        glObjBuffer[tracker+5] = normalArray[norm_a];
-                                        glObjBuffer[tracker+6] = normalArray[norm_a+1];
-                                        glObjBuffer[tracker+7] = normalArray[norm_a+2];
-					if(materialFileLoc != ""){
-						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
-                                                glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
-                                                glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						tracker += 11;
-                                        }else{
-						tracker +=8;
-					}
-
-					glObjBuffer[tracker] = vertexArray[vec];
-                                        glObjBuffer[tracker+1] = vertexArray[vec+1];
-                                        glObjBuffer[tracker+2] = vertexArray[vec+2];
-                                        glObjBuffer[tracker+3] = textureArray[tex];
-                                        glObjBuffer[tracker+4] = textureArray[tex+1];
-                                        glObjBuffer[tracker+5] = normalArray[norm];
-                                        glObjBuffer[tracker+6] = normalArray[norm+1];
-                                        glObjBuffer[tracker+7] = normalArray[norm+2];
-					if(materialFileLoc != ""){
-						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
-                                                glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
-                                                glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						tracker += 11;
-                                        }else{
 						tracker += 8;
 					}
-
-					glObjBuffer[tracker] = vertexArray[vec_c];
-                                        glObjBuffer[tracker+1] = vertexArray[vec_c+1];
-                                        glObjBuffer[tracker+2] = vertexArray[vec_c+2];
-                                        glObjBuffer[tracker+3] = textureArray[tex_c];
-                                        glObjBuffer[tracker+4] = textureArray[tex_c+1];
-                                        glObjBuffer[tracker+5] = normalArray[norm_c];
-                                        glObjBuffer[tracker+6] = normalArray[norm_c+1];
-                                        glObjBuffer[tracker+7] = normalArray[norm_c+2];
-					if(materialFileLoc != ""){
-						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
-                                                glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
-                                                glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						tracker += 11;
-                                        }else{
-						tracker += 8;
-					}
+					
+					j+= 2;	
 				}
-
-				if(correct == 2){
-					printf("Correct 2 by adding 1\n");
-					glObjBuffer[tracker] = vertexArray[vec_b];
-                                        glObjBuffer[tracker+1] = vertexArray[vec_b+1];
-                                        glObjBuffer[tracker+2] = vertexArray[vec_b+2];
-                                        glObjBuffer[tracker+3] = textureArray[tex_b];
-                                        glObjBuffer[tracker+4] = textureArray[tex_b+1];
-                                        glObjBuffer[tracker+5] = normalArray[norm_b];
-                                        glObjBuffer[tracker+6] = normalArray[norm_b+1];
-                                        glObjBuffer[tracker+7] = normalArray[norm_b+2];
-					if(materialFileLoc != ""){
-						glObjBuffer[tracker+8] = materials[materialMap[i]].Ka[0];
-                                                glObjBuffer[tracker+9] = materials[materialMap[i]].Ka[1];
-                                                glObjBuffer[tracker+10] = materials[materialMap[i]].Ka[2];
-						tracker+=11;
-                                        }else{
-                                        	tracker += 8;
-					}
-				}
-
 			}
 
 			obj = (obj_data_t *)glObjBuffer;
@@ -663,47 +655,472 @@ class WavefrontImport{
 			return importedObjects;
 		}
 
+		void setFile(std::string directory, std::string name){
+			this->objectDirectory = directory;
+			this->objectName = name;
+		}
 
-		bool importComplex(std::string objectDir, std::string objectName){
-			std::string objectFile = objectDir + "/" + objectName + ".obj";
-			materialFileLoc = objectDir + "/" + objectName + ".mtl";
-			if(access(objectFile.c_str(), F_OK) == -1){
-				printf("Error: object file '%s' doesn't exist.\n", objectFile.c_str());
-				return false;
+		size_t countObjects(void){
+			if(this->objectDirectory == "" || this->objectName == ""){
+				return 0;
 			}
-		
-			if(access(materialFileLoc.c_str(), F_OK) == -1)
-				materialFileLoc = "";
+			std::string objFileName = objectDirectory + "/" + objectName + ".obj";
+			int fd = open(objFileName.c_str(), O_RDONLY);
+			if(fd <= -1){
+				return 0;
+			}
+			struct stat st;
+			if(fstat(fd, &st) == -1){
+				return 0;
+			}
+			
+			size_t ret = 0;
+			char *b = new char[st.st_size];
+			if(read(fd, b, st.st_size) != st.st_size){
+				close(fd);
+				delete[] b;
+				return 0;
+			}
+			std::string grabber = "";
+			for(int i=0; i<st.st_size; i++){
+				if(b[i] == '\n'){
+					if(grabber.rfind("o ", 0) == 0){
+						ret++;
+					}
+					grabber = "";
+				}else{
+					grabber += b[i];
+				}
+			}
+			close(fd);
+			delete[] b;
+			return ret;
+		}
 
-			if(!this->readFile(objectFile.c_str())){
+		bool objStat(obj_t *o, size_t oSize){
+			if(this->objectDirectory == "" || this->objectName == ""){
+                                return false;
+                        }
+                        std::string objFileName = objectDirectory + "/" + objectName + ".obj";
+                        int fd = open(objFileName.c_str(), O_RDONLY);
+                        if(fd <= -1){
+                                return false;
+                        }
+                        struct stat st;
+                        if(fstat(fd, &st) == -1){
                                 return false;
                         }
 
-			// Parse out the .obj and .mtl files
-			countFields();
-			allocateFieldStrings();
-                        parseVertexFloats();
-                        parseTextureFloats();
-                        parseNormalFloats();
-                        parseFaceIndecies();
-                        parseMaterials();
-			calculateOffsets();
-			
-			// check for texutre images
-			for(int i=0; i<varTracker.object_count; i++){
-				importedObjects[i].textureLocation = objectDir + "/" + importedObjects[i].name + ".jpg";
-				if(access(importedObjects[i].textureLocation.c_str(), F_OK) == -1){
-					importedObjects[i].textureLocation = "";
+			char *b = new char[st.st_size];
+			if(read(fd, b, st.st_size) != st.st_size){
+				delete[] b;
+				close(fd);
+				return false;
+			}
+			int oi = -1;
+			std::string grabber = "";
+			for(int i=0; i<st.st_size; i++){
+				if(oi >= oSize && oi != -1){
+					break;
+				}
+				if(b[i] == '\n'){
+					if(grabber.rfind("o ", 0) == 0){
+						oi++;
+						o[oi].name = "";
+						if(o[oi].glut_data != NULL){
+							delete[] o[oi].glut_data;
+							o[oi].glut_data = NULL;
+						}
+						o[oi].glut_size = 0;
+						for(int j=2; j<grabber.length(); j++)
+							o[oi].name += grabber[j];
+					}else if(grabber.rfind("f ", 0) == 0){
+						o[oi].face_count++;
+						grabber += ' ';
+						std::string grab = "";
+						for(int j=2; j<grabber.length(); j++){
+							if(grabber[j] == ' '){
+								o[oi].glut_size+=11;
+								o[oi].element_count++;
+								grab = "";
+							}else{
+								grab += grabber[j];
+							}
+						}
+						if(grab != "")
+							o[oi].glut_size += 11;
+					}else if(grabber.rfind("vn ", 0) == 0){
+						o[oi].normal_count++;
+					}else if(grabber.rfind("v ", 0) == 0){
+                                                o[oi].vertex_count++;
+					}else if(grabber.rfind("vt ", 0) == 0){
+						o[oi].texture_count++;
+					}else if(grabber.rfind("usemtl ", 0) == 0){
+						o[oi].material.name = "";
+						for(int j=7; j<grabber.length(); j++)
+							o[oi].material.name += grabber[j];
+					}
+					grabber = "";
 				}else{
-					printf("Debug Found Texture '%s'\n", importedObjects[i].textureLocation.c_str());
+					grabber += b[i];
+				}
+			}
+			close(fd);
+			delete[] b;
+			return true;
+		}
+
+		bool loadMaterial(obj_t *o, size_t oSize){
+			if(this->objectDirectory == "" || this->objectName == ""){
+                                return false;
+                        }
+			std::string materialFileLoc = this->objectDirectory + "/" + this->objectName + ".mtl";
+                        fd = open(materialFileLoc.c_str(), O_RDONLY);
+                        if(!fd){
+                                printf("Failed to open '%s'\n", materialFileLoc.c_str());
+                                return false;
+                        }
+
+                        struct stat st;
+                        if(fstat(fd, &st)){
+                                printf("fstat failed.\n");
+                                close(fd);
+                                return false;
+                        }
+                        size_t mtlSize = st.st_size;
+                        char *mtl = new char[mtlSize];
+
+                        int err = read(fd, mtl, mtlSize);
+			if(err != mtlSize){
+                                printf("Failed to read.\n");
+                                close(fd);
+                                delete[] mtl;
+                                return false;
+                        }
+
+                        close(fd);
+			
+			std::string grabber = "";
+			std::string materialName = "";
+                        int selectedMaterial = -1;
+                        for(int i=0; i<mtlSize; i++){
+                                if(mtl[i] == '\n'){
+                                        if(grabber.rfind("newmtl ", 0) == 0){ // Found material name
+                                                std::string name = "";
+                                                for(int j=7; j<grabber.length(); j++){
+                                                        name += grabber[j];
+                                                        materialName += grabber[j];
+                                                }
+
+                                                for(int j=0; j<uniqueMaterialCount; j++){
+                                                        if(name == materials[j].name){
+                                                                selectedMaterial = j;
+                                                                break;
+                                                        }
+                                                }
+                                        }else if(grabber.rfind("Kd ", 0) == 0){
+						for(int j=0; j<oSize; j++){
+							if(materialName != o[j].material.name){
+								continue;
+							}
+                                                	std::string grab = "";
+
+                                                	bool gotRed = false;
+							bool gotGreen = false;
+                                                	for(int k=3; k<grabber.length(); k++){
+                                                	        if(grabber[j] == ' '){
+									if(!gotRed){
+										o[j].material.Ka[0] = std::stof(grab);
+										gotRed = true;
+									}else if(!gotGreen){
+										o[j].material.Ka[1] = std::stof(grab);
+										gotGreen = true;
+									}else{
+										o[j].material.Ka[2] = std::stof(grab);
+									
+									}
+                                                	                grab = "";
+                                                	        }else{
+                                                	                grab += grabber[k];
+                                                	        }
+                                                	}
+							if(grab != ""){
+								o[j].material.Ka[2] = std::stof(grab);
+							}
+						}
+                                        }
+                                        grabber = "";
+                                }else{
+                                        grabber += mtl[i];
+                                }
+                        }
+                        delete[] mtl;
+			return true;
+		}
+		bool loadData(obj_t *o, size_t oSize){
+			 if(this->objectDirectory == "" || this->objectName == ""){
+                                return false;
+                        }
+                        std::string objFileName = objectDirectory + "/" + objectName + ".obj";
+                        int fd = open(objFileName.c_str(), O_RDONLY);
+                        if(fd <= -1){
+                                return false;
+                        }
+                        struct stat st;
+                        if(fstat(fd, &st) == -1){
+                                return false;
+                        }
+
+			size_t bSize = st.st_size;
+                        char *b = new char[bSize];
+                        int err = read(fd, b, bSize);
+		       	if(err != st.st_size){
+                                delete[] b;
+                                close(fd);
+				return false;
+                        }
+			int oi = -1;
+			glm::vec3 *v = NULL;
+			int vi = 0;
+			glm::vec2 *t = NULL;
+			int ti = 0;
+			glm::vec3 *n = NULL;
+			int ni = 0;
+			glm::vec3 *f = NULL;
+			int fi = 0;
+			int glI=0;
+			std::string grabber = "";
+			bool finalize = false;
+			int vTrack = 0;
+			int tTrack = 0;
+			int nTrack = 0;
+			for(int i=0; i<st.st_size; i++){
+				if(b[i] == '\n'){
+					if(grabber.rfind("o ", 0) == 0){
+						if(oi >= 0){
+							for(int j=0; j<o[oi].element_count; j++){
+								if(glI >= o[oi].glut_size){
+									break;
+								}
+
+								int vOff = (int)(f[j].x-1); //- (vTrack-o[oi].vertex_count) - 1;
+								int tOff = (int)(f[j].y-1); // - (tTrack-o[oi].texture_count) - 1;
+								int nOff = (int)(f[j].z-1); //- (nTrack-o[oi].normal_count) - 1;
+								if(oi > 1){
+									vOff -= o[oi-1].vertex_count;
+									tOff -= o[oi-1].texture_count;
+									nOff -= o[oi-1].normal_count;
+								}
+
+								o[oi].glut_data[glI] = v[vOff].x;
+								glI++;
+								o[oi].glut_data[glI] = v[vOff].y;
+								glI++;
+								o[oi].glut_data[glI] = v[vOff].z;
+								glI++;
+
+								o[oi].glut_data[glI] = t[tOff].x;
+								glI++;
+								o[oi].glut_data[glI] = t[tOff].y;
+								glI++;
+								
+								o[oi].glut_data[glI] = n[nOff].x;
+								glI++;
+								o[oi].glut_data[glI] = n[nOff].y;
+								glI++;
+								o[oi].glut_data[glI] = n[nOff].z;
+								glI++;
+								
+								o[oi].glut_data[glI] = o[oi].material.Ka[0];
+								glI++;
+								o[oi].glut_data[glI] = o[oi].material.Ka[1];
+								glI++;
+								o[oi].glut_data[glI] = o[oi].material.Ka[2];
+								glI++;
+							}
+						}
+						oi++;
+						if(f != NULL){
+                        		        	delete[] f;
+							f = NULL;
+						}
+                        			if(n != NULL){
+                        			        delete[] n;
+							n = NULL;
+						}
+                        			if(t != NULL){
+                        			        delete[] t;
+							t = NULL;
+						}
+                        			if(v != NULL){
+                        		        	delete[] v;
+							v = NULL;
+						}
+						if(o[oi].glut_data){
+							delete[] o[oi].glut_data;
+							o[oi].glut_data = NULL;
+
+						}
+						o[oi].glut_data = new float[o[oi].glut_size];
+						vi = 0;
+						ti = 0;
+						ni = 0;
+						fi = 0;
+						glI = 0;
+						v = new glm::vec3[o[oi].vertex_count];
+						t = new glm::vec2[o[oi].texture_count];
+						n = new glm::vec3[o[oi].normal_count];
+						f = new glm::vec3[o[oi].element_count];
+					}else if(grabber.rfind("v ", 0) == 0){
+						std::string grab = "";
+						bool gotX = false;
+						for(int j=2; j<grabber.length(); j++){
+							if(grabber[j] == ' '){
+								if(!gotX){
+									v[vi].x = std::stof(grab.c_str());
+									gotX = true;
+								}else{
+									v[vi].y = std::stof(grab.c_str());
+								}
+								
+								grab = "";
+							}else{
+								grab += grabber[j];
+							}
+						}
+						if(grab != "")
+							v[vi].z = std::stof(grab.c_str());
+						vi++;
+						vTrack++;
+					}else if(grabber.rfind("vn ", 0) == 0){
+                                                std::string grab = "";
+                                                bool gotX = false;
+                                                for(int j=3; j<grabber.length(); j++){
+                                                        if(grabber[j] == ' '){
+                                                                if(!gotX){
+                                                                        n[ni].x = std::stof(grab.c_str());
+                                                                        gotX = true;
+                                                                }else{
+                                                                        n[ni].y = std::stof(grab.c_str());
+                                                                }
+
+                                                                grab = "";
+                                                        }else{
+                                                                grab += grabber[j];
+                                                        }
+                                                }
+                                                if(grab != "")
+                                                        n[ni].z = std::stof(grab.c_str());
+                                                ni++;
+						nTrack++;
+                                        }else if(grabber.rfind("vt", 0) == 0){
+                                                std::string grab = "";
+                                                for(int j=3; j<grabber.length(); j++){
+                                                        if(grabber[j] == ' '){
+                                                                t[ti].x = std::stof(grab.c_str());
+                                                                grab = "";
+                                                        }else{
+                                                                grab += grabber[j];
+                                                        }
+                                                }
+                                                if(grab != "")
+                                                        t[ti].y = std::stof(grab.c_str());
+                                                ti++;
+						tTrack++;
+                                        }else if(grabber.rfind("f ", 0) == 0){
+						grabber += " ";
+                                                std::string grab = "";
+                                                for(int j=2; j<grabber.length(); j++){
+                                            		if(grabber[j] == ' '){
+								grab += "/";
+								std::string g = "";
+								bool gotV=false, gotT=false;
+								for(int k=0; k<grab.length(); k++){
+									if(grab[k] == '/'){
+										if(!gotV){
+											f[fi].x = std::stof(g.c_str());
+											gotV=true;
+										}else if(!gotT){
+											f[fi].y = std::stof(g.c_str());
+											gotT=true;
+										}else{ // got normal
+											f[fi].z = std::stof(g.c_str());
+											fi++;
+											g = "";
+											break;
+										}
+										g = "";
+									}else{
+										g += grab[k];
+									}
+								}
+
+                                                                grab = "";
+                                                        }else{
+                                                                grab += grabber[j];
+                                                        }
+                                                }
+                                        }
+					grabber = "";
+				}else{
+					grabber += b[i];
 				}
 			}
 
-			// debug code
-			createGlBuffer();
-                        delete[] this->objFileData;
+			// Final process
+			for(int j=0; j<o[oi].element_count; j++){
+				if(glI >= o[oi].glut_size){
+					break;
+				}
 
-			return true;	
+				int vOff = (int)(f[j].x-1); //- (vTrack-o[oi].vertex_count) - 1;
+				int tOff = (int)(f[j].y-1); // - (tTrack-o[oi].texture_count) - 1;
+				int nOff = (int)(f[j].z-1); //- (nTrack-o[oi].normal_count) - 1;
+				if(oi > 0){
+					vOff -= o[oi-1].vertex_count;
+					tOff -= o[oi-1].texture_count;
+					nOff -= o[oi-1].normal_count;
+				}
+				o[oi].glut_data[glI] = v[vOff].x;glI++;
+				o[oi].glut_data[glI] = v[vOff].y;glI++;
+				o[oi].glut_data[glI] = v[vOff].z;glI++;
+				
+				o[oi].glut_data[glI] = t[tOff].x;glI++;
+				o[oi].glut_data[glI] = t[tOff].y;glI++;
+				
+				o[oi].glut_data[glI] = n[nOff].x;glI++;
+				o[oi].glut_data[glI] = n[nOff].y;glI++;
+				o[oi].glut_data[glI] = n[nOff].z;glI++;
+
+				o[oi].glut_data[glI] = o[oi].material.Ka[0];glI++;
+				o[oi].glut_data[glI] = o[oi].material.Ka[1];glI++;
+				o[oi].glut_data[glI] = o[oi].material.Ka[2];glI++;
+			}
+
+			for(int i=0; i<oSize; i++){
+				o[i].textureLocation = this->objectDirectory;
+			       	o[i].textureLocation += "/";
+				o[i].textureLocation += o[i].name;
+			       	o[i].textureLocation +=	".jpg";
+                                if(access(o[i].textureLocation.c_str(), F_OK) == -1){
+                                        o[i].textureLocation = "";
+                                }else{
+                                        printf("Debug: Found Texture '%s'\n", o[i].textureLocation.c_str());
+                                }
+			}
+
+
+			delete[] b; 
+                        if(f != NULL)
+				delete[] f;
+                        if(n != NULL)
+				delete[] n;
+                        if(t != NULL)
+				delete[] t;
+			if(v != NULL)
+				delete[] v;
+			close(fd);
+			return true;
 		}
 
 		bool import(const char *objFile){

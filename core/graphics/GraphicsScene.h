@@ -4,19 +4,16 @@ class GraphicsScene : public GraphicsObject{
 		WavefrontImport importer;
 		GraphicsTexture *objectTextures = NULL;
 		size_t objectTextureCount = 0;
-		obj_t *objs = NULL;
+		obj_t * objs;
+		
 
 	public:
 		obj_t *getObjs(void){
 			return objs;
 		}
-		size_t getObjsCount(void){
-			return this->importer.getObjectCount();
-		}
+
+		
 		glm::vec3 lightPos;
-		size_t getObjectCount(void){
-			return importer.objCount;
-		}
 		obj_data_t *getObjectPointer(void){
 			return importer.obj;
 		}
@@ -64,12 +61,13 @@ class GraphicsScene : public GraphicsObject{
                         unsigned int projectionLoc = this->getUniformLoc("projection");
                         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
+			objs = this->getObjects();
 			if(objs != NULL){
-				for(int i=0; i<this->importer.getObjectCount(); i++){
+				for(int i=0; i<this->getObjectCount(); i++){
 					if(objs[i].textureLocation != "")
 						objectTextures[i].bind2D();
-					this->storeVertexData(sizeof(float)*objs[i].buffer_size, this->importer.glObjBuffer+objs[i].buffer_start, GL_STATIC_DRAW);
-					glDrawArrays(GL_TRIANGLES, 0, objs[i].buffer_count);
+					this->storeVertexData(sizeof(float)*objs[i].glut_size, objs[i].glut_data, GL_STATIC_DRAW);
+					glDrawArrays(GL_TRIANGLES, 0, objs[i].element_count);
 					this->setUniform("model", model);
 
 					if(objs[i].textureLocation != "")
@@ -100,11 +98,12 @@ class GraphicsScene : public GraphicsObject{
                         this->bindVao();
                         this->bindVbo();
 
-			if(!this->importer.importComplex(sceneDir, sceneName)){
-                                printf("Failed to import Cube object.\n");
+			if(!this->import(sceneDir, sceneName)){
+			//if(!this->importer.importComplex(sceneDir, sceneName)){
+                                printf("Failed to import the object '%s'.\n", sceneName.c_str());
                                 return false;
                         }
-			objs = this->importer.getImportedObjects();
+			//objs = this->importer.getImportedObjects();
 
 			this->setAttributePointer(0, 3, 11, (void *)0); // vertex
                         this->enableArrayAttribute(0);
@@ -115,22 +114,25 @@ class GraphicsScene : public GraphicsObject{
 			this->setAttributePointer(3, 3, 11, (void *)(8*sizeof(float))); // material color
                         this->enableArrayAttribute(3);
 
-			objectTextureCount = this->importer.getObjectCount();
+			objectTextureCount = this->getObjectCount();
 			objectTextures = new GraphicsTexture[objectTextureCount];
+			objs = this->getObjects();
 
 			for(int i=0; i<objectTextureCount; i++){
 				if(objs[i].textureLocation == ""){
 					continue;
 				}
-				objectTextures[i].add2DParameter(0, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                        	objectTextures[i].add2DParameter(1, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                        	objectTextures[i].add2DParameter(2, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        	objectTextures[i].add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                        	objectTextures[i].setTextureUnit(0);
-                        	if(!objectTextures[i].loadTexture2D(objs[i].textureLocation.c_str())){
+				GraphicsTexture test;
+				test.add2DParameter(0, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                        	test.add2DParameter(1, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                        	test.add2DParameter(2, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                        	test.add2DParameter(3, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                        	test.setTextureUnit(0);
+                        	if(!test.loadTexture2D(objs[i].textureLocation.c_str())){
                         	        printf("Failed to load texture for object '%s'\n", objs[i].name.c_str());
                         	        return false;
                         	}
+				objectTextures[i] = test;
 			}
 
 

@@ -19,27 +19,44 @@ typedef struct GraphicsLight{
 
 class GraphicsObject{
 	private:
-		unsigned int elementBufferObject;
-		unsigned int vertexBufferObject;
-		unsigned int vertexArrayObject;
-		unsigned int *vIndecies = NULL;
+		unsigned int elementBufferObject = 0;
+		unsigned int vertexBufferObject = 0;
+		unsigned int vertexArrayObject = 0;
 		GraphicsTexture texture;
-		float *vertices = NULL;
 		GraphicsShader shader;
+		obj_t *objects = NULL;
+		size_t objectsSize = 0;
+		
 	public:
 		GraphicsCamera camera;
 		graphics_material_t material;
 		graphics_light_t light;
 		WavefrontImport objImporter;
 
-		size_t calcVertexFileSize(std::string vertexFile){
-                        size_t ret = 0;
+		size_t getObjectCount(void){
+			return objectsSize;
+		}
 
-                        return ret;
-                }
-                void loadVertexFile(std::string vertextFile, float *ret, size_t retSize){
-
-                }
+		obj_t *getObjects(void){
+			return objects;
+		}
+		
+		bool import(std::string directory, std::string name){
+			if(directory == "" || name == "")
+				return false;
+			objImporter.setFile(directory, name);
+			objectsSize = objImporter.countObjects();
+			if(objectsSize <= 0)
+				return false;
+			objects = new obj_t[objectsSize];
+			if(!objImporter.objStat(objects, objectsSize))
+				return false;
+			if(!objImporter.loadMaterial(objects, objectsSize))
+				return false;
+			if(!objImporter.loadData(objects, objectsSize))
+				return false;
+			return true;
+		}
 
 		bool addVertexShader(const char *fileLoc, int id){
 			return shader.addVertexShader(fileLoc, id);
@@ -123,6 +140,17 @@ class GraphicsObject{
 			glDeleteBuffers(1, &vertexBufferObject);
 			glDeleteBuffers(1, &elementBufferObject);
 			shader.deleteProgram();
+			if(objects != NULL){
+				for(int i=0; i<objectsSize; i++){
+					if(objects[i].glut_data != NULL){
+						delete[] objects[i].glut_data;
+						objects[i].glut_size = 0;
+					}
+				}
+				delete[] objects;
+				objects = NULL;
+			}
+			objectsSize = 0;
 		}
 
 		void use(void){

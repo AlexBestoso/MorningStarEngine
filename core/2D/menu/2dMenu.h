@@ -157,6 +157,7 @@ class Menu2D : public GraphicsObject{
 			for(int i=0; i<30; i++){
 				menuButtons[i].destroy();
 			}
+			texture.destroy();
 			GraphicsObject::destroy();
 		}
 

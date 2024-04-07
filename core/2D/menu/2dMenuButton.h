@@ -173,4 +173,9 @@ class Menu2DButton : public GraphicsObject{
 
                         glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+
+		void destroy(){
+                        texture.destroy();
+                        GraphicsObject::destroy();
+                }
 };
