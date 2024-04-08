@@ -32,6 +32,7 @@ float pitch, yaw;
 
 #include "./core/structs/structs.h"
 #include "./core/peripherals/peripherals.h"
+#include "./core/physics/physics.h"
 #include "./core/graphics/graphics.h"
 #include "./GraphicsEngine.h"
 

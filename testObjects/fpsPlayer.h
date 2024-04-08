@@ -34,8 +34,6 @@ class FpsPlayer : public GraphicsObject{
 		size_t objsCount = 0;
 
 		//float gravity = 0.000001;
-		float gravity = 0.0667408;
-		float jumpStrength = 0.05;
 		//float jumpStrength = 0.000001;
 		float playerSize = 0.10;
 		bool grounded = false;
@@ -50,15 +48,21 @@ class FpsPlayer : public GraphicsObject{
 		bool firstStart = true;
 
 		float debugArea= 0;
-		bool generalCollision(glm::vec3 camera, triangle3_t surface){
+		float previousArea = 0.25;
+		bool generalCollision(glm::vec3 camera, triangle3_t surface, float maxOrbit, float *output){
+			if(output == NULL)
+				return false;
 			float area = surface.area;
 			triangle3_t a = geometry.createTriangle(surface.vertecies[0], surface.vertecies[1], camera);
                         triangle3_t b = geometry.createTriangle(surface.vertecies[1], surface.vertecies[2], camera);
                         triangle3_t c = geometry.createTriangle(surface.vertecies[2], surface.vertecies[0], camera);
 			
 			float areap = (a.area + b.area + c.area);
-			debugArea = areap;
                         if(areap == area){
+				output[0] = 0;
+				printf("Perfection.\n");
+				printf("Area : %f vs %f\n", areap, debugArea);
+				exit(1);
 				return true;
 			}else{
                         	if(areap > area){
@@ -66,35 +70,33 @@ class FpsPlayer : public GraphicsObject{
                         	}else{
                         		areap = area - areap;
                         	}
-
-                        	return areap >= 0 && areap < 10;
+				output[0] = areap;
+                        	return areap < maxOrbit;
                         }
 		}
 		
-		bool wallCollision(glm::vec3 camera, triangle3_t surface){
-                        float area = surface.area;
-                        triangle3_t a = geometry.createTriangle(surface.vertecies[0], surface.vertecies[1], camera);
-                        triangle3_t b = geometry.createTriangle(surface.vertecies[1], surface.vertecies[2], camera);
-                        triangle3_t c = geometry.createTriangle(surface.vertecies[2], surface.vertecies[0], camera);
-
-                        float areap = (a.area + b.area + c.area);
-
-                        debugArea = areap;
-                        if(areap == area){
-                                return false;
-                        }else{
-                                if(areap > area){
-                                        areap = areap - area;
-                                }else{
-                                        areap = area - areap;
-                                }
-
-                                return areap >= 0 && areap < 10;
-                        }	
-			return false;
+		int getQuadrant(glm::vec3 p){
+			if(p.x >= 0 && p.y >= 0 && p.z >= 0)
+				return 1;
+			else if(p.x < 0 && p.y >= 0 && p.z >= 0)
+				return 2;
+			else if(p.x < 0 && p.y < 0 && p.z >= 0)
+				return 3;
+			else if(p.x >= 0 && p.y < 0 && p.z >= 0)
+				return 4;
+			if(p.x >= 0 && p.y >= 0 && p.z < 0)
+                                return 5;
+                        else if(p.x < 0 && p.y >= 0 && p.z < 0)
+                                return 6;
+                        else if(p.x < 0 && p.y < 0 && p.z < 0)
+                                return 7;
+                        else if(p.x >= 0 && p.y < 0 && p.z < 0)
+				return 8;
+			return 1;
 		}
 
 		int debugA = 0;
+		bool inOrbit = false;
 		void calculateCollision(void){
 			grounded = false;
 			bool invertJump = false;
@@ -105,8 +107,11 @@ class FpsPlayer : public GraphicsObject{
 			bool invertRight = false;
 
 			glm::vec3 pointa;
+			glm::vec3 normala;
 			glm::vec3 pointb;
+			glm::vec3 normalb;
 			glm::vec3 pointc;
+			glm::vec3 normalc;
 			glm::vec3 camera = this->camera.getPos();
 			
 			int objIndex = 0, tracker=0;
@@ -119,16 +124,19 @@ class FpsPlayer : public GraphicsObject{
 				 	int test = (j%3);
 					if(test == 0){
                                         	pointa = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
+                                        	normala = glm::vec3(pA[j].normal[0], pA[j].normal[1], pA[j].normal[2]);
                                         	tracker++;
                                         	continue;
                                 	}
                                 	if(test == 1){
                                 	        pointb = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
+                                        	normalb = glm::vec3(pA[j].normal[0], pA[j].normal[1], pA[j].normal[2]);
                                 	        tracker++;
                                 	        continue;
                                 	}
 
 					pointc = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
+                                        normalc = glm::vec3(pA[j].normal[0], pA[j].normal[1], pA[j].normal[2]);
 					
                                 	glm::vec3 down = glm::vec3(0, -1, 0);
                                 	glm::vec3 up = glm::vec3(0, 1, 0);
@@ -146,48 +154,79 @@ class FpsPlayer : public GraphicsObject{
                                 	triangle3_t triangleZn = geometry.createTriangle(pointa*backward, pointb*backward, camera*backward);
 
                                 	triangle3_t testA = geometry.createTriangle(pointa*down, pointb*down, camera*down);
-					line3_t fart = geometry.createLine(previousCoords, camera);
-                                	bool hit = generalCollision(camera, triangle);
-                                	if(hit){
 
-                                                glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
-						printf("%f Collision count : %d : %f, %f, %f\n", debugArea, debugA, ff.x, ff.y, ff.z);
-						debugA++;
-						if (gui_engine_global.keyboard.key_w){
-                        			        float y = this->camera.cameraPosition.y;
-							if(debugArea >= 70.0 && debugArea <= 79.0 || (debugArea>=40.0 && debugArea<= 50.0))
-	                        			        this->camera.cameraPosition = previousCoords;// + cameraSpeed * this->camera.cameraFront;
-                        			        this->camera.cameraPosition.y = y;
-                        			}
-                        			if (gui_engine_global.keyboard.key_s){
-                        			        float y = this->camera.cameraPosition.y;
-							if(debugArea >= 70.0 && debugArea <= 79.0 || (debugArea>=40.0 && debugArea<= 50.0))
-                        			        	this->camera.cameraPosition = previousCoords;// - cameraSpeed * this->camera.cameraFront;
-                        			        this->camera.cameraPosition.y = y;
-                        			}
-                        			if (gui_engine_global.keyboard.key_a){
-                        			        float y = this->camera.cameraPosition.y;
-							if(debugArea >= 70.0 && debugArea <= 79.0 || (debugArea>=40.0 && debugArea<= 50.0))
-                        			        	this->camera.cameraPosition = previousCoords;// - glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
-                        			        this->camera.cameraPosition.y = y;
-                        			}
-                        			if (gui_engine_global.keyboard.key_d){
-                        			        float y = this->camera.cameraPosition.y;
-							if(debugArea >= 70.0 && debugArea <= 79.0 || (debugArea>=40.0 && debugArea<= 50.0))
-                        			        	this->camera.cameraPosition = previousCoords;// + glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
-                        			        this->camera.cameraPosition.y = y;
-                        			}
-						if(!jumping && !grounded){
-                        			        this->camera.cameraPosition.y += this->gravity;
-                        			}else{
-                        			        this->camera.cameraPosition.y -= jumpStrength;
-                        			}
-						break;
+                                	bool hit = generalCollision(camera, triangle, /*previousArea*/1.0, &debugArea);
+
+					glm::vec3 triangleDirection = glm::normalize(normala + normalb + normalc)*-11.0f;
+					line3_t magnatude = geometry.createLine(triangleDirection, previousCoords);
+
+						triangle3_t finalizer = geometry.createTriangle(
+							glm::vec3(0), 
+							camera,
+							triangleDirection
+						);
+
+					inOrbit = hit;
+                                	if(hit){
+						this->travel = triangleDirection;
+							break;
+						//this->camera.cameraPosition -= triangleDirection;
+						int q = this->getQuadrant(triangleDirection);
+						int q2 = this->getQuadrant(camera);
+
+						printf("Relative quadrents : %d, %d\n", q, q2);
+						float grav = 0;
+						camera += (force-momentum) * triangleDirection;
+						this->camera.cameraPosition = camera;
+
+						//triangleDirection -= camera;
+						//camera = glm::vec3(0.0f) + triangleDirection + this->camera.cameraPosition;
+						
+						//glm::vec3 surfaceToAir = glm::cross(triangleDirection, camera);
+						//this->camera.cameraPosition = camera;
+						//camera = surfaceToAir;
+
+						// we have a 90 degree angle.
+						// Now we just have to shft all the data to be the center of the universe.
+						//...
+						//camera = ((triangleDirection-camera) + (triangleDirection+camera))/2.0f;
+						float test = glm::degrees(glm::dot(triangleDirection, camera));
+						//camera *= -1.0f;
+
+						//camera *= cos(glm::radians(test));
+						//camera += grav;
+						//triangleDirection -= camera;
+						//camera -= camera;
+
+							
+						line3_t baseMeasure = geometry.createLine(camera, triangleDirection);
+
+						
+						//camera += (camera+triangleDirection)-(camera - triangleDirection);
+						printf("Grav Value : %f\n", grav);
+						printf("Direction Vectors : (%f, %f, %f) vs (%f, %f, %f), (%f, %f, %f)\n", triangleDirection.x, triangleDirection.y, triangleDirection.z, this->camera.cameraPosition.x, this->camera.cameraPosition.y, this->camera.cameraPosition.z, camera.x, camera.y, camera.z);
+						printf("Line of interest : |%f| %f, %f, %f\n", baseMeasure.distance, baseMeasure.direction.x, baseMeasure.direction.y, baseMeasure.direction.z);
+						printf("Angle of interest : %f\n", test);
+						this->camera.cameraPosition = camera;
+						//`this->camera.setCameraTarget(triangleDirection);
+
+							//-(triangleDirection * glm::vec3(0.0025f));
+                                                //glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
+						///printf("%f Collision count : %d : %f, %f, %f\n", debugArea, debugA, ff.x, ff.y, ff.z);
+						//debugA++;
+						break;	
 					}
 				}
 			}
+			previousArea = 0.5;
 		}
 	public:
+		float momentum = 0;
+		glm::vec3 force = glm::vec3(0);
+		glm::vec3 travel = glm::normalize(glm::vec3(1.0f));
+		float gravity = 0.0667408;
+		float jumpStrength = 0.05;
+
 		void setSceneData(obj_data_t *d, size_t s){
 			sceneData = d;
 			sceneDataSize = s;
@@ -214,6 +253,8 @@ class FpsPlayer : public GraphicsObject{
 			previousCoords = this->camera.cameraPosition;
 
 
+			force = glm::vec3(0);
+
 			/*
 			 * Manage horizontal movement
 			 * */
@@ -221,25 +262,35 @@ class FpsPlayer : public GraphicsObject{
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition += cameraSpeed * this->camera.cameraFront;
 				this->camera.cameraPosition.y = y;
+				momentum += 0.0000253f;
 			}
-                        if (gui_engine_global.keyboard.key_s){
+			else if (gui_engine_global.keyboard.key_s){
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition -= cameraSpeed * this->camera.cameraFront;
 				this->camera.cameraPosition.y = y;
+				momentum -= 0.000015f;
+				
+			}else{
+				momentum -= 0.000000003f;
+				
 			}
+			if(momentum < 0)
+				momentum = 0;
+
                         if (gui_engine_global.keyboard.key_a){
 				float y = this->camera.cameraPosition.y;
-                                this->camera.cameraPosition -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                                this->camera.cameraPosition -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * momentum;
 				this->camera.cameraPosition.y = y;
 			}
                         if (gui_engine_global.keyboard.key_d){
 				float y = this->camera.cameraPosition.y;
-                                this->camera.cameraPosition += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
+                                this->camera.cameraPosition += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * momentum;
 				this->camera.cameraPosition.y = y;
 			}
 
 			if (gui_engine_global.keyboard.key_e){
-                                this->camera.cameraPosition.y -= jumpStrength;
+				travel = this->camera.cameraFront;
+                                this->camera.cameraPosition -= this->gravity * this->travel;
                         }
 
 			// Error correction for invalid camera possitions
@@ -259,26 +310,35 @@ class FpsPlayer : public GraphicsObject{
 			 * */
 			if(gui_engine_global.keyboard.key_space){
 				jumping = true;
+				travel = this->camera.cameraFront;
 			}else{
 				jumping = false;
 			}
 
 			if (gui_engine_global.keyboard.key_1){
-                                this->camera.cameraPosition = glm::vec3(5.980382, 5.903437, 5.995522);
+                                this->camera.cameraPosition = glm::vec3(objs[0].glut_data[0], objs[0].glut_data[1]+5, objs[0].glut_data[2]);
                         }else if(gui_engine_global.keyboard.key_2){
-				this->camera.cameraPosition = glm::vec3(-7.010662, 1.903437, -6.995522);	
 			}else if(gui_engine_global.keyboard.key_3){
-				this->camera.cameraPosition.x += cameraSpeed;
 			}
 			
 
 			if(!jumping && !grounded){
-                      		this->camera.cameraPosition.y -= this->gravity;
+				momentum = momentum <= 0 ? 0 : momentum+0.000002;
+                      		this->camera.cameraPosition += momentum * this->travel;
 			}else{
-				this->camera.cameraPosition.y += jumpStrength;
+				momentum = momentum <= 0 ? 0 : momentum;
+				this->camera.cameraPosition -= momentum * this->travel;
 			}
 
+			force += previousCoords - camera.cameraPosition;
 			calculateCollision();
+
+			printf("Caught in orbit : %f\n", momentum);
+			if(inOrbit){
+				momentum += 0.0000003f;
+				this->camera.cameraPosition -= force;
+				this->camera.cameraPosition += this->travel * momentum;
+			}
 
 			if(firstStart){
 				this->camera.cameraPosition = glm::vec3(-7.5, 1.5, -6.5);	
@@ -294,6 +354,9 @@ class FpsPlayer : public GraphicsObject{
                         //}
                 }
 		void draw(void){
+			if(inOrbit){
+				//exit(1);
+			}
 			fpsControls();
 			view = camera.focus();
 			//this->setUniform("fpsview", view);

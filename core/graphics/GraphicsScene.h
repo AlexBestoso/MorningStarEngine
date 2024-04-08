@@ -1,19 +1,16 @@
 class GraphicsScene : public GraphicsObject{
 	private:
+		PhysicsScene physics;
 		GLFWwindow* window = NULL;
 		WavefrontImport importer;
 		GraphicsTexture *objectTextures = NULL;
 		size_t objectTextureCount = 0;
 		obj_t * objs;
-		
-
 	public:
+		glm::vec3 lightPos;
 		obj_t *getObjs(void){
 			return objs;
 		}
-
-		
-		glm::vec3 lightPos;
 		obj_data_t *getObjectPointer(void){
 			return importer.obj;
 		}
@@ -162,5 +159,9 @@ class GraphicsScene : public GraphicsObject{
                         setUniform("material.specularMap", 0);
 
 			return true;
+		}
+
+		void processCollision(glm::vec3 objectPos){
+			
 		}
 };

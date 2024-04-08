@@ -6,6 +6,7 @@ class CustomTestContext : public GraphicsContext{
 	        FpsPlayer playerOne;
 		TestLight testLight;
 		Menu2D menu;
+		DevTools devtools;
 
 		void processInput(GLFWwindow *window){
 		        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -47,10 +48,20 @@ class CustomTestContext : public GraphicsContext{
                         else
                                 gui_engine_global.keyboard.key_1 = false;
 
-			if (glfwGetKey(window, GLFW_KEY_2))
+			if (glfwGetKey(window, GLFW_KEY_2)){
+				// Debug Commands.
                                 gui_engine_global.keyboard.key_2 = true;
-                        else
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				printf("Dev Consol\n:");
+				printf("> ");
+				std::string input = "";
+				std::getline(std::cin, input);
+				devtools.runCommand(input, window, this->scene);
+				printf("input : %s\n", input.c_str());
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			}else{
                                 gui_engine_global.keyboard.key_2 = false;
+			}
 
 			if (glfwGetKey(window, GLFW_KEY_3))
                                 gui_engine_global.keyboard.key_3 = true;
@@ -109,6 +120,7 @@ class CustomTestContext : public GraphicsContext{
 			//skybox.draw();
 
 			scene.camera = this->activeCamera[0];
+			scene.processCollision(playerOne.camera.cameraPosition);
 			//scene.lightPos = testLight.getPos();
 			scene.draw();
 			return this->context;

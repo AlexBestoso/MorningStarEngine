@@ -161,6 +161,50 @@ class GraphicsObject{
 			glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 		}
 
+		void directDraw(float *data, size_t dataSize, float strideSize, GLenum drawMode){
+			this->bindVao();
+                        this->bindVbo();
+                        this->use();
+
+			glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, glm::vec3(0.0f, -0.7f, 0.0f));
+                        //model = glm::scale(model, glm::vec3(1.0f));
+                        glm::mat4 view = glm::mat4(1.0f);
+                        glm::mat4 projection = glm::mat4(1.0f);
+
+                        this->setUniform("material.ambient", material.ambient);
+                        this->setUniform("material.diffuse", material.diffuse);
+                        this->setUniform("material.specular", material.specular);
+                        this->setUniform("material.shininess", material.shininess);
+
+			this->setUniform("light.ambient", light.ambient);
+                        this->setUniform("light.diffuse", light.diffuse);
+                        this->setUniform("light.specular", light.specular);
+                        //this->setUniform("light.direction", light.direction);
+
+                        //Flashling configs
+                        this->setUniform("light.position", camera.cameraPosition);
+                        this->setUniform("light.direction", camera.cameraFront);
+                        this->setUniform("light.cuttOff", glm::cos(glm::radians(12.5f)));
+			 this->setUniform("light.constant", light.constant);
+                        this->setUniform("light.linear", light.linear);
+                        this->setUniform("light.quadratic", light.quadratic);
+
+                        this->setUniform("useTexture", 1);
+                        this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+                        this->setUniform("viewPos", camera.getPos());
+
+                        view = camera.getView();
+                        unsigned int viewLoc = this->getUniformLoc("view");
+                        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+			projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+                        unsigned int projectionLoc = this->getUniformLoc("projection");
+                        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
+
+			this->storeVertexData(sizeof(float)*dataSize, data, GL_STATIC_DRAW);
+			glDrawArrays(drawMode, 0, strideSize);
+		}
+
 		virtual void draw(void){
 			
 		}
