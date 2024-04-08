@@ -8,20 +8,23 @@
 #include "./glm/glm/gtc/matrix_transform.hpp"
 #include "./glm/glm/gtc/type_ptr.hpp"
 
+#include <dlfcn.h>
+#include <memory>
 #include <stdio.h>
 #include <string>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
 #include <math.h>
 #include <iostream>
+#include <dirent.h>
+#include <fcntl.h>
+#include <typeinfo>
+using namespace std;
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "./stb_image.h"
-
-#include "./WavefrontImport.h"
+#include "./core/tools/tools.h"
 
 unsigned int SCR_WIDTH = 1000;
 unsigned int SCR_HEIGHT = 800;
@@ -41,7 +44,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_click_callback(GLFWwindow* window, int button, int action, int mod);
 
 #include "./Custom/Custom_TestContext.h"
-#include "./Custom/Custom_MainMenu.h"
+//#include "./Custom/Custom_MainMenu.h"
 
 int main(void){
 	// Calculate aspect ratio to fix glut bug.
@@ -51,12 +54,11 @@ int main(void){
 	SCR_HEIGHT = s->height;
 	XCloseDisplay(d);
 
-	ge.init("MSGE A 0.0.0", SCR_WIDTH, SCR_HEIGHT);
+	ge.init("MSGE 0.0.0a", SCR_WIDTH, SCR_HEIGHT);
 	GLFWwindow* window = ge.getWindow();
     	ge.setFrameBufferSizeCallback(framebuffer_size_callback);
 	ge.setMouseCursorPosCallback(mouse_callback);
 	ge.setMouseClickCallback(mouse_click_callback);
-	ge.setContext(&customMainMenu);
 	//ge.disableMouseCursor();
 	int previous = 0;
     	while (ge.running()){
@@ -65,8 +67,11 @@ int main(void){
 		
 		if(ctx != previous){
 			previous = ctx;
+			ge.contextDestroy();
+			ge.setContext(ctx);
+					
 
-			switch(ctx){
+		/*	switch(ctx){
 				case 0: // Main eenu
 					break;
 				case 1: // Scene One
@@ -74,7 +79,7 @@ int main(void){
 					ge.setContext(&customTestContext);
 					ge.disableMouseCursor();
 					break;
-			}
+			}*/
 		}
     	}
 

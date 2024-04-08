@@ -28,6 +28,7 @@ class GraphicsObject{
 		size_t objectsSize = 0;
 		
 	public:
+		struct GuiEngineStruct ges;
 		GraphicsCamera camera;
 		graphics_material_t material;
 		graphics_light_t light;

@@ -145,8 +145,8 @@ class Menu2DButton : public GraphicsObject{
 		}
 
 		void setMouseHover(){
-			float a = (2*(gui_engine_global.mouse.mouseX/gui_engine_global.displayX)-1);
-			float b = -2*(gui_engine_global.mouse.mouseY/gui_engine_global.displayY)+1;
+			float a = (2*(this->ges.mouse.mouseX/this->ges.displayX)-1);
+			float b = -2*(this->ges.mouse.mouseY/this->ges.displayY)+1;
 			glm::vec4 mouse(a, b, 0, 0);
 			if((mouse.x >= x_min && mouse.x <= x_max) && (mouse.y >= y_min && mouse.y <= y_max)){
 				hovered = 1;

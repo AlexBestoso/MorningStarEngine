@@ -83,6 +83,14 @@ typedef struct Triangle3D{
         float angle_c_deg = 0;
         float angle_c_rad = 0;
 }triangle3_t;
+
+typedef struct Circle2d{
+
+}circle2_t;
+
+typedef struct Circle3d{
+	
+}circle3_t;
 class GraphicsGeometry{
 	private:
 		bool error = false;
@@ -102,8 +110,6 @@ class GraphicsGeometry{
 			}
 			return ret;
 		}
-
-
 
 		triangle2_t create2dTriangle(line2_t a, line2_t b, line2_t c){
 			triangle2_t ret;

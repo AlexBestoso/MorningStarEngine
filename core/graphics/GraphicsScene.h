@@ -1,5 +1,6 @@
 class GraphicsScene : public GraphicsObject{
 	private:
+		const int id = 0;
 		PhysicsScene physics;
 		GLFWwindow* window = NULL;
 		WavefrontImport importer;

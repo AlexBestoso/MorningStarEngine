@@ -170,8 +170,10 @@ class Menu2D : public GraphicsObject{
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			for(int i=0; i<30; i++){
-				if(activeMenuButtons[i] != -1)
+				if(activeMenuButtons[i] != -1){
+					menuButtons[i].ges = this->ges;
 	                                menuButtons[i].draw();
+				}
                         }	
 		}
 };

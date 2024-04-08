@@ -1,33 +1,121 @@
-/*#include "GraphicsShader.h"
-#include "GraphicsTexture.h"
-#include "GraphicsCamera.h"
-
-#include "./GraphicsObject.h"
-*/
 #include "./test.obj.h"
 #include "./testObjects/testTerrain.h"
 #include "./testObjects/fpsPlayer.h"
 #include "./testObjects/testLight.h"
 #include "./importedObjTest.h"
 
+#include "./core/context/context.interface.h"
 #include "./core/core.h"
 #define MASTER_OBJECT_ARRAY_MAX 10
-GraphicsObject masterObjectArray[MASTER_OBJECT_ARRAY_MAX];
+#define SO_LOCATIONS "./sharedObjects"
+
 
 class GraphicsEngine{
 	private:
 		GLFWwindow* window = NULL;
 		GraphicsCamera *activeCamera = NULL;
-		GraphicsContext *context = NULL;
-	public:
 
-		void setContext(GraphicsContext *ctx){
-			context = ctx;
+		context_interface_t invoker = NULL;
+		std::unique_ptr<ContextInterface> _context  = NULL;
+		void *contextHandle = NULL;
+		size_t contextListSize = 0;
+		std::string *availableSoFiles = NULL;
+		
+
+		bool isSoFile(std::string v){
+			return (v.length() >= 3 && v.rfind(".so", v.length()-3) == v.length()-3);
+		}
+
+		static void Reset_dlerror() {
+    	    		dlerror();
+    		}
+
+    		static void Check_dlerror() {
+        		const char * dlsym_error = dlerror();
+        		if (dlsym_error) {
+        	    		printf(".SO error : %s\n", dlsym_error);
+        		}
+    		}
+
+	public:
+		
+		~GraphicsEngine(){
+			if(contextHandle)
+				dlclose(contextHandle);
+		}
+		bool fetchContexts(void){
+			FileSnake fs;
+                        if(!fs.dirExists(SO_LOCATIONS))
+                                return false;
+                        string *files = fs.listDir(SO_LOCATIONS);
+			if(files == NULL)
+				return false;
+                        contextListSize = 0;
+			int listIndex = 0;
+                        while(files[listIndex] != ""){
+				printf("Files : %s\n", files[listIndex].c_str());
+				if(this->isSoFile(files[listIndex])){
+                                	contextListSize++;
+				}
+				listIndex++;
+                        }
+
+			availableSoFiles = new std::string[contextListSize];
+			int variableIndex = 0;
+			listIndex = 0;
+			while(files[listIndex] != ""){
+				std::string then = files[listIndex];
+				if(this->isSoFile(then)){
+					availableSoFiles[variableIndex] = SO_LOCATIONS;
+				       	availableSoFiles[variableIndex] = availableSoFiles[variableIndex] + "/" + then;
+					if(variableIndex == 0){
+						contextHandle = dlopen(availableSoFiles[variableIndex].c_str(), RTLD_NOW);
+						if(!contextHandle){
+							printf("Failed to load first context.\n");
+							Check_dlerror();
+							exit(1);
+						}
+
+						Reset_dlerror();
+						invoker = reinterpret_cast<context_interface_t>(dlsym(contextHandle, "create"));
+						Check_dlerror();
+						_context = std::unique_ptr<ContextInterface>(invoker());
+						_context->init();
+
+					}
+					variableIndex++;
+				}
+				listIndex++;
+			}
+                        delete[] files;
+                        return  true;
+		}
+
+		void setContext(int ctx){
+			if(ctx >= contextListSize || ctx <= -1){
+				printf("Invalid context id; exiting.\n");
+				exit(EXIT_FAILURE);
+			}
+			availableSoFiles[ctx];
+
+			contextHandle = dlopen(availableSoFiles[ctx].c_str(), RTLD_NOW);
+			if(!contextHandle){
+				printf("Failed to load context.\n");
+				Check_dlerror();
+				exit(EXIT_FAILURE);
+			}
+
+			Reset_dlerror();
+			invoker = reinterpret_cast<context_interface_t>(dlsym(contextHandle, "create"));
+			Check_dlerror();
+			_context = std::unique_ptr<ContextInterface>(invoker());
 			this->contextInit();
 		}
+		
 		GLFWwindow* getWindow(void){
 			return window;
 		}
+		
 		bool init(const char * windowTitle, const unsigned int screenW, const unsigned int screenH){
     			glfwInit();
     			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -41,18 +129,16 @@ class GraphicsEngine{
     			}
     			glfwMakeContextCurrent(window);
 			glEnable(GL_DEPTH_TEST);
+			fetchContexts();
     			return true;
 		}
 
 		void contextInit(){
-			if(context != NULL){
-				context[0].init();
-			}
+			_context->init();
 		}
 		void contextDestroy(){
-			if(context != NULL){
-				context[0].destroy();
-			}
+			_context->destroy();
+			dlclose(contextHandle);
 		}
 		
 
@@ -62,9 +148,8 @@ class GraphicsEngine{
 
 		int exec(void){
 			int context = 0;
-			if(this->context != NULL){
-				context = this->context[0].exec(window);
-			}
+			_context->ges = gui_engine_global;
+			context = _context->exec(window);
 			swapAndPoll();
 			return context;
 		}
