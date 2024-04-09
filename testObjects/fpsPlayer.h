@@ -174,7 +174,7 @@ class FpsPlayer : public GraphicsObject{
 						int q = this->getQuadrant(triangleDirection);
 						int q2 = this->getQuadrant(camera);
 
-						printf("Relative quadrents : %d, %d\n", q, q2);
+					//	printf("Relative quadrents : %d, %d\n", q, q2);
 						float grav = 0;
 						camera += (force-momentum) * triangleDirection;
 						this->camera.cameraPosition = camera;
@@ -203,10 +203,10 @@ class FpsPlayer : public GraphicsObject{
 
 						
 						//camera += (camera+triangleDirection)-(camera - triangleDirection);
-						printf("Grav Value : %f\n", grav);
-						printf("Direction Vectors : (%f, %f, %f) vs (%f, %f, %f), (%f, %f, %f)\n", triangleDirection.x, triangleDirection.y, triangleDirection.z, this->camera.cameraPosition.x, this->camera.cameraPosition.y, this->camera.cameraPosition.z, camera.x, camera.y, camera.z);
-						printf("Line of interest : |%f| %f, %f, %f\n", baseMeasure.distance, baseMeasure.direction.x, baseMeasure.direction.y, baseMeasure.direction.z);
-						printf("Angle of interest : %f\n", test);
+					//	printf("Grav Value : %f\n", grav);
+					//	printf("Direction Vectors : (%f, %f, %f) vs (%f, %f, %f), (%f, %f, %f)\n", triangleDirection.x, triangleDirection.y, triangleDirection.z, this->camera.cameraPosition.x, this->camera.cameraPosition.y, this->camera.cameraPosition.z, camera.x, camera.y, camera.z);
+					//	printf("Line of interest : |%f| %f, %f, %f\n", baseMeasure.distance, baseMeasure.direction.x, baseMeasure.direction.y, baseMeasure.direction.z);
+					//	printf("Angle of interest : %f\n", test);
 						this->camera.cameraPosition = camera;
 						//`this->camera.setCameraTarget(triangleDirection);
 
@@ -246,9 +246,9 @@ class FpsPlayer : public GraphicsObject{
 			 * Account for player's head position.
 			 * */
                         glm::vec3 front;
-                        front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-                        front.y = sin(glm::radians(pitch));
-                        front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+                        front.x = cos(glm::radians(ges.pitch)) * cos(glm::radians(ges.yaw));
+                        front.y = sin(glm::radians(ges.pitch));
+                        front.z = cos(glm::radians(ges.pitch)) * sin(glm::radians(ges.yaw));
                         this->camera.cameraFront = front;//glm::normalize(front);
 			previousCoords = this->camera.cameraPosition;
 
@@ -258,13 +258,13 @@ class FpsPlayer : public GraphicsObject{
 			/*
 			 * Manage horizontal movement
 			 * */
-                        if (gui_engine_global.keyboard.key_w){
+                        if (ges.keyboard.key_w){
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition += cameraSpeed * this->camera.cameraFront;
 				this->camera.cameraPosition.y = y;
 				momentum += 0.0000253f;
 			}
-			else if (gui_engine_global.keyboard.key_s){
+			else if (ges.keyboard.key_s){
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition -= cameraSpeed * this->camera.cameraFront;
 				this->camera.cameraPosition.y = y;
@@ -277,18 +277,18 @@ class FpsPlayer : public GraphicsObject{
 			if(momentum < 0)
 				momentum = 0;
 
-                        if (gui_engine_global.keyboard.key_a){
+                        if (ges.keyboard.key_a){
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * momentum;
 				this->camera.cameraPosition.y = y;
 			}
-                        if (gui_engine_global.keyboard.key_d){
+                        if (ges.keyboard.key_d){
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * momentum;
 				this->camera.cameraPosition.y = y;
 			}
 
-			if (gui_engine_global.keyboard.key_e){
+			if (ges.keyboard.key_e){
 				travel = this->camera.cameraFront;
                                 this->camera.cameraPosition -= this->gravity * this->travel;
                         }
@@ -308,17 +308,18 @@ class FpsPlayer : public GraphicsObject{
 			/*
 			 * Manage jump physics
 			 * */
-			if(gui_engine_global.keyboard.key_space){
+			if(ges.keyboard.key_space){
 				jumping = true;
 				travel = this->camera.cameraFront;
 			}else{
 				jumping = false;
 			}
 
-			if (gui_engine_global.keyboard.key_1){
-                                this->camera.cameraPosition = glm::vec3(objs[0].glut_data[0], objs[0].glut_data[1]+5, objs[0].glut_data[2]);
-                        }else if(gui_engine_global.keyboard.key_2){
-			}else if(gui_engine_global.keyboard.key_3){
+			if (ges.keyboard.key_1){
+				printf("Changing camera position...\n");
+                                this->camera.cameraPosition = glm::vec3(0.0f);
+                        }else if(ges.keyboard.key_2){
+			}else if(ges.keyboard.key_3){
 			}
 			
 
@@ -333,7 +334,6 @@ class FpsPlayer : public GraphicsObject{
 			force += previousCoords - camera.cameraPosition;
 			calculateCollision();
 
-			printf("Caught in orbit : %f\n", momentum);
 			if(inOrbit){
 				momentum += 0.0000003f;
 				this->camera.cameraPosition -= force;

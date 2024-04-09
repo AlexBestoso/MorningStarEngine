@@ -1,6 +1,7 @@
 class GraphicsCamera{
 	private:
 	public:
+		struct GuiEngineStruct ges;
 		glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 invDirection = glm::normalize(cameraPosition - cameraTarget);
@@ -49,17 +50,17 @@ class GraphicsCamera{
 		float cameraSpeed = 0.05f;
 		void fpsControls(void){
 			glm::vec3 front;
-                        front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-                        front.y = sin(glm::radians(pitch));
-                        front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+                        front.x = cos(glm::radians(ges.pitch)) * cos(glm::radians(ges.yaw));
+                        front.y = sin(glm::radians(ges.pitch));
+                        front.z = cos(glm::radians(ges.pitch)) * sin(glm::radians(ges.yaw));
                         cameraFront = glm::normalize(front);
-			if (gui_engine_global.keyboard.key_w)
+			if (ges.keyboard.key_w)
                                 cameraPosition += cameraSpeed * cameraFront;
-                        if (gui_engine_global.keyboard.key_s)
+                        if (ges.keyboard.key_s)
                                 cameraPosition -= cameraSpeed * cameraFront;
-                        if (gui_engine_global.keyboard.key_a)
+                        if (ges.keyboard.key_a)
                                 cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-                        if (gui_engine_global.keyboard.key_d)
+                        if (ges.keyboard.key_d)
                                 cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
 			if(cameraPosition.y > 0){

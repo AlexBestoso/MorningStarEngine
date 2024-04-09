@@ -43,7 +43,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_click_callback(GLFWwindow* window, int button, int action, int mod);
 
-#include "./Custom/Custom_TestContext.h"
+//#include "./Custom/Custom_TestContext.h"
 //#include "./Custom/Custom_MainMenu.h"
 
 int main(void){
@@ -137,11 +137,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;	
 
-	yaw += xoffset;
-	pitch += yoffset;
+	gui_engine_global.yaw += xoffset;
+	gui_engine_global.pitch += yoffset;
 
-	if(pitch > 89.0f)
-		pitch = 89.0f;
-	if(pitch < -89.0f)
-		pitch = -89.0f;
+	if(gui_engine_global.pitch > 89.0f)
+		gui_engine_global.pitch = 89.0f;
+	if(gui_engine_global.pitch < -89.0f)
+		gui_engine_global.pitch = -89.0f;
 }

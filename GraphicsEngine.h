@@ -96,7 +96,6 @@ class GraphicsEngine{
 				printf("Invalid context id; exiting.\n");
 				exit(EXIT_FAILURE);
 			}
-			availableSoFiles[ctx];
 
 			contextHandle = dlopen(availableSoFiles[ctx].c_str(), RTLD_NOW);
 			if(!contextHandle){
@@ -108,6 +107,7 @@ class GraphicsEngine{
 			Reset_dlerror();
 			invoker = reinterpret_cast<context_interface_t>(dlsym(contextHandle, "create"));
 			Check_dlerror();
+
 			_context = std::unique_ptr<ContextInterface>(invoker());
 			this->contextInit();
 		}
@@ -134,7 +134,9 @@ class GraphicsEngine{
 		}
 
 		void contextInit(){
+			printf("attempting initalization...\n");
 			_context->init();
+			printf("Initalized!\n");
 		}
 		void contextDestroy(){
 			_context->destroy();
@@ -148,7 +150,7 @@ class GraphicsEngine{
 
 		int exec(void){
 			int context = 0;
-			_context->ges = gui_engine_global;
+			_context->setGES(gui_engine_global);
 			context = _context->exec(window);
 			swapAndPoll();
 			return context;

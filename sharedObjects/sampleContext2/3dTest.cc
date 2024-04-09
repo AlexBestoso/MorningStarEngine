@@ -1,56 +1,57 @@
-class CustomTestContext : public GraphicsContext{
+#include "../interfaceHeaders.h"
+class CustomTestContext : public ContextInterface{
 	private:
+		const int id = 1;
 		GraphicsScene scene;
-		GraphicsSkybox skybox;
-	        TestObject testObj;
+		//GraphicsSkybox skybox;
 	        FpsPlayer playerOne;
-		TestLight testLight;
 		Menu2D menu;
 		DevTools devtools;
+		bool firstStart = true;
 
 		void processInput(GLFWwindow *window){
 		        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		                glfwSetWindowShouldClose(window, true);
 	
 		        if (glfwGetKey(window, GLFW_KEY_W)){
-		                gui_engine_global.keyboard.key_w = true;
+		                ges.keyboard.key_w = true;
 		        }else{
-		                gui_engine_global.keyboard.key_w = false;
+		                ges.keyboard.key_w = false;
 		        }
 	
 		        if (glfwGetKey(window, GLFW_KEY_S))
-		                gui_engine_global.keyboard.key_s = true;
+		                ges.keyboard.key_s = true;
 		        else
-		                gui_engine_global.keyboard.key_s = false;
+		                ges.keyboard.key_s = false;
 	
 		        if (glfwGetKey(window, GLFW_KEY_A))
-		                gui_engine_global.keyboard.key_a = true;
+		                ges.keyboard.key_a = true;
 		        else
-		                gui_engine_global.keyboard.key_a = false;
+		                ges.keyboard.key_a = false;
 	
 		        if (glfwGetKey(window, GLFW_KEY_D))
-		                gui_engine_global.keyboard.key_d = true;
+		                ges.keyboard.key_d = true;
 		        else
-		                gui_engine_global.keyboard.key_d = false;
+		                ges.keyboard.key_d = false;
 		
 		        if(glfwGetKey(window, GLFW_KEY_SPACE))
-		                gui_engine_global.keyboard.key_space = true;
+		                ges.keyboard.key_space = true;
 		        else
-		                gui_engine_global.keyboard.key_space = false;
+		                ges.keyboard.key_space = false;
 
 			if (glfwGetKey(window, GLFW_KEY_E))
-                                gui_engine_global.keyboard.key_e = true;
+                                ges.keyboard.key_e = true;
                         else
-                                gui_engine_global.keyboard.key_e = false;
+                                ges.keyboard.key_e = false;
 
 			if (glfwGetKey(window, GLFW_KEY_1))
-                                gui_engine_global.keyboard.key_1 = true;
+                                ges.keyboard.key_1 = true;
                         else
-                                gui_engine_global.keyboard.key_1 = false;
+                                ges.keyboard.key_1 = false;
 
 			if (glfwGetKey(window, GLFW_KEY_2)){
 				// Debug Commands.
-                                gui_engine_global.keyboard.key_2 = true;
+                                ges.keyboard.key_2 = true;
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				printf("Dev Consol\n:");
 				printf("> ");
@@ -60,18 +61,18 @@ class CustomTestContext : public GraphicsContext{
 				printf("input : %s\n", input.c_str());
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			}else{
-                                gui_engine_global.keyboard.key_2 = false;
+                                ges.keyboard.key_2 = false;
 			}
 
 			if (glfwGetKey(window, GLFW_KEY_3))
-                                gui_engine_global.keyboard.key_3 = true;
+                                ges.keyboard.key_3 = true;
                         else
-                                gui_engine_global.keyboard.key_3 = false;
+                                ges.keyboard.key_3 = false;
 
 		}
 
 	public:
-		void init(){	
+		virtual void init() override{	
 			printf("Trying to build...\n");
 			if(!scene.create("./scenes/sampleScene", "SampleScene")){
 				printf("Failed to build scene.\n");
@@ -101,14 +102,20 @@ class CustomTestContext : public GraphicsContext{
 			this->context = 1;
 		}
 
-		void destroy(){
+		virtual void destroy() override{
 			printf("Destroying Scene.\n");
 			scene.destroy();
 			playerOne.destroy();
 			//testLight.destroy();
 		}
-		int exec(GLFWwindow* window){
+		virtual int exec(GLFWwindow* window) override{
+			if(firstStart){
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				firstStart = false;
+			}
 			this->processInput(window);
+			playerOne.setGES(ges);
+			scene.setGES(ges);
 			playerOne.draw();
 
 
@@ -125,4 +132,10 @@ class CustomTestContext : public GraphicsContext{
 			scene.draw();
 			return this->context;
 		}
-}customTestContext;
+};
+
+extern "C"{
+	CustomTestContext *create(){
+		return new CustomTestContext;
+	}
+}

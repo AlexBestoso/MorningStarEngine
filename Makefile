@@ -10,3 +10,5 @@ clean:
 	rm ./morningStarEngine
 install:
 	sudo apt-get install freeglut3-dev libxml2-dev -y
+shared:
+	./make_shared.sh

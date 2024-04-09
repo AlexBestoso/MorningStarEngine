@@ -38,3 +38,4 @@ float pitch, yaw;
 
 #include "../core/core.h"
 
+#include "../testObjects/fpsPlayer.h"
