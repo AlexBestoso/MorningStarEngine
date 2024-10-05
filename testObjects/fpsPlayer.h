@@ -1,20 +1,3 @@
-typedef struct triangle{
-	int hypotIndex = -1;
-	glm::vec3 points[3];
-	glm::vec3 centroid;
-	glm::vec3 edgeCenters[3];
-	glm::vec3 direction[2];
-	float lengths[3];
-	float angles[3];
-	float height = 0;
-	float semiperimiter = 0;
-	bool equilateral = false;
-	bool isosceles = false;
-	bool orthogonal = false;
-	bool scalene = false;
-
-}triangle_t;
-
 typedef struct collision_vars{
 	glm::vec3 origin;
 
@@ -171,10 +154,7 @@ class FpsPlayer : public GraphicsObject{
 						this->travel = triangleDirection;
 							break;
 						//this->camera.cameraPosition -= triangleDirection;
-						int q = this->getQuadrant(triangleDirection);
-						int q2 = this->getQuadrant(camera);
 
-					//	printf("Relative quadrents : %d, %d\n", q, q2);
 						float grav = 0;
 						camera += (force-momentum) * triangleDirection;
 						this->camera.cameraPosition = camera;
@@ -239,6 +219,10 @@ class FpsPlayer : public GraphicsObject{
 		bool create(void){
 			return true;
 		}
+
+		glm::vec3 getPlayerCoords(void){
+			return this->camera.cameraPosition;
+		}
 		
 		
 		void fpsControls(void){
@@ -252,9 +236,6 @@ class FpsPlayer : public GraphicsObject{
                         this->camera.cameraFront = front;//glm::normalize(front);
 			previousCoords = this->camera.cameraPosition;
 
-
-			force = glm::vec3(0);
-
 			/*
 			 * Manage horizontal movement
 			 * */
@@ -262,35 +243,27 @@ class FpsPlayer : public GraphicsObject{
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition += cameraSpeed * this->camera.cameraFront;
 				this->camera.cameraPosition.y = y;
-				momentum += 0.0000253f;
 			}
-			else if (ges.keyboard.key_s){
+			
+			if (ges.keyboard.key_s){
 				float y = this->camera.cameraPosition.y;
                                 this->camera.cameraPosition -= cameraSpeed * this->camera.cameraFront;
-				this->camera.cameraPosition.y = y;
-				momentum -= 0.000015f;
-				
-			}else{
-				momentum -= 0.000000003f;
-				
+				this->camera.cameraPosition.y = y;	
 			}
-			if(momentum < 0)
-				momentum = 0;
 
                         if (ges.keyboard.key_a){
 				float y = this->camera.cameraPosition.y;
-                                this->camera.cameraPosition -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * momentum;
+                                this->camera.cameraPosition -= glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
 				this->camera.cameraPosition.y = y;
 			}
                         if (ges.keyboard.key_d){
 				float y = this->camera.cameraPosition.y;
-                                this->camera.cameraPosition += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * momentum;
+                                this->camera.cameraPosition += glm::normalize(glm::cross(this->camera.cameraFront, this->camera.cameraUp)) * cameraSpeed;
 				this->camera.cameraPosition.y = y;
 			}
 
 			if (ges.keyboard.key_e){
-				travel = this->camera.cameraFront;
-                                this->camera.cameraPosition -= this->gravity * this->travel;
+                                this->camera.cameraPosition += this->gravity * glm::vec3(0, -1, 0);
                         }
 
 			// Error correction for invalid camera possitions
@@ -309,61 +282,23 @@ class FpsPlayer : public GraphicsObject{
 			 * Manage jump physics
 			 * */
 			if(ges.keyboard.key_space){
-				jumping = true;
-				travel = this->camera.cameraFront;
-			}else{
-				jumping = false;
+                      		this->camera.cameraPosition += gravity * glm::vec3(0, 1, 0);
 			}
 
 			if (ges.keyboard.key_1){
-				printf("Changing camera position...\n");
                                 this->camera.cameraPosition = glm::vec3(0.0f);
                         }else if(ges.keyboard.key_2){
 			}else if(ges.keyboard.key_3){
 			}
 			
 
-			if(!jumping && !grounded){
-				momentum = momentum <= 0 ? 0 : momentum+0.000002;
-                      		this->camera.cameraPosition += momentum * this->travel;
-			}else{
-				momentum = momentum <= 0 ? 0 : momentum;
-				this->camera.cameraPosition -= momentum * this->travel;
-			}
-
-			force += previousCoords - camera.cameraPosition;
-			calculateCollision();
-
-			if(inOrbit){
-				momentum += 0.0000003f;
-				this->camera.cameraPosition -= force;
-				this->camera.cameraPosition += this->travel * momentum;
-			}
-
 			if(firstStart){
 				this->camera.cameraPosition = glm::vec3(-7.5, 1.5, -6.5);	
 				firstStart = false;
 			}
-			/*
-			 * Collision processing
-			 * */
-			// Manage Y axis collision
-			
-                        //if(this->camera.cameraPosition.y < 0){
-                        //        this->camera.cameraPosition.y = 0;
-                        //}
                 }
 		void draw(void){
-			if(inOrbit){
-				//exit(1);
-			}
 			fpsControls();
 			view = camera.focus();
-			//this->setUniform("fpsview", view);
-
-			//projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-			//this->setUniform("fpsperspective", projection);
-			
-			//this->drawTriangles(0, 36);
 		}
 };

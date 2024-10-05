@@ -156,6 +156,13 @@ class GraphicsEngine{
 			return context;
 		}
 
+		bool setKeyboardCallback(void (*callback)(GLFWwindow* window, int key, int scancode, int action, int mods)){
+			if(this->window == NULL)
+				return false;
+
+			glfwSetKeyCallback(this->window, callback);
+			return true;
+		}
 		bool setFrameBufferSizeCallback(void (*callback)(GLFWwindow*, int, int)){
 			if(this->window == NULL){
 				return false;

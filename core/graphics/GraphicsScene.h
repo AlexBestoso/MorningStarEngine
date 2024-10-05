@@ -21,7 +21,7 @@ class GraphicsScene : public GraphicsObject{
                         this->use();
 
 			glm::mat4 model = glm::mat4(1.0f);
-                        model = glm::translate(model, glm::vec3(0.0f, -0.7f, 0.0f));
+                        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
                         //model = glm::scale(model, glm::vec3(1.0f));
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
@@ -64,8 +64,8 @@ class GraphicsScene : public GraphicsObject{
 				for(int i=0; i<this->getObjectCount(); i++){
 					if(objs[i].textureLocation != "")
 						objectTextures[i].bind2D();
-					this->storeVertexData(sizeof(float)*objs[i].glut_size, objs[i].glut_data, GL_STATIC_DRAW);
-					glDrawArrays(GL_TRIANGLES, 0, objs[i].element_count);
+					this->storeVertexData(sizeof(float)*objs[i].glut_size, objs[i].glut_data,  GL_DYNAMIC_DRAW);
+					glDrawArrays(objs[i].mode, 0, objs[i].element_count);
 					this->setUniform("model", model);
 
 					if(objs[i].textureLocation != "")
@@ -129,7 +129,8 @@ class GraphicsScene : public GraphicsObject{
                         	if(!test.loadTexture2D(objs[i].textureLocation.c_str())){
                         	        printf("Failed to load texture for object '%s'\n", objs[i].name.c_str());
                         	        return false;
-                        	}
+                        	}else{
+				}
 				objectTextures[i] = test;
 			}
 

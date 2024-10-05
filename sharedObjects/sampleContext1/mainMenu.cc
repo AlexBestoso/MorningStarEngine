@@ -5,8 +5,8 @@ class MainMenu : public ContextInterface{
 		Menu2D menu;
 
 		void processInput(GLFWwindow *window){
-                        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-                                glfwSetWindowShouldClose(window, true);
+                        //if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+                        //        glfwSetWindowShouldClose(window, true);
 
                         if (glfwGetKey(window, GLFW_KEY_W)){
                                 this->ges.keyboard.key_w = true;
@@ -79,6 +79,7 @@ class MainMenu : public ContextInterface{
                         }
 
                         this->activeCamera = &menu.camera;
+			this->context = 0;
 		}
         	virtual int exec(GLFWwindow* window) override{
 			this->processInput(window);

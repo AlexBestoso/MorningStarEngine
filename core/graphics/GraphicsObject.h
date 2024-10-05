@@ -29,6 +29,11 @@ class GraphicsObject{
 		
 	public:
 		struct GuiEngineStruct ges;
+		GraphicsCamera camera;
+		graphics_material_t material;
+		graphics_light_t light;
+		WavefrontImport objImporter;
+
 		virtual void setGES(struct GuiEngineStruct ges){
 			this->ges = ges;
 			camera.ges = ges;
@@ -36,10 +41,6 @@ class GraphicsObject{
 		void setGes(struct GuiEngineStruct ges){
 			setGES(ges);
 		}
-		GraphicsCamera camera;
-		graphics_material_t material;
-		graphics_light_t light;
-		WavefrontImport objImporter;
 
 		size_t getObjectCount(void){
 			return objectsSize;
@@ -47,6 +48,14 @@ class GraphicsObject{
 
 		obj_t *getObjects(void){
 			return objects;
+		}
+
+		bool updateObject(obj_t newObj, int objIdx){
+			if(objIdx <= -1 || objIdx >= this->objectsSize || objects == NULL)
+				return false;
+			
+			this->objects[objIdx] = newObj;
+			return true;
 		}
 		
 		bool import(std::string directory, std::string name){

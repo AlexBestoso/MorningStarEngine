@@ -342,4 +342,51 @@ class GraphicsGeometry{
                                 ret.perspective_z_y.area;
 			return ret;
 		};
+
+		int getQuadrant(glm::vec3 p){
+                        if(p.x >= 0 && p.y >= 0 && p.z >= 0)
+                                return 1;
+                        else if(p.x < 0 && p.y >= 0 && p.z >= 0)
+                                return 2;
+                        else if(p.x < 0 && p.y < 0 && p.z >= 0)
+                                return 3;
+                        else if(p.x >= 0 && p.y < 0 && p.z >= 0)
+                                return 4;
+                        if(p.x >= 0 && p.y >= 0 && p.z < 0)
+                                return 5;
+                        else if(p.x < 0 && p.y >= 0 && p.z < 0)
+                                return 6;
+                        else if(p.x < 0 && p.y < 0 && p.z < 0)
+                                return 7;
+                        else if(p.x >= 0 && p.y < 0 && p.z < 0)
+                                return 8;
+                        return 1;
+                }
+
+		int getRelativeQuadrant(glm::vec3 point, glm::vec3 center){
+			glm::vec3 direction = glm::vec3(
+				center.x - point.x, 
+				center.y - point.y,
+				center.z - point.z		
+			);
+			
+			if(direction.x <= 0 && direction.y <= 0 && direction.z <= 0){
+				return 1;
+			}else if(direction.x > 0 && direction.y <= 0 && direction.z <= 0){
+				return 2;
+			}else if(direction.x > 0 && direction.y > 0 && direction.z <= 0){
+				return 3;
+			}else if(direction.x <= 0 && direction.y > 0 && direction.z <= 0){
+				return 4;
+			}else if(direction.x <= 0 && direction.y <= 0 && direction.z > 0){
+				return 5;
+			}else if(direction.x > 0 && direction.y <= 0 && direction.z > 0){
+				return 6;
+			}else if(direction.x > 0 && direction.y > 0 && direction.z > 0){
+				return 7;
+			}else if(direction.x <= 0 && direction.y > 0 && direction.z > 0){
+				return 8;
+			}
+			return 1;
+		}
 };

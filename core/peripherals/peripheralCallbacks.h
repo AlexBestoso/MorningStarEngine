@@ -1,6 +1,4 @@
-void updateKeyboardSpecial(bool keyDown, int key, int mouseX, int mouseY){
-	gui_engine_global.mouse.mouseX = mouseX;
-	gui_engine_global.mouse.mouseY = mouseY;
+void updateKeyboardSpecial(bool keyDown, int key){
 	switch(key){
 		case 0x65:
 			gui_engine_global.keyboard.key_up = keyDown;
@@ -46,10 +44,11 @@ void updateKeyboardSpecial(bool keyDown, int key, int mouseX, int mouseY){
 			break;
 	}
 }
-void updateKeyboard(bool keyDown, unsigned char key, int mouseX, int mouseY){
-	gui_engine_global.mouse.mouseX = mouseX;
-	gui_engine_global.mouse.mouseY = mouseY;
+void updateKeyboard(bool keyDown, int key, int action, int mod){
 	switch(key){
+		case 0x20:
+			gui_engine_global.keyboard.key_space = keyDown;
+			break;
 		case 0x61:
 			gui_engine_global.keyboard.key_a = keyDown;
 			break;

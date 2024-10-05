@@ -30,7 +30,9 @@ typedef struct obj{
 	size_t normal_count = 0;
 	size_t face_count = 0;
 	size_t element_count = 0;
-	
+
+
+	//TODO: The stuff below can probably be deleted now
 	size_t buffer_size = 0;
 	int buffer_start = 0;
 	int buffer_count = 0;
@@ -42,6 +44,8 @@ typedef struct obj{
 	int vertex_end = 0;
 	int texture_end = 0;
 	int normal_end = 0;
+
+	uint32_t mode = (uint32_t)GL_TRIANGLES;
 }obj_t;
 
 class WavefrontImport{
@@ -727,6 +731,7 @@ class WavefrontImport{
 					if(grabber.rfind("o ", 0) == 0){
 						oi++;
 						o[oi].name = "";
+						o[oi].mode = GL_TRIANGLES;
 						if(o[oi].glut_data != NULL){
 							delete[] o[oi].glut_data;
 							o[oi].glut_data = NULL;
@@ -1036,22 +1041,26 @@ class WavefrontImport{
 								std::string g = "";
 								bool gotV=false, gotT=false;
 								for(int k=0; k<grab.length(); k++){
-									if(grab[k] == '/'){
-										if(!gotV){
-											f[fi].x = std::stof(g.c_str());
-											gotV=true;
-										}else if(!gotT){
-											f[fi].y = std::stof(g.c_str());
-											gotT=true;
-										}else{ // got normal
-											f[fi].z = std::stof(g.c_str());
-											fi++;
+									try{
+										if(grab[k] == '/'){
+											if(!gotV){
+												gotV=true;
+												f[fi].x = std::stof(g.c_str());
+											}else if(!gotT){
+												gotT=true;
+												f[fi].y = std::stof(g.c_str());
+											}else{ // got normal
+												f[fi].z = std::stof(g.c_str());
+												fi++;
+												g = "";
+												break;
+											}
 											g = "";
-											break;
+										}else{
+											g += grab[k];
 										}
-										g = "";
-									}else{
-										g += grab[k];
+									}catch(std::invalid_argument e){
+										continue;
 									}
 								}
 
@@ -1103,6 +1112,7 @@ class WavefrontImport{
 				o[i].textureLocation += o[i].name;
 			       	o[i].textureLocation +=	".jpg";
                                 if(access(o[i].textureLocation.c_str(), F_OK) == -1){
+                                        printf("Debug: Texture Doesn't Exist '%s'\n", o[i].textureLocation.c_str());
                                         o[i].textureLocation = "";
                                 }else{
                                         printf("Debug: Found Texture '%s'\n", o[i].textureLocation.c_str());

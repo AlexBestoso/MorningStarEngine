@@ -42,6 +42,7 @@ float pitch, yaw;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_click_callback(GLFWwindow* window, int button, int action, int mod);
+void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 //#include "./Custom/Custom_TestContext.h"
 //#include "./Custom/Custom_MainMenu.h"
@@ -59,6 +60,7 @@ int main(void){
     	ge.setFrameBufferSizeCallback(framebuffer_size_callback);
 	ge.setMouseCursorPosCallback(mouse_callback);
 	ge.setMouseClickCallback(mouse_click_callback);
+	ge.setKeyboardCallback(keyboard_callback);
 	//ge.disableMouseCursor();
 	int previous = 0;
     	while (ge.running()){
@@ -116,6 +118,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+	if((key >= 0x41 && key <= 0x5a) && mods ==0){
+                key += (0x61-0x41);
+        }
+	updateKeyboard((GLFW_PRESS == action || GLFW_REPEAT == action), key, action, mods);
+	updateKeyboardSpecial((GLFW_PRESS == action || GLFW_REPEAT == action), key);
 }
 
 bool firstMouse = true;
