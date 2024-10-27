@@ -51,11 +51,23 @@ class GraphicsTexture{
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 			stbi_image_free(data);
+			data = NULL;
 			return true;
+		}
+
+		void destroy(void){
+			unbind2D();
+			if(data != NULL)
+				free(data);
 		}
 
 		void bind2D(void){
 			glActiveTexture(GL_TEXTURE0+textureUnit);
 			glBindTexture(GL_TEXTURE_2D, texture);
+		}
+
+		void unbind2D(void){
+			glActiveTexture(GL_TEXTURE0+textureUnit);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 };
