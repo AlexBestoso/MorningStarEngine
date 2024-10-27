@@ -1962,7 +1962,6 @@ class WavefrontImport{
 			
 			printf("Object 1: %s\n", this->objectBuffers[0].c_str());
 			printf("Object 2: %s\n", this->objectBuffers[1].c_str());
-			printf("Object 3: %s\n", this->objectBuffers[2].c_str());
 			return true;
 		}
 

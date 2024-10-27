@@ -67,11 +67,14 @@ class GraphicsObject{
 				printf("Failed to read object file %s\n", objImporter.buildFilePath().c_str());
 			}
 			
+			printf("Counting objects...\n");
 			objectsSize = objImporter.countObjects();
 			if(objectsSize <= 0)
 				return false;
 			
+			printf("Isolating objects\n");
 			objImporter.isoloateObjects();
+			printf("Converting objects.\n");
 			objImporter.convertObjects();
 			printf("IMPORT COMPLETED\n");
 			//objImporter.serializeObjects();
