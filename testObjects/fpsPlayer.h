@@ -300,7 +300,7 @@ class FpsPlayer : public GraphicsObject{
 			}
 
 			if(ges.keyboard.key_space){
-				this->momentum.y = this->camera.cameraPosition.y <= this->height ? (this->gravity*10) : this->momentum.y;
+				this->momentum.y = this->camera.cameraPosition.y <= this->height ? (this->gravity*5) : this->momentum.y;
 			}
 
 			if(firstStart){

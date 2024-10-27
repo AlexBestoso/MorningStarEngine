@@ -4,7 +4,7 @@ class CustomTestContext : public ContextInterface{
 		const int id = 1;
 		GraphicsGeometry geom;
 		GraphicsScene scene;
-		//GraphicsSkybox skybox;
+		GraphicsSkybox skybox;
 	        FpsPlayer playerOne;
 		Menu2D menu;
 		DevTools devtools;
@@ -13,6 +13,15 @@ class CustomTestContext : public ContextInterface{
 		glm::vec3 *organizedPoints[8];
 		size_t quadrantSize[8] = {0};
 		glm::vec3 minX, minY, minZ, maxX, maxY, maxZ, center;
+
+		std::string skyboxFaces[6] = {
+			"./scenes/sampleScene/skybox/right.jpg",
+			"./scenes/sampleScene/skybox/left.jpg",
+			"./scenes/sampleScene/skybox/top.jpg",
+			"./scenes/sampleScene/skybox/bottom.jpg",
+			"./scenes/sampleScene/skybox/back.jpg",
+			"./scenes/sampleScene/skybox/front.jpg"
+		};
 
 		void processInput(GLFWwindow *window){
 		        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
@@ -44,7 +53,6 @@ class CustomTestContext : public ContextInterface{
 
 	public:
 		virtual void init() override{	
-			printf("Setting up the scene\n");
 			if(!scene.create("./scenes/sampleScene", "SampleScene")){
 				printf("Failed to build scene.\n");
 				exit(EXIT_FAILURE);
@@ -54,6 +62,11 @@ class CustomTestContext : public ContextInterface{
 		                printf("Failed to create main character\n");
 		                exit(EXIT_FAILURE);
 		        }
+		
+			if(!skybox.create(skyboxFaces)){
+				printf("Failed to create skybox.\n");
+				exit(EXIT_FAILURE);
+			}
 	
 			this->activeCamera = &playerOne.camera;
 
@@ -85,6 +98,9 @@ class CustomTestContext : public ContextInterface{
 			this->processInput(window);
 
 			scene.camera = this->activeCamera[0];
+			skybox.camera = this->activeCamera[0];
+
+			skybox.draw();
 			scene.draw();
 			playerOne.draw();
 			return this->context;
