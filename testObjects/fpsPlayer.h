@@ -201,11 +201,13 @@ class FpsPlayer : public GraphicsObject{
 			previousArea = 0.5;
 		}
 	public:
-		float momentum = 0;
+		glm::vec3 momentum = glm::vec3(0);
 		glm::vec3 force = glm::vec3(0);
 		glm::vec3 travel = glm::normalize(glm::vec3(1.0f));
+		float height = 0.298666;
 		float gravity = 0.0667408;
 		float jumpStrength = 0.05;
+		bool respectGravity = true;
 
 		void setSceneData(obj_data_t *d, size_t s){
 			sceneData = d;
@@ -236,6 +238,9 @@ class FpsPlayer : public GraphicsObject{
                         this->camera.cameraFront = front;//glm::normalize(front);
 			previousCoords = this->camera.cameraPosition;
 
+			if(ges.keyboard.key_2){
+				printf("Player Coords : (%f, %f, %f)\n", this->camera.cameraPosition.x, this->camera.cameraPosition.y, this->camera.cameraPosition.z);
+			}
 			/*
 			 * Manage horizontal movement
 			 * */
@@ -281,16 +286,22 @@ class FpsPlayer : public GraphicsObject{
 			/*
 			 * Manage jump physics
 			 * */
-			if(ges.keyboard.key_space){
-                      		this->camera.cameraPosition += gravity * glm::vec3(0, 1, 0);
-			}
 
 			if (ges.keyboard.key_1){
                                 this->camera.cameraPosition = glm::vec3(0.0f);
                         }else if(ges.keyboard.key_2){
 			}else if(ges.keyboard.key_3){
 			}
-			
+
+			if(this->respectGravity){
+                                this->camera.cameraPosition.y -= (this->gravity-this->momentum.y);
+				this->momentum.y -= (this->momentum.y - this->gravity) <= 0 ? this->momentum.y : this->gravity/4;
+				if(this->camera.cameraPosition.y <= this->height) this->camera.cameraPosition.y = this->height;
+			}
+
+			if(ges.keyboard.key_space){
+				this->momentum.y = this->camera.cameraPosition.y <= this->height ? (this->gravity*10) : this->momentum.y;
+			}
 
 			if(firstStart){
 				this->camera.cameraPosition = glm::vec3(-7.5, 1.5, -6.5);	

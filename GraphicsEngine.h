@@ -16,7 +16,8 @@ class GraphicsEngine{
 		GraphicsCamera *activeCamera = NULL;
 
 		context_interface_t invoker = NULL;
-		std::unique_ptr<ContextInterface> _context  = NULL;
+		//std::unique_ptr<ContextInterface> _context  = NULL;
+		ContextInterface *_context  = NULL;
 		void *contextHandle = NULL;
 		size_t contextListSize = 0;
 		std::string *availableSoFiles = NULL;
@@ -79,7 +80,7 @@ class GraphicsEngine{
 						Reset_dlerror();
 						invoker = reinterpret_cast<context_interface_t>(dlsym(contextHandle, "create"));
 						Check_dlerror();
-						_context = std::unique_ptr<ContextInterface>(invoker());
+						_context = invoker();
 						_context->init();
 
 					}
@@ -95,6 +96,8 @@ class GraphicsEngine{
 			if(ctx >= contextListSize || ctx <= -1){
 				printf("Invalid context id; exiting.\n");
 				exit(EXIT_FAILURE);
+			}else{
+				printf("Opening %s\n", availableSoFiles[ctx].c_str());
 			}
 
 			contextHandle = dlopen(availableSoFiles[ctx].c_str(), RTLD_NOW);
@@ -108,7 +111,9 @@ class GraphicsEngine{
 			invoker = reinterpret_cast<context_interface_t>(dlsym(contextHandle, "create"));
 			Check_dlerror();
 
-			_context = std::unique_ptr<ContextInterface>(invoker());
+			printf("Testing...\n");
+			_context = invoker();
+			printf("Context Init\n");
 			this->contextInit();
 		}
 		

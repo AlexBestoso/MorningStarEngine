@@ -22,7 +22,7 @@ class CustomTestContext : public ContextInterface{
 			}	
 			if (glfwGetKey(window, GLFW_KEY_2)){
 				// Debug Commands.
-                                ges.keyboard.key_2 = true;
+                /*                ges.keyboard.key_2 = true;
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				printf("Dev Consol\n:");
 				printf("> ");
@@ -30,7 +30,7 @@ class CustomTestContext : public ContextInterface{
 				std::getline(std::cin, input);
 				devtools.runCommand(input, window, this->scene);
 				printf("input : %s\n", input.c_str());
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);*/
 			}else{
                                 ges.keyboard.key_2 = false;
 			}
@@ -57,14 +57,14 @@ class CustomTestContext : public ContextInterface{
 	
 			this->activeCamera = &playerOne.camera;
 
-			size_t sceneObjCount = scene.getObjectCount();
-			obj_t *sceneObjects = scene.getObjects();
+			//size_t sceneObjCount = scene.getObjectCount();
+			//obj_t *sceneObjects = scene.getObjects();
 			
-			for(int i=0; i<sceneObjCount; i++){
-				obj_data_t *data = (obj_data_t *)sceneObjects[i].glut_data;
-				for(int j=0; j<sceneObjects[i].element_count; j++){
-				}
-			}
+			//for(int i=0; i<sceneObjCount; i++){
+			//	obj_data_t *data = (obj_data_t *)sceneObjects[i].glut_data;
+			//	for(int j=0; j<sceneObjects[i].element_count; j++){
+		//		}
+		//	}
 			
 			this->context = 1;
 		}

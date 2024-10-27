@@ -62,16 +62,29 @@ class GraphicsObject{
 			if(directory == "" || name == "")
 				return false;
 			objImporter.setFile(directory, name);
+			
+			if(!objImporter.readFile(objImporter.buildFilePath().c_str())){
+				printf("Failed to read object file %s\n", objImporter.buildFilePath().c_str());
+			}
+			
 			objectsSize = objImporter.countObjects();
 			if(objectsSize <= 0)
 				return false;
-			objects = new obj_t[objectsSize];
+			
+			objImporter.isoloateObjects();
+			objImporter.convertObjects();
+			printf("IMPORT COMPLETED\n");
+			//objImporter.serializeObjects();
+			
+			
+
+		/*	objects = new obj_t[objectsSize];
 			if(!objImporter.objStat(objects, objectsSize))
 				return false;
 			if(!objImporter.loadMaterial(objects, objectsSize))
 				return false;
 			if(!objImporter.loadData(objects, objectsSize))
-				return false;
+				return false;*/
 			return true;
 		}
 

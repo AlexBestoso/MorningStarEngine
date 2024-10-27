@@ -8,7 +8,9 @@ class GraphicsScene : public GraphicsObject{
 		size_t objectTextureCount = 0;
 		obj_t * objs;
 	public:
-		glm::vec3 lightPos;
+		glm::vec3 lightPos = glm::vec3(20, 30, 15);
+		bool showSun = true;
+		
 		obj_t *getObjs(void){
 			return objs;
 		}
@@ -26,7 +28,7 @@ class GraphicsScene : public GraphicsObject{
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
 
-			this->setUniform("material.ambient", material.ambient);
+		/*	this->setUniform("material.ambient", material.ambient);
                         this->setUniform("material.diffuse", material.diffuse);
                         this->setUniform("material.specular", material.specular);
                         this->setUniform("material.shininess", material.shininess);
@@ -45,8 +47,8 @@ class GraphicsScene : public GraphicsObject{
                         this->setUniform("light.constant", light.constant);
                         this->setUniform("light.linear", light.linear);
                         this->setUniform("light.quadratic", light.quadratic);
-
-                        this->setUniform("useTexture", 1);
+*/
+                        this->setUniform("useTexture", 0);
                         this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
                         this->setUniform("lightPos", lightPos);
                         this->setUniform("viewPos", camera.getPos());
@@ -59,20 +61,24 @@ class GraphicsScene : public GraphicsObject{
                         unsigned int projectionLoc = this->getUniformLoc("projection");
                         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
-			objs = this->getObjects();
-			if(objs != NULL){
-				for(int i=0; i<this->getObjectCount(); i++){
-					if(objs[i].textureLocation != "")
-						objectTextures[i].bind2D();
-					this->storeVertexData(sizeof(float)*objs[i].glut_size, objs[i].glut_data,  GL_DYNAMIC_DRAW);
-					glDrawArrays(objs[i].mode, 0, objs[i].element_count);
-					this->setUniform("model", model);
-
-					if(objs[i].textureLocation != "")
-						objectTextures[i].unbind2D();
-				}
-			}else{
-				printf("Error, No objects loaded.\n");
+			for(int i=0; i<this->objImporter.objectCount; i++){
+				this->setUniform("material.ambient", this->objImporter.waveObjects[i].material.mtl.Ka);
+				this->setUniform("material.diffuse", this->objImporter.waveObjects[i].material.mtl.Kd);
+				this->setUniform("material.specular", this->objImporter.waveObjects[i].material.mtl.Ks);
+				this->setUniform("material.shininess", this->objImporter.waveObjects[i].material.mtl.Ns);
+				this->setUniform("material.dissolve", this->objImporter.waveObjects[i].material.mtl.d);
+				/*if(objs[i].textureLocation != ""){
+					objectTextures[i].bind2D();
+					this->setUniform("useTexture", 1);
+				}else{
+					this->setUniform("useTexture", 0);
+				}*/
+				this->objImporter.serializeObject(i);
+				this->storeVertexData(sizeof(float)*this->objImporter.glObjBufferSize, this->objImporter.glObjBuffer, GL_DYNAMIC_DRAW);
+				glDrawArrays(GL_TRIANGLES, 0, this->objImporter.waveObjects[i].getFCount());
+				this->setUniform("model", model);
+				//	if(objs[i].textureLocation != "")
+				//		objectTextures[i].unbind2D();
 			}
 		}
 
@@ -112,11 +118,11 @@ class GraphicsScene : public GraphicsObject{
 			this->setAttributePointer(3, 3, 11, (void *)(8*sizeof(float))); // material color
                         this->enableArrayAttribute(3);
 
-			objectTextureCount = this->getObjectCount();
-			objectTextures = new GraphicsTexture[objectTextureCount];
-			objs = this->getObjects();
+			//objectTextureCount = this->getObjectCount();
+			//objectTextures = new GraphicsTexture[objectTextureCount];
+			//objs = this->getObjects();
 
-			for(int i=0; i<objectTextureCount; i++){
+			/*for(int i=0; i<objectTextureCount; i++){
 				if(objs[i].textureLocation == ""){
 					continue;
 				}
@@ -132,7 +138,7 @@ class GraphicsScene : public GraphicsObject{
                         	}else{
 				}
 				objectTextures[i] = test;
-			}
+			}*/
 
 
 			this->unbindVbo();
@@ -159,7 +165,7 @@ class GraphicsScene : public GraphicsObject{
 
                         setUniform("material.diffuseMap", 0);
                         setUniform("material.specularMap", 0);
-
+			
 			return true;
 		}
 
