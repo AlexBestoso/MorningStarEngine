@@ -358,6 +358,7 @@ class WavefrontObject{
 		size_t f_size = 0;
 
 
+
 		std::string material_name = "";
 		std::string object_name = "";
 
@@ -381,10 +382,10 @@ class WavefrontObject{
                 	vn_size = 0;
                 	f_size = 0;
 
-                	v_data = NULL;
+                	/*v_data = NULL;
                 	vt_data = NULL;
                 	vn_data = NULL;
-                	f_data = NULL;
+                	f_data = NULL;*/
 		}
 		
 		struct wavefront_face parseFace(std::string val){
@@ -534,10 +535,9 @@ class WavefrontObject{
 				if(val[i] == '\n'){
 					if(isField("v ", g.c_str())){
 						g+=' ';
-						printf("Parsing '%s'\n", g.c_str());
 						v_data[x] = parse3Var(g, 2);
-						printf("Stored %f, %f, %f in %d\n", v_data[x].x, v_data[x].y, v_data[x].z, x);
 						x++;
+						if(x >= v_size) break;
 					}
 					g = "";
 				}else{
@@ -554,6 +554,7 @@ class WavefrontObject{
                                                 g+=' ';
                                                 vt_data[x] = parse2Var(g, 3);
                                                 x++;
+						if(x >= vt_size) break;
                                         } 
                                         g = "";
                                 }else{
@@ -570,6 +571,7 @@ class WavefrontObject{
                                                 g+=' ';
                                                 vn_data[x] = parse3Var(g, 3);
                                                 x++;
+						if(x >= vn_size) break;
                                         }
                                         g = "";
                                 }else{
@@ -588,7 +590,11 @@ class WavefrontObject{
 						for(int j=2; j<g.length(); j++){
 							if(g[j] == ' '){
 								f_data[x] = parseFace(_g);
+								f_data[x].v -= v_offset;
+								f_data[x].t -= vt_offset;
+								f_data[x].n -= vn_offset;
                                                 		x++;
+								if(x >= f_size) break;
 								_g = "";
 							}else{
 								_g += g[j];
@@ -625,11 +631,11 @@ class WavefrontObject{
                         for(int i=0; i<val.length(); i++){
                                 if(val[i] == '\n'){
                                         if(isField("usemtl ", g.c_str())){
-                                                this->object_name = "";
+                                                this->material_name = "";
                                                 for(int j=7; j<g.length(); j++){
                                                         this->material_name += g[j];
                                                 }
-                                                break;
+  	                                        break;
                                         } 
                                         g = "";
                                 }else{
@@ -641,11 +647,37 @@ class WavefrontObject{
 		glm::vec3 *v_data = NULL;
 		glm::vec2 *vt_data = NULL;
 		glm::vec3 *vn_data = NULL;
+		int v_offset = 0;
+		int vt_offset = 0;
+		int vn_offset = 0;
 		struct wavefront_face *f_data = NULL;
 
 		WavefrontMaterial material;
 
-		void init(std::string objectData, std::string matLoc){
+		void enumObj(){
+			printf("Object: %s\n", object_name.c_str());
+			printf("Material : %s\n", material_name.c_str());
+			printf("Face Count: %ld\n", f_size);
+			printf("V Count: %ld\n", v_size);
+			printf("Vt Count: %ld\n", vt_size);
+			printf("Vn Count: %ld\n", vn_size);
+			//size_t v_size = 0;
+                	//size_t vt_size = 0;
+                	//size_t vn_size = 0;
+                	for(int i=0; i<f_size; i++){
+				printf("%d/%d/%d = (%f, %f, %f) (%f, %f) (%f, %f, %f)\n", f_data[i].v, f_data[i].t, f_data[i].n,
+					v_data[f_data[i].v].x, v_data[f_data[i].v].y, v_data[f_data[i].v].z, 
+					vt_data[f_data[i].t].x, vt_data[f_data[i].t].y, 
+					vn_data[f_data[i].n].x, vn_data[f_data[i].n].y, vn_data[f_data[i].n].z);
+			}
+
+		}
+
+		void init(std::string objectData, std::string matLoc, int v_o=0, int vt_o=0, int vn_o=0){
+			v_offset = v_o;
+			vt_offset = vt_o;
+			vn_offset = vn_o;
+
 			calcObjectName(objectData);
 			calcMaterialName(objectData);
 
@@ -679,6 +711,10 @@ class WavefrontObject{
 		}
 		size_t getFCount(void){
 			return f_size;
+		}
+
+		std::string getName(void){
+			return this->object_name;
 		}
 
 		void cleanup(void){this->_cleanup();}
@@ -784,351 +820,6 @@ class WavefrontImport{
 			importedObjects = new obj_t[varTracker.object_count];
 		}
 
-		void allocateFieldStrings(void){
-			textures = new std::string[varTracker.texture_count];
-                        normals = new std::string[varTracker.normal_count];
-                        vertexs = new std::string[varTracker.vertex_count];
-                        faces = new std::string[varTracker.face_count];
-			materialNames = new std::string[materialCount];
-
-			int t=0, n=0, v=0, f=0, m=0, o=-1; // incrementers
-			std::string grabber = ""; // line buffer
-			// parse out the obj data into seperate strings.
-                        for(int i=0; i<objFileSize; i++){
-				if(objFileData[i] == '\n'){
-					if(grabber.rfind("vt ", 0) == 0){
-						textures[t] = "";
-						for(int j=3; j<grabber.length(); j++)
-							textures[t] += grabber[j];
-						textures[t] += ' ';
-						importedObjects[o].texture_count++;
-						t++;
-					}else if(grabber.rfind("vn ", 0) == 0){
-						normals[n] = "";
-						for(int j=3; j<grabber.length(); j++)
-							normals[n] += grabber[j];
-						normals[n] += ' ';
-						importedObjects[o].normal_count++;
-						n++;
-					}else if(grabber.rfind("v ", 0) == 0){
-						vertexs[v] = "";
-						for(int j=2; j<grabber.length(); j++)
-							vertexs[v] += grabber[j];
-						vertexs[v] += ' ';
-						importedObjects[o].vertex_count++;
-						v++;
-					}else if(grabber.rfind("f ", 0) == 0){
-                                                faces[f] = "";
-                                                for(int j=2; j<grabber.length(); j++)
-                                                        faces[f] += grabber[j];
-                                                faces[f] += ' ';
-						importedObjects[o].face_count++;
-                                                f++;
-                                        }else if(grabber.rfind("usemtl ", 0) == 0){
-                                                materialNames[m] = "";
-                                                for(int j=7; j<grabber.length(); j++)
-                                                        materialNames[m] += grabber[j];
-						importedObjects[o].material.name = materialNames[m];
-                                                m++;
-                                        }else if(grabber.rfind("o ", 0) == 0){
-						o++;
-						importedObjects[o].name = "";
-						for(int j=2; j<grabber.length(); j++)
-							importedObjects[o].name += grabber[j];
-						importedObjects[o].vertex_count = 0;
-						importedObjects[o].texture_count = 0;
-						importedObjects[o].normal_count = 0;
-					}
-					grabber = "";
-				}else{
-					grabber += objFileData[i];
-				}
-                        }
-
-			// Identify unique material names.
-			std::string *usedNames = new std::string[materialCount];
-			uniqueMaterialCount = 0;
-			for(int i=0; i<materialCount; i++){
-				grabber = materialNames[i];
-				bool unique = true;
-				for(int j=0; j<materialCount; j++){
-					if(grabber == usedNames[j]){
-						unique = false;
-						break;
-					}
-				}
-				if(unique){
-					usedNames[uniqueMaterialCount] = grabber;
-					uniqueMaterialCount++;
-					grabber = "";
-				}
-			}
-
-			materials = new obj_material_t[uniqueMaterialCount];
-			for(int i=0; i<uniqueMaterialCount; i++)
-				materials[i].name = usedNames[i];
-			delete[] usedNames;
-
-
-		}
-
-
-		void parseVertexFloats(void){
-			vertexMultiplyer = 0;
-			for(int i=0; i<vertexs[0].length(); i++){
-				if(vertexs[0][i] == ' '){
-					vertexMultiplyer++;
-				}
-			}
-
-			vertexArray = new float[varTracker.vertex_count*vertexMultiplyer];
-			int k = 0;
-                        for(int i=0; i<varTracker.vertex_count; i++){
-                                std::string grab = "";
-                                for(int j=0; j<vertexs[i].length(); j++){
-                                        if(vertexs[i][j] == ' '){
-						if(k >= varTracker.vertex_count*vertexMultiplyer)
-							break;
-                                                vertexArray[k] = std::stof(grab);
-                                                grab = "";
-                                                k++;
-                                        }else{
-                                                grab += vertexs[i][j];
-                                        }
-                                }
-				if(k >= varTracker.vertex_count*vertexMultiplyer)
-                                	break;
-                        }
-			delete[] vertexs;
-		}
-
-
-		void parseTextureFloats(void){
-			textureMultiplyer = 0;
-			for(int i=0; i<textures[0].length(); i++){
-                                if(textures[0][i] == ' '){
-                                        textureMultiplyer++;
-                                }
-                        }
-
-			textureArray = new float[varTracker.texture_count*textureMultiplyer];
-
-			int k = 0;
-                        for(int i=0; i<varTracker.texture_count; i++){
-                                std::string grab = "";
-                                for(int j=0; j<textures[i].length(); j++){
-                                        if(textures[i][j] == ' ' && grab.length() != 0){
-						if(k >= varTracker.texture_count*textureMultiplyer)
-		                                        break;
-                                                textureArray[k] = std::stof(grab);
-                                                grab = "";
-                                                k++;
-                                        }else{
-                                                grab += textures[i][j];
-                                        }
-                                }
-				if(k >= varTracker.texture_count*textureMultiplyer)
-                                        break;
-                        }
-
-			delete[] textures;
-		}
-
-
-		void parseNormalFloats(void){
-			normalMultiplyer = 0;
-			for(int i=0; i<normals[0].length(); i++){
-                                if(normals[0][i] == ' '){
-                                        normalMultiplyer++;
-                                }
-                        }
-
-                	normalArray = new float[varTracker.normal_count*normalMultiplyer];
-			
-			int k = 0;
-                        for(int i=0; i<varTracker.normal_count; i++){
-                                std::string grab = "";
-                                for(int j=0; j<normals[i].length(); j++){
-					if(k >= varTracker.normal_count*normalMultiplyer)
-                                        	break;
-                                        if(normals[i][j] == ' ' && grab.length() != 0){
-                                                normalArray[k] = std::stof(grab);
-                                                grab = "";
-                                                k++;
-                                        }else{
-                                                grab += normals[i][j];
-                                        }
-                                }
-				if(k >= varTracker.normal_count*normalMultiplyer)
-                                        break;
-                        }
-			delete[] normals;
-		}
-
-		void parseFaceIndecies(void){
-			faceArrayLens = new int[varTracker.face_count];
-			faceArraySize = 0;
-			for(int j=0; j<varTracker.face_count; j++){
-				faceMultiplyer = 0;
-				for(int i=0; i<faces[j].length(); i++){
-					if(faces[j][i] == ' '){
-						faceMultiplyer++;
-					}
-				}
-				faceArrayLens[j] = faceMultiplyer;
-				faceArraySize += 3*faceMultiplyer;
-			}
-
-			faceArray = new int[faceArraySize];
-			int k = 0;
-                        for(int i=0; i<varTracker.face_count; i++){
-                                std::string grab = "";
-                                for(int j=0; j<faces[i].length(); j++){
-					if(k >= faceArraySize)
-                                        	break;
-                                        if((faces[i][j] == ' ' || faces[i][j] == '/') && grab.length() != 0){
-                                                faceArray[k] = std::stoi(grab);
-                                                grab = "";
-                                                k++;
-                                        }else{
-                                                grab += faces[i][j];
-                                        }
-                                }
-				if(k >= faceArraySize)
-                                        break;
-                        }
-			delete[] faces;
-
-		}
-
-		
-
-		bool parseMaterials(void){
-			fd = open(materialFileLoc.c_str(), O_RDONLY);
-                        if(!fd){
-                                printf("Failed to open '%s'\n", materialFileLoc.c_str());
-                                return false;
-                        }
-
-                        struct stat st;
-                        if(fstat(fd, &st)){
-                                printf("fstat failed.\n");
-                                close(fd);
-                                return false;
-                        }
-                        size_t mtlSize = st.st_size;
-                        char *mtl = new char[objFileSize];
-
-                        if(read(fd, mtl, mtlSize) < mtlSize){
-                                printf("Failed to read.\n");
-                                close(fd);
-                                delete[] mtl;
-                                return false;
-                        }
-                        close(fd);
-			std::string grabber = "";
-			int selectedMaterial = -1;
-			for(int i=0; i<mtlSize; i++){
-				if(mtl[i] == '\n'){
-					if(grabber.rfind("newmtl ", 0) == 0){ // Found material name
-						std::string name = "";
-						for(int j=7; j<grabber.length(); j++){
-							name += grabber[j];
-						}
-
-						for(int j=0; j<uniqueMaterialCount; j++){
-							if(name == materials[j].name){
-								selectedMaterial = j;
-								break;
-							}
-						}
-					}else if(grabber.rfind("Kd ", 0) == 0){
-						std::string value = "";
-						int a = 0;
-						for(int j=3; j<grabber.length(); j++){
-							if(grabber[j] == ' '){
-								materials[selectedMaterial].Kd[a] = std::stof(value);
-								value = "";
-								a++;
-							}else{
-								value += grabber[j];
-							}
-						}
-						materials[selectedMaterial].Ka[a] = std::stof(value);
-					}
-					grabber = "";
-				}else{
-					grabber += mtl[i];
-				}
-			}
-			delete[] mtl;
-
-			// build material map
-			grabber = "";
-			selectedMaterial = -1;
-			int faceTracker = 0;
-			for(int i=0; i<objFileSize; i++){
-				if(objFileData[i] == '\n'){
-					if(grabber.rfind("usemtl ", 0) == 0){
-						std::string name = "";
-                                                for(int j=7; j<grabber.length(); j++){
-                                                        name += grabber[j];
-                                                }
-
-                                                for(int j=0; j<uniqueMaterialCount; j++){
-                                                        if(name == materials[j].name){
-                                                                selectedMaterial = j;
-                                                                break;
-                                                        }
-                                                }
-					}else if(grabber.rfind("f ", 0) == 0){
-						materialMap[faceTracker] = selectedMaterial;
-						faceTracker++;
-					}
-					grabber = "";
-				}else{
-					grabber += objFileData[i];
-				}
-			}
-			return true;
-		}
-
-		/*
-		 * This function is used to map the data of the .obj file to
-		 * individual objects when multiple objects are within a single
-		 * .obj
-		 * */
-		void calculateOffsets(void){
-			int o = 0;
-			int faceTracker = 0;
-			for(int i=0; i<varTracker.face_count; i++){
-				//int val = (faceArrayLens[i]%3) == 1 ? 2 : (faceArrayLens[i]%3) == 2 ? 1 : 0; // Magical line that corrects a flaw in the population of this array.
-				if(o > varTracker.object_count)
-					break;
-				importedObjects[o].buffer_size += (faceArrayLens[i]/*+val*/)*11; // 8 becase 3v / 2t/ 3n
-				if(faceTracker >= importedObjects[o].face_count){
-					importedObjects[o].buffer_count = importedObjects[o].buffer_size / 11;
-					if(o == 0){
-						importedObjects[o].buffer_start = 0;
-					}else{
-						importedObjects[o].buffer_start = importedObjects[o-1].buffer_start+importedObjects[o-1].buffer_size;
-					}
-					o++;
-					faceTracker = 0;
-				}
-				if(faceTracker == 0){
-					importedObjects[o].buffer_size = 0;
-				}
-				faceTracker++;
-			}
-			importedObjects[o].buffer_count = importedObjects[o].buffer_size / 11;
-			if(o == 0){
-				importedObjects[o].buffer_start = 0;
-			}else{
-				importedObjects[o].buffer_start = importedObjects[o-1].buffer_start+importedObjects[o-1].buffer_size;
-			}
-		}
-
 		int getObjectIndexByFace(int faceIndex){
 			int ret = -1;
 			std::string grabber = "";
@@ -1165,117 +856,9 @@ class WavefrontImport{
 			return ret;
 		}
 		
-		int getObjectTextureOffsetByIndex(int objIndex){
-                        int ret = 0;
-                        if(objIndex <= -1 || objIndex >= varTracker.object_count)
-                                return 0;
-                        for(int i=0; i<varTracker.object_count; i++){
-                                if(i == objIndex){
-                                        break;
-                                }else{
-                                        ret += importedObjects[i].texture_count;
-                                }
-                        }
-                        return ret;
-		}
 
-		int getObjectNormalOffsetByIndex(int objIndex){
-			int ret = 0;
-                        if(objIndex <= -1 || objIndex >= varTracker.object_count)
-                                return 0;
-                        for(int i=0; i<varTracker.object_count; i++){
-                                if(i == objIndex){
-                                        break;
-                                }else{
-                                        ret += importedObjects[i].normal_count;
-                                }
-                        }
-                        return ret;
-		}
 
-		size_t calculateBufferSize(void){
-			glObjBufferSize = 0;
-                        for(int i=0; i<varTracker.object_count; i++){
-                                if(materialFileLoc == "")
-                                        glObjBufferSize += 8 * importedObjects[i].buffer_count;
-                                else
-                                        glObjBufferSize += 11 * importedObjects[i].buffer_count;
-                        }
-			return glObjBufferSize;
-		}
 
-		void createGlBuffer(void){
-			glObjBufferSize = glObjBufferSize;
-			printf("Buffer Size : %ld\n", glObjBufferSize);
-                	this->glObjBuffer = new float[glObjBufferSize];
-			int tracker = 0;
-			int faceTrack = 0;
-			for(int i=0; i<varTracker.face_count; i++){
-				if(tracker > glObjBufferSize)
-					break;
-				int objectIndex = getObjectIndexByFace(i);
-				if(objectIndex <= -1)
-					continue;
-				int objectVectorOffset = getObjectVectorOffsetByIndex(objectIndex);
-				int objectTextureOffset = getObjectTextureOffsetByIndex(objectIndex);
-				int objectNormalOffset = getObjectNormalOffsetByIndex(objectIndex);
-				glm::vec3 vert;
-				glm::vec2 texture;
-				glm::vec3 normal;
-				glm::vec3 color;
-
-				// what vector indecies does the first face use?
-				int faceCounter = 0;
-				for(int j=0; j<faceArrayLens[j]; j++){
-					if(i+3 >= varTracker.face_count || tracker > glObjBufferSize)
-						break;
-				
-					int vertIndex = objectVectorOffset+faceArray[(i*j)+j];
-					int textureIndex = objectTextureOffset+faceArray[(i*j)+j+1];
-					int normalIndex = objectNormalOffset+faceArray[(i*j)+j+2];
-					if(vertIndex+2 >= varTracker.vertex_count*vertexMultiplyer)
-						break;
-					if(textureIndex+1 >= varTracker.texture_count*textureMultiplyer)
-						break;
-					if(normalIndex+2 >= varTracker.normal_count*normalMultiplyer)
-						break;
-					vert = glm::vec3(vertexArray[vertIndex], vertexArray[vertIndex+1], vertexArray[vertIndex+2]);
-					texture = glm::vec2(textureArray[textureIndex], textureArray[textureIndex+1]);
-					normal = glm::vec3(normalArray[normalIndex], normalArray[normalIndex+1], normalArray[normalIndex+2]);
-					
-
-					glObjBuffer[tracker] = vert.x; tracker++;
-					glObjBuffer[tracker] = vert.y; tracker++;
-					glObjBuffer[tracker] = vert.z; tracker++;
-					glObjBuffer[tracker] = texture.x; tracker++;
-					glObjBuffer[tracker] = texture.x; tracker++;
-					glObjBuffer[tracker] = normal.x; tracker++;
-					glObjBuffer[tracker] = normal.y; tracker++;
-					glObjBuffer[tracker] = normal.z; tracker++;
-					if(materialFileLoc != ""){
-						color = glm::vec3(materials[materialMap[i]].Ka[0], materials[materialMap[i]].Ka[1], materials[materialMap[i]].Ka[2]);
-						glObjBuffer[tracker] = color.x; tracker++;
-						glObjBuffer[tracker] = color.y; tracker++;
-						glObjBuffer[tracker] = color.z; tracker++;
-						tracker+= 11;
-					}else{
-						tracker += 8;
-					}
-					
-					j+= 2;	
-				}
-			}
-
-			obj = (obj_data_t *)glObjBuffer;
-			if(materialFileLoc != "")
-				objCount = glObjBufferSize/11;
-			else
-				objCount = glObjBufferSize/8;///sizeof(obj_data_t);
-			delete[] faceArray;
-			delete[] vertexArray;
-			delete[] textureArray;
-			delete[] normalArray;
-		}
 
 		bool isField(std::string target, std::string src){
 			return src.rfind(target.c_str(), 0) == 0;
@@ -1290,6 +873,7 @@ class WavefrontImport{
 		float *glObjBuffer = NULL;
 
 		WavefrontObject *waveObjects = NULL;
+		//WavefrontObject waveObjects[1000];
 	
 		bool readFile(const char *objFile){
 			fd = open(objFile, O_RDONLY);
@@ -1320,9 +904,6 @@ class WavefrontImport{
 
 		size_t getObjectCount(void){
 			return varTracker.object_count;
-		}
-                obj_t *getImportedObjects(void){
-			return importedObjects;
 		}
 
 		void setFile(std::string directory, std::string name){
@@ -1377,539 +958,7 @@ class WavefrontImport{
 			return ret;
 		}
 
-		bool objStat(obj_t *o, size_t oSize){
-			if(this->objectDirectory == "" || this->objectName == ""){
-                                return false;
-                        }
-                        std::string objFileName = objectDirectory + "/" + objectName + ".obj";
-                        int fd = open(objFileName.c_str(), O_RDONLY);
-                        if(fd <= -1){
-                                return false;
-                        }
-                        struct stat st;
-                        if(fstat(fd, &st) == -1){
-                                return false;
-                        }
 
-			char *b = new char[st.st_size];
-			if(read(fd, b, st.st_size) != st.st_size){
-				delete[] b;
-				close(fd);
-				return false;
-			}
-			int oi = -1;
-			std::string grabber = "";
-			for(int i=0; i<st.st_size; i++){
-				if(oi >= oSize && oi != -1){
-					break;
-				}
-				if(b[i] == '\n'){
-					if(grabber.rfind("o ", 0) == 0){
-						oi++;
-						o[oi].name = "";
-						o[oi].mode = GL_TRIANGLES;
-						if(o[oi].glut_data != NULL){
-							delete[] o[oi].glut_data;
-							o[oi].glut_data = NULL;
-						}
-						o[oi].glut_size = 0;
-						for(int j=2; j<grabber.length(); j++)
-							o[oi].name += grabber[j];
-					}else if(grabber.rfind("f ", 0) == 0){
-						o[oi].face_count++;
-						grabber += ' ';
-						std::string grab = "";
-						for(int j=2; j<grabber.length(); j++){
-							if(grabber[j] == ' '){
-								o[oi].glut_size+=11;
-								o[oi].element_count++;
-								grab = "";
-							}else{
-								grab += grabber[j];
-							}
-						}
-						if(grab != "")
-							o[oi].glut_size += 11;
-					}else if(grabber.rfind("vn ", 0) == 0){
-						o[oi].normal_count++;
-					}else if(grabber.rfind("v ", 0) == 0){
-                                                o[oi].vertex_count++;
-					}else if(grabber.rfind("vt ", 0) == 0){
-						o[oi].texture_count++;
-					}else if(grabber.rfind("usemtl ", 0) == 0){
-						o[oi].material.name = "";
-						for(int j=7; j<grabber.length(); j++)
-							o[oi].material.name += grabber[j];
-					}
-					grabber = "";
-				}else{
-					grabber += b[i];
-				}
-			}
-			close(fd);
-			delete[] b;
-			return true;
-		}
-
-		bool loadMaterial(obj_t *o, size_t oSize){
-			if(this->objectDirectory == "" || this->objectName == ""){
-                                return false;
-                        }
-			std::string materialFileLoc = this->objectDirectory + "/" + this->objectName + ".mtl";
-                        fd = open(materialFileLoc.c_str(), O_RDONLY);
-                        if(!fd){
-                                printf("Failed to open '%s'\n", materialFileLoc.c_str());
-                                return false;
-                        }
-
-                        struct stat st;
-                        if(fstat(fd, &st)){
-                                printf("fstat failed.\n");
-                                close(fd);
-                                return false;
-                        }
-                        size_t mtlSize = st.st_size;
-                        char *mtl = new char[mtlSize];
-
-                        int err = read(fd, mtl, mtlSize);
-			if(err != mtlSize){
-                                printf("Failed to read.\n");
-                                close(fd);
-                                delete[] mtl;
-                                return false;
-                        }
-
-                        close(fd);
-
-/*			      std::string name = "";
-        float Ks[3] = {0, 0, 0}; // Specular color
-        int Ns = 0; // Shininess
-        float d = 0.0; // Dissolve
-}obj_material_t;*/
-			
-			obj_material_t matCont;
-			
-			std::string grabber = "";
-			std::string materialName = "";
-                        int selectedMaterial = -1;
-			
-                        for(int i=0; i<mtlSize; i++){
-                                if(mtl[i] == '\n'){
-                                        if(grabber.rfind("newmtl ", 0) == 0){ // Found material name
-                                                matCont.name = "";
-                                                for(int j=7; j<grabber.length(); j++){
-                                                        matCont.name += grabber[j];
-                                                }
-                                        }else if(grabber.rfind("Kd ", 0) == 0){
-						grabber += " ";
-						for(int j=0; j<3; j++) matCont.Kd[j] = 0.0;
-						std::string grub = "";
-						int x = 0;
-						for(int j=3; j<grabber.length(); j++){
-							if(grabber[j] == ' '){
-								try{
-									matCont.Kd[x] = std::stof(grub.c_str());
-								}catch(std::invalid_argument e){
-									matCont.Kd[x] = 0.0;	
-								}
-								x++;
-								grub = "";
-							}else{
-								grub += grabber[j];
-							}
-						}
-						for(int j=0; j<oSize; j++){
-							if(o[j].material.name == matCont.name){
-								o[j].material.Kd[0] = matCont.Kd[0];
-								o[j].material.Kd[1] = matCont.Kd[1];
-								o[j].material.Kd[2] = matCont.Kd[2];
-							}
-						}
-                                        }else if(grabber.rfind("Ka ", 0) == 0){
-                                                grabber += " ";
-                                                for(int j=0; j<3; j++) matCont.Ka[j] = 0.0;
-                                                std::string grub = "";
-                                                int x = 0;
-                                                for(int j=3; j<grabber.length(); j++){
-                                                        if(grabber[j] == ' '){
-                                                                try{    
-                                                                        matCont.Ka[x] = std::stof(grub.c_str());
-                                                                }catch(std::invalid_argument e){
-                                                                        matCont.Ka[x] = 0.0;
-                                                                }
-                                                                x++; 
-                                                                grub = "";
-                                                        }else{
-                                                                grub += grabber[j];
-                                                        }
-                                                }
-                                                for(int j=0; j<oSize; j++){
-                                                        if(o[j].material.name == matCont.name){
-                                                                o[j].material.Ka[0] = matCont.Ka[0];
-                                                                o[j].material.Ka[1] = matCont.Ka[1];
-                                                                o[j].material.Ka[2] = matCont.Ka[2];
-                                                        }
-                                                }
-                                        }else if(grabber.rfind("Ks ", 0) == 0){
-                                                grabber += " ";
-                                                for(int j=0; j<3; j++) matCont.Ks[j] = 0.0;
-                                                std::string grub = "";
-                                                int x = 0;
-                                                for(int j=3; j<grabber.length(); j++){
-                                                        if(grabber[j] == ' '){
-                                                                try{    
-                                                                        matCont.Ks[x] = std::stof(grub.c_str());
-                                                                }catch(std::invalid_argument e){
-                                                                        matCont.Ks[x] = 0.0;
-                                                                }
-                                                                x++; 
-                                                                grub = "";
-                                                        }else{
-                                                                grub += grabber[j];
-                                                        }
-                                                }
-                                                for(int j=0; j<oSize; j++){
-                                                        if(o[j].material.name == matCont.name){
-                                                                o[j].material.Ks[0] = matCont.Ks[0];
-                                                                o[j].material.Ks[1] = matCont.Ks[1];
-                                                                o[j].material.Ks[2] = matCont.Ks[2];
-                                                        }
-                                                }
-                                        }else if(grabber.rfind("Ns ", 0) == 0){
-                                                grabber += " ";
-                                               	matCont.Ns = 0;
-                                                std::string grub = "";
-                                                int x = 0;
-                                                for(int j=3; j<grabber.length(); j++){
-                                                        if(grabber[j] == ' '){
-                                                                try{    
-                                                                	matCont.Kd[x] = std::stoi(grub.c_str());
-                                                                }catch(std::invalid_argument e){
-                                                                        matCont.Kd[x] = 0;
-                                                                }
-                                                                x++; 
-                                                                grub = "";
-                                                        }else{
-                                                                grub += grabber[j];
-                                                        }
-                                                }
-                                                for(int j=0; j<oSize; j++){
-                                                        if(o[j].material.name == matCont.name){
-                                                                o[j].material.Ns = matCont.Ns;
-                                                        }
-                                                }
-                                        }else if(grabber.rfind("Kd ", 0) == 0){
-                                                grabber += " ";
-                                                matCont.d = 0.0;
-                                                std::string grub = "";
-                                                int x = 0;
-                                                for(int j=3; j<grabber.length(); j++){
-                                                        if(grabber[j] == ' '){
-                                                                try{    
-                                                                        matCont.d = std::stof(grub.c_str());
-                                                                }catch(std::invalid_argument e){
-                                                                        matCont.d = 0.0;
-                                                                }
-                                                                x++; 
-                                                                grub = "";
-                                                        }else{
-                                                                grub += grabber[j];
-                                                        }
-                                                }
-                                                for(int j=0; j<oSize; j++){
-                                                        if(o[j].material.name == matCont.name){
-                                                                o[j].material.d = matCont.d;
-                                                        }
-                                                }
-                                        }else if(grabber.rfind("map_Kd ", 0) == 0){
-						matCont.map_Kd = "";
-                                                for(int j=7; j<grabber.length(); j++){
-                                                        matCont.map_Kd += grabber[j];
-                                                }
-                                                for(int j=0; j<oSize; j++){
-                                                        if(o[j].material.name == matCont.name){
-                                                                o[j].material.map_Kd = matCont.map_Kd;
-                                                        }
-                                                }
-                                        }
-                                        grabber = "";
-                                }else{
-                                        grabber += mtl[i];
-                                }
-                        }
-                        delete[] mtl;
-			return true;
-		}
-		bool loadData(obj_t *o, size_t oSize){
-			 if(this->objectDirectory == "" || this->objectName == ""){
-                                return false;
-                        }
-                        std::string objFileName = objectDirectory + "/" + objectName + ".obj";
-                        int fd = open(objFileName.c_str(), O_RDONLY);
-                        if(fd <= -1){
-                                return false;
-                        }
-                        struct stat st;
-                        if(fstat(fd, &st) == -1){
-                                return false;
-                        }
-
-			size_t bSize = st.st_size;
-                        char *b = new char[bSize];
-                        int err = read(fd, b, bSize);
-		       	if(err != st.st_size){
-                                delete[] b;
-                                close(fd);
-				return false;
-                        }
-			int oi = -1;
-			glm::vec3 *v = NULL;
-			int vi = 0;
-			glm::vec2 *t = NULL;
-			int ti = 0;
-			glm::vec3 *n = NULL;
-			int ni = 0;
-			glm::vec3 *f = NULL;
-			int fi = 0;
-			int glI=0;
-			std::string grabber = "";
-			bool finalize = false;
-			int vTrack = 0;
-			int tTrack = 0;
-			int nTrack = 0;
-			for(int i=0; i<st.st_size; i++){
-				if(b[i] == '\n'){
-					if(grabber.rfind("o ", 0) == 0){
-						if(oi >= 0){
-							for(int j=0; j<o[oi].element_count; j++){
-								if(glI >= o[oi].glut_size){
-									break;
-								}
-
-								int vOff = (int)(f[j].x-1); //- (vTrack-o[oi].vertex_count) - 1;
-								int tOff = (int)(f[j].y-1); // - (tTrack-o[oi].texture_count) - 1;
-								int nOff = (int)(f[j].z-1); //- (nTrack-o[oi].normal_count) - 1;
-								if(oi > 1){
-									vOff -= o[oi-1].vertex_count;
-									tOff -= o[oi-1].texture_count;
-									nOff -= o[oi-1].normal_count;
-								}
-
-								o[oi].glut_data[glI] = v[vOff].x;
-								glI++;
-								o[oi].glut_data[glI] = v[vOff].y;
-								glI++;
-								o[oi].glut_data[glI] = v[vOff].z;
-								glI++;
-
-								o[oi].glut_data[glI] = t[tOff].x;
-								glI++;
-								o[oi].glut_data[glI] = t[tOff].y;
-								glI++;
-								
-								o[oi].glut_data[glI] = n[nOff].x;
-								glI++;
-								o[oi].glut_data[glI] = n[nOff].y;
-								glI++;
-								o[oi].glut_data[glI] = n[nOff].z;
-								glI++;
-								
-								o[oi].glut_data[glI] = o[oi].material.Kd[0];
-								glI++;
-								o[oi].glut_data[glI] = o[oi].material.Kd[1];
-								glI++;
-								o[oi].glut_data[glI] = o[oi].material.Kd[2];
-								glI++;
-							}
-						}
-						oi++;
-						if(f != NULL){
-                        		        	delete[] f;
-							f = NULL;
-						}
-                        			if(n != NULL){
-                        			        delete[] n;
-							n = NULL;
-						}
-                        			if(t != NULL){
-                        			        delete[] t;
-							t = NULL;
-						}
-                        			if(v != NULL){
-                        		        	delete[] v;
-							v = NULL;
-						}
-						if(o[oi].glut_data){
-							delete[] o[oi].glut_data;
-							o[oi].glut_data = NULL;
-
-						}
-						o[oi].glut_data = new float[o[oi].glut_size];
-						vi = 0;
-						ti = 0;
-						ni = 0;
-						fi = 0;
-						glI = 0;
-						v = new glm::vec3[o[oi].vertex_count];
-						t = new glm::vec2[o[oi].texture_count];
-						n = new glm::vec3[o[oi].normal_count];
-						f = new glm::vec3[o[oi].element_count];
-					}else if(grabber.rfind("v ", 0) == 0){
-						std::string grab = "";
-						bool gotX = false;
-						for(int j=2; j<grabber.length(); j++){
-							if(grabber[j] == ' '){
-								if(!gotX){
-									v[vi].x = std::stof(grab.c_str());
-									gotX = true;
-								}else{
-									v[vi].y = std::stof(grab.c_str());
-								}
-								
-								grab = "";
-							}else{
-								grab += grabber[j];
-							}
-						}
-						if(grab != "")
-							v[vi].z = std::stof(grab.c_str());
-						vi++;
-						vTrack++;
-					}else if(grabber.rfind("vn ", 0) == 0){
-                                                std::string grab = "";
-                                                bool gotX = false;
-                                                for(int j=3; j<grabber.length(); j++){
-                                                        if(grabber[j] == ' '){
-                                                                if(!gotX){
-                                                                        n[ni].x = std::stof(grab.c_str());
-                                                                        gotX = true;
-                                                                }else{
-                                                                        n[ni].y = std::stof(grab.c_str());
-                                                                }
-
-                                                                grab = "";
-                                                        }else{
-                                                                grab += grabber[j];
-                                                        }
-                                                }
-                                                if(grab != "")
-                                                        n[ni].z = std::stof(grab.c_str());
-                                                ni++;
-						nTrack++;
-                                        }else if(grabber.rfind("vt", 0) == 0){
-                                                std::string grab = "";
-                                                for(int j=3; j<grabber.length(); j++){
-                                                        if(grabber[j] == ' '){
-                                                                t[ti].x = std::stof(grab.c_str());
-                                                                grab = "";
-                                                        }else{
-                                                                grab += grabber[j];
-                                                        }
-                                                }
-                                                if(grab != "")
-                                                        t[ti].y = std::stof(grab.c_str());
-                                                ti++;
-						tTrack++;
-                                        }else if(grabber.rfind("f ", 0) == 0){
-						grabber += " ";
-                                                std::string grab = "";
-                                                for(int j=2; j<grabber.length(); j++){
-                                            		if(grabber[j] == ' '){
-								grab += "/";
-								std::string g = "";
-								bool gotV=false, gotT=false;
-								for(int k=0; k<grab.length(); k++){
-									try{
-										if(grab[k] == '/'){
-											if(!gotV){
-												gotV=true;
-												f[fi].x = std::stof(g.c_str());
-											}else if(!gotT){
-												gotT=true;
-												f[fi].y = std::stof(g.c_str());
-											}else{ // got normal
-												f[fi].z = std::stof(g.c_str());
-												fi++;
-												g = "";
-												break;
-											}
-											g = "";
-										}else{
-											g += grab[k];
-										}
-									}catch(std::invalid_argument e){
-										continue;
-									}
-								}
-
-                                                                grab = "";
-                                                        }else{
-                                                                grab += grabber[j];
-                                                        }
-                                                }
-                                        }
-					grabber = "";
-				}else{
-					grabber += b[i];
-				}
-			}
-
-			// Final process
-			for(int j=0; j<o[oi].element_count; j++){
-				if(glI >= o[oi].glut_size){
-					break;
-				}
-
-				int vOff = (int)(f[j].x-1); //- (vTrack-o[oi].vertex_count) - 1;
-				int tOff = (int)(f[j].y-1); // - (tTrack-o[oi].texture_count) - 1;
-				int nOff = (int)(f[j].z-1); //- (nTrack-o[oi].normal_count) - 1;
-				if(oi > 0){
-					vOff -= o[oi-1].vertex_count;
-					tOff -= o[oi-1].texture_count;
-					nOff -= o[oi-1].normal_count;
-				}
-				o[oi].glut_data[glI] = v[vOff].x;glI++;
-				o[oi].glut_data[glI] = v[vOff].y;glI++;
-				o[oi].glut_data[glI] = v[vOff].z;glI++;
-				
-				o[oi].glut_data[glI] = t[tOff].x;glI++;
-				o[oi].glut_data[glI] = t[tOff].y;glI++;
-				
-				o[oi].glut_data[glI] = n[nOff].x;glI++;
-				o[oi].glut_data[glI] = n[nOff].y;glI++;
-				o[oi].glut_data[glI] = n[nOff].z;glI++;
-
-				o[oi].glut_data[glI] = o[oi].material.Kd[0];glI++;
-				o[oi].glut_data[glI] = o[oi].material.Kd[1];glI++;
-				o[oi].glut_data[glI] = o[oi].material.Kd[2];glI++;
-			}
-
-			for(int i=0; i<oSize; i++){
-				o[i].textureLocation = this->objectDirectory;
-			       	o[i].textureLocation += "/";
-				o[i].textureLocation += o[i].name;
-			       	o[i].textureLocation +=	".jpg";
-                                if(access(o[i].textureLocation.c_str(), F_OK) == -1){
-                                        printf("Debug: Texture Doesn't Exist '%s'\n", o[i].textureLocation.c_str());
-                                        o[i].textureLocation = "";
-                                }else{
-                                        printf("Debug: Found Texture '%s'\n", o[i].textureLocation.c_str());
-                                }
-			}
-
-
-			delete[] b; 
-                        if(f != NULL)
-				delete[] f;
-                        if(n != NULL)
-				delete[] n;
-                        if(t != NULL)
-				delete[] t;
-			if(v != NULL)
-				delete[] v;
-			close(fd);
-			return true;
-		}
 
 		size_t countObjects(void){
 			this->objectCount = 0;
@@ -1922,7 +971,6 @@ class WavefrontImport{
 					this->objectCount++;
 				}
 			}
-			printf("New : Object Count : %d\n", (int)this->objectCount);
 			
 			return (size_t)this->objectCount;
 		}
@@ -1959,9 +1007,7 @@ class WavefrontImport{
 					}
 				}
 			}
-			
-			printf("Object 1: %s\n", this->objectBuffers[0].c_str());
-			printf("Object 2: %s\n", this->objectBuffers[1].c_str());
+
 			return true;
 		}
 
@@ -1972,24 +1018,16 @@ class WavefrontImport{
 				delete[] waveObjects;
 			
 			waveObjects = new WavefrontObject[this->objectCount];
+			int vo=0, to=0, no=0;
 			for(int i=0; i<this->objectCount; i++){
-				waveObjects[i].init(this->objectBuffers[i], this->buildFilePathMat());
+				waveObjects[i].init(this->objectBuffers[i], this->buildFilePathMat(), vo, to, no);
+				vo += waveObjects[i].getVCount();
+				to += waveObjects[i].getVtCount();
+				no += waveObjects[i].getVnCount();
 			}
 			return true;
 		}
 
-		size_t calcGlBufferSize(void){
-			size_t ret = 0;
-			/*
- 			 * Current structure is vertex(3), texture(2), normal(3), color(3)
-			* */
-			int fragmentSize = 11;
-			for(int i=0; i<this->objectCount; i++){
-				ret += waveObjects[i].getFCount() * fragmentSize;
-			}
-			
-			return ret;
-		}
 
 		size_t calcGlBufferSize(int idx){
 			size_t ret = 0;
@@ -1997,7 +1035,7 @@ class WavefrontImport{
  			 * Current structure is vertex(3), texture(2), normal(3), color(3)
 			* */
 			int fragmentSize = 11;
-			ret += waveObjects[idx].getFCount() * fragmentSize;
+			ret = waveObjects[idx].getFCount() * fragmentSize;
 			
 			return ret;
 		}
@@ -2013,83 +1051,39 @@ class WavefrontImport{
 				return false;
 			glObjBuffer = new float[glObjBufferSize];
 
-			printf("Serializing %d faces...\n", (int)waveObjects[idx].getFCount());
 			int x = 0;
 			for(int j=0; j<waveObjects[idx].getFCount() && x < glObjBufferSize; j++){
 				int vindex = waveObjects[idx].f_data[j].v;
-				printf("\tFace %d using vertex index %d\n", j, vindex);
 				// Each face contains an index for the respective v/vt/n values....
 				glObjBuffer[x] = waveObjects[idx].v_data[vindex].x; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].v_data[vindex].y; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].v_data[vindex].z; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 					
 				int vtindex = waveObjects[idx].f_data[j].t;
 				glObjBuffer[x] = waveObjects[idx].vt_data[vtindex].x; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].vt_data[vtindex].y; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 
 				int vnindex = waveObjects[idx].f_data[j].n;
 				glObjBuffer[x] = waveObjects[idx].vn_data[vnindex].x; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].vn_data[vnindex].y; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].vn_data[vnindex].z; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 					
 				glObjBuffer[x] = waveObjects[idx].material.mtl.Kd.x; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].material.mtl.Kd.y; x++;
-				printf("\t\t%f\n", glObjBuffer[x-1]);
 				glObjBuffer[x] = waveObjects[idx].material.mtl.Kd.z; x++;
-				printf("\t\t%f\n\n", glObjBuffer[x-1]);
 			}
 
 			return true;
 		}
 
-		bool serializeObjects(void){
-			if(glObjBufferSize > 0){
-                		delete[] glObjBuffer;
-			}
-			
-			glObjBufferSize = calcGlBufferSize();
-			if(glObjBufferSize <= 0)
-				return false;
-			glObjBuffer = new float[glObjBufferSize];
 
-			int x = 0;			
-			for(int i=0; i<this->objectCount && x < glObjBufferSize; i++){
-				for(int j=0; j<waveObjects[i].getFCount() && x < glObjBufferSize; j++){
-					// Each face contains an index for the respective v/vt/n values....
-					glObjBuffer[x] = waveObjects[i].v_data[waveObjects[i].f_data[j].v].x; x++;
-					glObjBuffer[x] = waveObjects[i].v_data[waveObjects[i].f_data[j].v].y; x++;
-					glObjBuffer[x] = waveObjects[i].v_data[waveObjects[i].f_data[j].v].z; x++;
-					
-					glObjBuffer[x] = waveObjects[i].vt_data[waveObjects[i].f_data[j].t].x; x++;
-					glObjBuffer[x] = waveObjects[i].vt_data[waveObjects[i].f_data[j].t].y; x++;
-
-					glObjBuffer[x] = waveObjects[i].vn_data[waveObjects[i].f_data[j].n].x; x++;
-					glObjBuffer[x] = waveObjects[i].vn_data[waveObjects[i].f_data[j].n].y; x++;
-					glObjBuffer[x] = waveObjects[i].vn_data[waveObjects[i].f_data[j].n].z; x++;
-					
-					glObjBuffer[x] = waveObjects[i].material.mtl.Kd.x; x++;
-					glObjBuffer[x] = waveObjects[i].material.mtl.Kd.y; x++;
-					glObjBuffer[x] = waveObjects[i].material.mtl.Kd.z; x++;
-				}
-			}
-			return true;
-		}
-
+		////TODO: Delete this once the skybox class is addressed.
 		bool import(const char *objFile){
 			/*new import function start*/
-			if(!this->readFile(objFile)){
-                                return false;
-                        }
-			this->_countObjects();
+		//	if(!this->readFile(objFile)){
+                 //               return false;
+                  //      }
+		//	this->_countObjects();
 			
 			/*new import function end*/
 
@@ -2101,7 +1095,7 @@ class WavefrontImport{
 			parseFaceIndecies();
 			parseMaterials();
 			createGlBuffer();*/
-			delete[] this->objFileData;
+		//	delete[] this->objFileData;
 
 
 			return true;
