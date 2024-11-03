@@ -48,6 +48,31 @@ class CustomTestContext : public ContextInterface{
                         else
                                 ges.keyboard.key_3 = false;
 
+			glm::mat4 model = glm::mat4(1.0f);
+                        glm::mat4 view = glm::mat4(1.0f);
+                        glm::mat4 projection = glm::mat4(1.0f);
+
+                        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+			view = activeCamera[0].getView();
+                        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+
+
+			for(int i=0; i<scene.objImporter.objectCount; i++){
+				for(int j=0; j<scene.objImporter.waveObjects[i].getVCount(); j++){
+                                        glm::vec4 pos = view * model * glm::vec4(scene.objImporter.waveObjects[i].v_data[j], 1.0);
+                                        glm::vec4 a = glm::vec4(glm::vec3(0.0125), 1.0);
+                                        //printf("%f, %f, %f vs %f, %f, %f\n", a.x, a.y, a.z, pos.x, pos.y, pos.z);
+                                        if(pos.x >= -a.x && pos.x <= a.x && pos.y >= -a.y && pos.y <= a.y){
+                                                pos = model * glm::vec4(scene.objImporter.waveObjects[i].v_data[j], 1.0);
+						devtools.processInput(glm::vec3(pos.x, pos.y, pos.z));
+                                                printf("(%f %f %f) : %s\n", pos.x, pos.y, pos.z, scene.objImporter.waveObjects[i].getName().c_str());
+                                                break;
+                                        }
+
+                                }
+			}
+			glm::vec4 pos = view * model * glm::vec4(0.0125, 0.0125, 0.0125, 1.0);
+			devtools.processInput(glm::vec3(pos.x, pos.y, pos.z)); // convert center of screen to world coords.
 		}
 
 	public:
@@ -99,6 +124,7 @@ class CustomTestContext : public ContextInterface{
 			
 			scene.setGES(ges);
 			playerOne.setGES(ges);
+			devtools.setGES(ges);
 			this->processInput(window);
 
 			scene.camera = this->activeCamera[0];

@@ -82,7 +82,10 @@ class DevTools : public GraphicsObject{
 		bool objectReady = false;
 		float serial_data[6000]; // arbitrary max
 		size_t serial_data_s = 0;
-		
+		bool ldrawClickMode = false;
+		glm::vec3 clickColor = glm::vec3(1.5, 0.0, 0.0);
+		GLenum drawMode = GL_LINES;
+	
 		void ldraw(){
 			if(argc == 2){
 				if(argv[1] == "clear"){
@@ -125,6 +128,38 @@ class DevTools : public GraphicsObject{
 					serial_data_s-=6;
 					return;
 				}
+			}else if(argc == 3){
+				if(argv[1] == "clickmode" && argv[2] == "on"){
+					printf("click mode enabled.\n");
+					ldrawClickMode = true;
+				}else if(argv[1] == "clickmode"){
+					printf("click mode disabled.\n");
+					ldrawClickMode = false;
+				}
+
+
+				if(argv[1] == "drawmode" && argv[2] == "lines"){
+					drawMode = GL_LINES;
+				}
+				if(argv[1] == "drawmode" && argv[2] == "points"){
+					drawMode = GL_POINTS;
+				}
+				if(argv[1] == "drawmode" && argv[2] == "linestrip"){
+					drawMode = GL_LINE_STRIP;
+				}
+				if(argv[1] == "drawmode" && argv[2] == "lineloop"){
+					drawMode = GL_LINE_LOOP;
+				}
+				if(argv[1] == "drawmode" && argv[2] == "trianglestrip"){
+					drawMode = GL_TRIANGLE_STRIP;
+				}
+				if(argv[1] == "drawmode" && argv[2] == "trianglefan"){
+					drawMode = GL_TRIANGLE_FAN;
+				}
+				if(argv[1] == "drawmode" && argv[2] == "triangles"){
+					drawMode = GL_TRIANGLES;
+				}
+			
 			}else if(argc == 5 || argc == 8){
 				if(argv[1] == "push"){
 					switch(argc){
@@ -200,7 +235,7 @@ class DevTools : public GraphicsObject{
                         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);	
 
 			this->storeVertexData(sizeof(float)*this->serial_data_s, this->serial_data, GL_STATIC_DRAW);
-                        glDrawArrays(GL_LINES, 0, serial_data_s/6);
+                        glDrawArrays(drawMode, 0, serial_data_s/6);
 		}
 		bool create(void){
 			int err = 0;
@@ -227,6 +262,54 @@ class DevTools : public GraphicsObject{
 			return true;
 		}
 
+		void processInput(glm::vec3 val){
+			if(ges.mouse.click_left && ldrawClickMode){
+				try{
+                                        int idx = serial_data_s;
+                                        serial_data_s+=6;
+                                        if(serial_data_s > 6000)
+                                                return;
+					ges.mouse.click_left = false;
+                                        printf("Pushing data...\n");
+                                        serial_data[idx] = val.x;
+                                        idx++;
+                                        serial_data[idx] = val.y;
+                                        idx++;
+                                        serial_data[idx] = val.z;
+                                        idx++;
+                                        serial_data[idx] = clickColor.x;
+                                        idx++;
+                                        serial_data[idx] = clickColor.y;
+                                        idx++;
+                                        serial_data[idx] = clickColor.z;
+					
+					sleep(1);
+
+                       		}catch(std::exception e){
+                                	serial_data_s-=6;
+                                        printf("Bad push args... [%s]\n", e.what());
+                                        return;
+                                }
+			}else if(ges.mouse.click_right && ldrawClickMode){
+				printf("removing line...\n");
+				sleep(1);
+				ges.mouse.click_right = false;
+				
+				if(serial_data_s <= 0 || serial_data_s > 6000)
+                                                return;
+
+                                if(serial_data_s - 6 < 6){
+                                	for(int i=0; i<6000; i++)
+                                       		serial_data[i] = 0;
+                                        serial_data_s = 0;
+                                        return;
+                                }
+                                for(int i=serial_data_s-6; i<serial_data_s; i++)
+                                	serial_data[i] = 0;
+                               	serial_data_s-=6;
+			}
+		}
+
 		void runCommand(std::string cmd, GLFWwindow *window, GraphicsObject go){
 			switch(this->processCommand(cmd)){
 				case 1: // objenum
@@ -237,12 +320,11 @@ class DevTools : public GraphicsObject{
 					break;
 				default:
 					printf("Invalid command '%s'.\n", cmd.c_str());
-					break;
+					return;
 			}
 
-			if(this->argv != NULL){
-				delete[] argv;
-			}
-			argc = 0;
+			delete[] argv;
+                        argv = NULL;
+                        argc = 0;
 		}
 };
