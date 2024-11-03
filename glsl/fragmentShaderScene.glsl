@@ -68,7 +68,7 @@ void main(){
 	                result *= vec3(texture(material.diffuseMap, oTexturePos));
 		}else{
 	                //FragColor = vec4((ambient + diffuse) * vec3(bColor.x, bColor.y, bColor.z), 1);
-			result *= material.diffuse;
+			result *= vec3(bColor.x, bColor.y, bColor.z);
 		}
 		FragColor = vec4(result, material.dissolve);
 }

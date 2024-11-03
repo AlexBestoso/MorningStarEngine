@@ -32,31 +32,8 @@ class FpsPlayer : public GraphicsObject{
 
 		float debugArea= 0;
 		float previousArea = 0.25;
-		bool generalCollision(glm::vec3 camera, triangle3_t surface, float maxOrbit, float *output){
-			if(output == NULL)
-				return false;
-			float area = surface.area;
-			triangle3_t a = geometry.createTriangle(surface.vertecies[0], surface.vertecies[1], camera);
-                        triangle3_t b = geometry.createTriangle(surface.vertecies[1], surface.vertecies[2], camera);
-                        triangle3_t c = geometry.createTriangle(surface.vertecies[2], surface.vertecies[0], camera);
-			
-			float areap = (a.area + b.area + c.area);
-                        if(areap == area){
-				output[0] = 0;
-				printf("Perfection.\n");
-				printf("Area : %f vs %f\n", areap, debugArea);
-				exit(1);
-				return true;
-			}else{
-                        	if(areap > area){
-                        		areap = areap - area;
-                        	}else{
-                        		areap = area - areap;
-                        	}
-				output[0] = areap;
-                        	return areap < maxOrbit;
-                        }
-		}
+		
+		
 		
 		int getQuadrant(glm::vec3 p){
 			if(p.x >= 0 && p.y >= 0 && p.z >= 0)
@@ -77,129 +54,18 @@ class FpsPlayer : public GraphicsObject{
 				return 8;
 			return 1;
 		}
+		
+		float cross_r = 0.5;
+		float cross_g = 0.5;
+		float cross_b = 0.5;
+		float cross_s = 0.0125;
+		float crossHair[6*4] = {
+			-cross_s, 0.0, 0.0, cross_r, cross_g, cross_b,
+			cross_s, 0.0, 0.0, cross_r, cross_g, cross_b,
+			0, cross_s, 0.0, cross_r, cross_g, cross_b,
+			0, -cross_s, 0.0, cross_r, cross_g, cross_b
+		};
 
-		int debugA = 0;
-		bool inOrbit = false;
-		void calculateCollision(void){
-			grounded = false;
-			bool invertJump = false;
-			bool invertFall = false;
-			bool invertForward = false;
-			bool invertBack = false;
-			bool invertLeft = false;
-			bool invertRight = false;
-
-			glm::vec3 pointa;
-			glm::vec3 normala;
-			glm::vec3 pointb;
-			glm::vec3 normalb;
-			glm::vec3 pointc;
-			glm::vec3 normalc;
-			glm::vec3 camera = this->camera.getPos();
-			
-			int objIndex = 0, tracker=0;
-			int objTrack = objs[objIndex].buffer_count;
-
-			obj_data_t *pA = NULL; 
-			for(int i=0; i<objsCount; i++){
-				pA = (obj_data_t  *)objs[i].glut_data;
-				for(int j=0; j<objs[i].element_count; j++){
-				 	int test = (j%3);
-					if(test == 0){
-                                        	pointa = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
-                                        	normala = glm::vec3(pA[j].normal[0], pA[j].normal[1], pA[j].normal[2]);
-                                        	tracker++;
-                                        	continue;
-                                	}
-                                	if(test == 1){
-                                	        pointb = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
-                                        	normalb = glm::vec3(pA[j].normal[0], pA[j].normal[1], pA[j].normal[2]);
-                                	        tracker++;
-                                	        continue;
-                                	}
-
-					pointc = glm::vec3(pA[j].vertex[0], pA[j].vertex[1], pA[j].vertex[2]);
-                                        normalc = glm::vec3(pA[j].normal[0], pA[j].normal[1], pA[j].normal[2]);
-					
-                                	glm::vec3 down = glm::vec3(0, -1, 0);
-                                	glm::vec3 up = glm::vec3(0, 1, 0);
-                                	glm::vec3 right = glm::vec3(1, 0, 0);
-                                	glm::vec3 left = glm::vec3(-1, 0, 0);
-                                	glm::vec3 forward = glm::vec3(0, 0, 1);
-                                	glm::vec3 backward = glm::vec3(0, 0, -1);
-
-					triangle3_t triangle = geometry.createTriangle(pointa, pointb, pointc);
-                                	triangle3_t triangleY = geometry.createTriangle(pointa*down, pointb*down, pointc*down);
-                                	triangle3_t triangleYn = geometry.createTriangle(pointa*up, pointb*up, camera*up);
-                                	triangle3_t triangleX = geometry.createTriangle(pointa*right, pointb*right, camera*right);
-                                	triangle3_t triangleXn = geometry.createTriangle(pointa*left, pointb*left, camera*left);
-                                	triangle3_t triangleZ = geometry.createTriangle(pointa*forward, pointb*forward, camera*forward);
-                                	triangle3_t triangleZn = geometry.createTriangle(pointa*backward, pointb*backward, camera*backward);
-
-                                	triangle3_t testA = geometry.createTriangle(pointa*down, pointb*down, camera*down);
-
-                                	bool hit = generalCollision(camera, triangle, /*previousArea*/1.0, &debugArea);
-
-					glm::vec3 triangleDirection = glm::normalize(normala + normalb + normalc)*-11.0f;
-					line3_t magnatude = geometry.createLine(triangleDirection, previousCoords);
-
-						triangle3_t finalizer = geometry.createTriangle(
-							glm::vec3(0), 
-							camera,
-							triangleDirection
-						);
-
-					inOrbit = hit;
-                                	if(hit){
-						this->travel = triangleDirection;
-							break;
-						//this->camera.cameraPosition -= triangleDirection;
-
-						float grav = 0;
-						camera += (force-momentum) * triangleDirection;
-						this->camera.cameraPosition = camera;
-
-						//triangleDirection -= camera;
-						//camera = glm::vec3(0.0f) + triangleDirection + this->camera.cameraPosition;
-						
-						//glm::vec3 surfaceToAir = glm::cross(triangleDirection, camera);
-						//this->camera.cameraPosition = camera;
-						//camera = surfaceToAir;
-
-						// we have a 90 degree angle.
-						// Now we just have to shft all the data to be the center of the universe.
-						//...
-						//camera = ((triangleDirection-camera) + (triangleDirection+camera))/2.0f;
-						float test = glm::degrees(glm::dot(triangleDirection, camera));
-						//camera *= -1.0f;
-
-						//camera *= cos(glm::radians(test));
-						//camera += grav;
-						//triangleDirection -= camera;
-						//camera -= camera;
-
-							
-						line3_t baseMeasure = geometry.createLine(camera, triangleDirection);
-
-						
-						//camera += (camera+triangleDirection)-(camera - triangleDirection);
-					//	printf("Grav Value : %f\n", grav);
-					//	printf("Direction Vectors : (%f, %f, %f) vs (%f, %f, %f), (%f, %f, %f)\n", triangleDirection.x, triangleDirection.y, triangleDirection.z, this->camera.cameraPosition.x, this->camera.cameraPosition.y, this->camera.cameraPosition.z, camera.x, camera.y, camera.z);
-					//	printf("Line of interest : |%f| %f, %f, %f\n", baseMeasure.distance, baseMeasure.direction.x, baseMeasure.direction.y, baseMeasure.direction.z);
-					//	printf("Angle of interest : %f\n", test);
-						this->camera.cameraPosition = camera;
-						//`this->camera.setCameraTarget(triangleDirection);
-
-							//-(triangleDirection * glm::vec3(0.0025f));
-                                                //glm::vec3 ff = glm::normalize(glm::cross(camera, fart.direction));
-						///printf("%f Collision count : %d : %f, %f, %f\n", debugArea, debugA, ff.x, ff.y, ff.z);
-						//debugA++;
-						break;	
-					}
-				}
-			}
-			previousArea = 0.5;
-		}
 	public:
 		glm::vec3 momentum = glm::vec3(0);
 		glm::vec3 force = glm::vec3(0);
@@ -219,6 +85,29 @@ class FpsPlayer : public GraphicsObject{
 			this->objsCount = objsCount;
 		}
 		bool create(void){
+			int err;
+			if((err = this->createShaders("./glsl/vertexShaderGeneric.glsl", "./glsl/fragmentShaderGeneric.glsl")) != 0){
+                                switch(err){
+                                        case 1: printf("Vertex Shader error.\n");break;
+                                        case 2: printf("Fragment shader error.\n");break;
+                                        default: printf("Shader Linking error.\n");break;
+                                }
+                                return false;
+                        }
+
+			
+			this->generateObjectIds(true, true, false);
+                        this->bindVao();
+                        this->bindVbo();
+
+			this->setAttributePointer(0, 3, 6, (void *)0); // vertex
+                        this->enableArrayAttribute(0);
+                        this->setAttributePointer(1, 3, 6, (void *)(8*sizeof(float))); // material color
+                        this->enableArrayAttribute(1);
+
+			this->unbindVbo();
+			this->unbindVao();
+
 			return true;
 		}
 
@@ -309,6 +198,12 @@ class FpsPlayer : public GraphicsObject{
 			}
                 }
 		void draw(void){
+			this->bindVao();
+			this->bindVbo();
+                        this->use();
+		
+			this->storeVertexData(sizeof(float)*(6*4), crossHair, GL_DYNAMIC_DRAW);
+			glDrawArrays(GL_LINES, 0, 4);
 			fpsControls();
 			view = camera.focus();
 		}

@@ -46,6 +46,21 @@ class GraphicsObject{
 			return objectsSize;
 		}
 
+		int getObjCount(void){
+                        return this->objImporter.objectCount;
+                }
+
+                WavefrontObject *getObjs(){
+                        return this->objImporter.waveObjects;
+                }
+
+                WavefrontObject getObjs(size_t id){
+			WavefrontObject err;
+                        if(this->objImporter.waveObjects == NULL || getObjCount() <= 0 || id >= getObjCount())
+                                return err;
+                        return this->objImporter.waveObjects[id];
+                }
+
 		obj_t *getObjects(void){
 			return objects;
 		}
@@ -99,6 +114,14 @@ class GraphicsObject{
 
 		bool linkShaders(void){
 			return shader.linkShaders();
+		}
+
+		int createShaders(const char *vertexShader, const char *fragShader){
+			if(!addVertexShader(vertexShader, 0))
+				return 1;
+			if(!addFragmentShader(fragShader, 1))
+				return 2;
+			return !linkShaders() ? 2 : 0;
 		}
 
 		void generateObjectIds(bool arrayObj, bool vertBuff, bool eleObj){

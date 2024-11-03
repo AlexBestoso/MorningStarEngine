@@ -31,15 +31,14 @@ class CustomTestContext : public ContextInterface{
 			}	
 			if (glfwGetKey(window, GLFW_KEY_2)){
 				// Debug Commands.
-                /*                ges.keyboard.key_2 = true;
+                                ges.keyboard.key_2 = true;
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				printf("Dev Consol\n:");
 				printf("> ");
 				std::string input = "";
 				std::getline(std::cin, input);
 				devtools.runCommand(input, window, this->scene);
-				printf("input : %s\n", input.c_str());
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);*/
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			}else{
                                 ges.keyboard.key_2 = false;
 			}
