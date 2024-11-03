@@ -66,6 +66,11 @@ class CustomTestContext : public ContextInterface{
 				printf("Failed to create skybox.\n");
 				exit(EXIT_FAILURE);
 			}
+
+			if(!devtools.create()){
+				printf("Failed to create devtools\n");
+				exit(EXIT_FAILURE);
+			}
 	
 			this->activeCamera = &playerOne.camera;
 
@@ -98,10 +103,12 @@ class CustomTestContext : public ContextInterface{
 
 			scene.camera = this->activeCamera[0];
 			skybox.camera = this->activeCamera[0];
+			devtools.camera = this->activeCamera[0];
 
 			skybox.draw();
 			scene.draw();
 			playerOne.draw();
+			devtools.draw();
 			return this->context;
 		}
 };

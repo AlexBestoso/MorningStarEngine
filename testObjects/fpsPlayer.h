@@ -85,7 +85,7 @@ class FpsPlayer : public GraphicsObject{
 			this->objsCount = objsCount;
 		}
 		bool create(void){
-			int err;
+			int err = 0;
 			if((err = this->createShaders("./glsl/vertexShaderGeneric.glsl", "./glsl/fragmentShaderGeneric.glsl")) != 0){
                                 switch(err){
                                         case 1: printf("Vertex Shader error.\n");break;
@@ -102,7 +102,7 @@ class FpsPlayer : public GraphicsObject{
 
 			this->setAttributePointer(0, 3, 6, (void *)0); // vertex
                         this->enableArrayAttribute(0);
-                        this->setAttributePointer(1, 3, 6, (void *)(8*sizeof(float))); // material color
+                        this->setAttributePointer(1, 3, 6, (void *)(3*sizeof(float))); // material color
                         this->enableArrayAttribute(1);
 
 			this->unbindVbo();
@@ -127,7 +127,7 @@ class FpsPlayer : public GraphicsObject{
                         this->camera.cameraFront = front;//glm::normalize(front);
 			previousCoords = this->camera.cameraPosition;
 
-			if(ges.keyboard.key_2){
+			if(ges.keyboard.key_3){
 				printf("Player Coords : (%f, %f, %f)\n", this->camera.cameraPosition.x, this->camera.cameraPosition.y, this->camera.cameraPosition.z);
 			}
 			/*

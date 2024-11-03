@@ -26,26 +26,6 @@ class GraphicsScene : public GraphicsObject{
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
 
-		/*	this->setUniform("material.ambient", material.ambient);
-                        this->setUniform("material.diffuse", material.diffuse);
-                        this->setUniform("material.specular", material.specular);
-                        this->setUniform("material.shininess", material.shininess);
-
-
-                        this->setUniform("light.ambient", light.ambient);
-                        this->setUniform("light.diffuse", light.diffuse);
-                        this->setUniform("light.specular", light.specular);
-                        //this->setUniform("light.direction", light.direction);
-
-                        //Flashling configs
-                        this->setUniform("light.position", camera.cameraPosition);
-                        this->setUniform("light.direction", camera.cameraFront);
-                        this->setUniform("light.cuttOff", glm::cos(glm::radians(12.5f)));
-
-                        this->setUniform("light.constant", light.constant);
-                        this->setUniform("light.linear", light.linear);
-                        this->setUniform("light.quadratic", light.quadratic);
-*/
                         this->setUniform("useTexture", 0);
                         this->setUniform("lightColor", glm::vec3(0.963f, 0.988f, 0.939f));
                         this->setUniform("lightPos", lightPos);
@@ -71,6 +51,18 @@ class GraphicsScene : public GraphicsObject{
 				}else{
 					this->setUniform("useTexture", 0);
 				}*/
+				
+				for(int j=0; j<this->objImporter.waveObjects[i].getVCount(); j++){
+					glm::vec4 pos = view * model * glm::vec4(this->objImporter.waveObjects[i].v_data[j], 1.0);
+					glm::vec4 a = glm::vec4(glm::vec3(0.0125), 1.0);
+					//printf("%f, %f, %f vs %f, %f, %f\n", a.x, a.y, a.z, pos.x, pos.y, pos.z);
+					if(pos.x >= -a.x && pos.x <= a.x && pos.y >= -a.y && pos.y <= a.y){
+						pos = model * glm::vec4(this->objImporter.waveObjects[i].v_data[j], 1.0);
+						printf("(%f %f %f) : %s\n", pos.x, pos.y, pos.z, objImporter.waveObjects[i].getName().c_str());
+						break;
+					}
+					
+				}
 				this->objImporter.serializeObject(i);
 				this->storeVertexData(sizeof(float)*this->objImporter.glObjBufferSize, this->objImporter.glObjBuffer, GL_DYNAMIC_DRAW);
 				glDrawArrays(GL_TRIANGLES, 0, this->objImporter.waveObjects[i].getFCount());
