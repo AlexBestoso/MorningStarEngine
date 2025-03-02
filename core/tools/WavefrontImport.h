@@ -18,7 +18,7 @@ typedef struct obj_materia{
 
 struct obj_mtl{
 	std::string name = "";
-	std::string map_Kd;
+	std::string map_Kd = "";
 	glm::vec3 Ka; // ambient color
 	glm::vec3 Kd; // diffuse color
 	glm::vec3 Ks; // Specular color
@@ -656,7 +656,6 @@ class WavefrontObject{
 
 		void enumObj(){
 			printf("Object: %s\n", object_name.c_str());
-			printf("Material : %s\n", material_name.c_str());
 			printf("Face Count: %ld\n", f_size);
 			printf("V Count: %ld\n", v_size);
 			printf("Vt Count: %ld\n", vt_size);
@@ -670,7 +669,14 @@ class WavefrontObject{
 					vt_data[f_data[i].t].x, vt_data[f_data[i].t].y, 
 					vn_data[f_data[i].n].x, vn_data[f_data[i].n].y, vn_data[f_data[i].n].z);
 			}
-
+			printf("Material name : %s\n", material.mtl.name.c_str());
+			printf("texture map : %s\n", material.mtl.map_Kd.c_str());
+			printf("ambient color : %f, %f, %f\n", material.mtl.Ka.x, material.mtl.Ka.y, material.mtl.Ka.z);
+			printf("diffuse color : %f, %f, %f\n", material.mtl.Kd.x, material.mtl.Kd.y, material.mtl.Kd.z);
+			printf("Specular color : %f, %f, %f\n", material.mtl.Ks.x, material.mtl.Ks.y, material.mtl.Ks.z);
+			printf("Shininess : %f\n", material.mtl.Ns);
+			printf("Dissolve : %f\n", material.mtl.d);
+			printf("Illumination : %d\n", material.mtl.illum);
 		}
 
 		void init(std::string objectData, std::string matLoc, int v_o=0, int vt_o=0, int vn_o=0){

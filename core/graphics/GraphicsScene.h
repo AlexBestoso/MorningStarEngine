@@ -7,13 +7,11 @@ class GraphicsScene : public GraphicsObject{
 		GraphicsTexture *objectTextures = NULL;
 		size_t objectTextureCount = 0;
 		obj_t * objs;
+
 	public:
-		glm::vec3 lightPos = glm::vec3(20, 30, 15);
+		glm::vec3 lightPos = glm::vec3(1.5833, 12.447, 5.0916);
 		bool showSun = true;
 		
-		obj_t *getObjs(void){
-			return objs;
-		}
 		obj_data_t *getObjectPointer(void){
 			return importer.obj;
 		}
@@ -28,28 +26,8 @@ class GraphicsScene : public GraphicsObject{
                         glm::mat4 view = glm::mat4(1.0f);
                         glm::mat4 projection = glm::mat4(1.0f);
 
-		/*	this->setUniform("material.ambient", material.ambient);
-                        this->setUniform("material.diffuse", material.diffuse);
-                        this->setUniform("material.specular", material.specular);
-                        this->setUniform("material.shininess", material.shininess);
-
-
-                        this->setUniform("light.ambient", light.ambient);
-                        this->setUniform("light.diffuse", light.diffuse);
-                        this->setUniform("light.specular", light.specular);
-                        //this->setUniform("light.direction", light.direction);
-
-                        //Flashling configs
-                        this->setUniform("light.position", camera.cameraPosition);
-                        this->setUniform("light.direction", camera.cameraFront);
-                        this->setUniform("light.cuttOff", glm::cos(glm::radians(12.5f)));
-
-                        this->setUniform("light.constant", light.constant);
-                        this->setUniform("light.linear", light.linear);
-                        this->setUniform("light.quadratic", light.quadratic);
-*/
                         this->setUniform("useTexture", 0);
-                        this->setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+                        this->setUniform("lightColor", glm::vec3(0.963f, 0.988f, 0.939f));
                         this->setUniform("lightPos", lightPos);
                         this->setUniform("viewPos", camera.getPos());
 
@@ -73,6 +51,7 @@ class GraphicsScene : public GraphicsObject{
 				}else{
 					this->setUniform("useTexture", 0);
 				}*/
+				
 				this->objImporter.serializeObject(i);
 				this->storeVertexData(sizeof(float)*this->objImporter.glObjBufferSize, this->objImporter.glObjBuffer, GL_DYNAMIC_DRAW);
 				glDrawArrays(GL_TRIANGLES, 0, this->objImporter.waveObjects[i].getFCount());
@@ -83,31 +62,24 @@ class GraphicsScene : public GraphicsObject{
 		}
 
 		bool create(std::string sceneDir, std::string sceneName){
-			if(!this->addVertexShader("./glsl/vertexShaderScene.glsl", 0)){
-                                printf("Failed to compile vertex shader.\n");
-                                return false;
-                        }
-
-                        if(!this->addFragmentShader("./glsl/fragmentShaderScene.glsl", 1)){
-                                printf("Failed to compile fragment shader\n");
-                                return false;
-                        }
-
-                        if(!this->linkShaders()){
-                                printf("Faild to link shader.\n");
-                                return false;
-                        }
+			int err = 0;
+			if((err = this->createShaders("./glsl/vertexShaderScene.glsl", "./glsl/fragmentShaderScene.glsl")) != 0){
+				switch(err){
+					case 1: printf("Vertex Shader error.\n");break;
+					case 2: printf("Fragment shader error.\n");break;
+					default: printf("Shader Linking error.\n");break;
+				}
+				return false;
+			}
 
 			this->generateObjectIds(true, true, false);
                         this->bindVao();
                         this->bindVbo();
 
 			if(!this->import(sceneDir, sceneName)){
-			//if(!this->importer.importComplex(sceneDir, sceneName)){
                                 printf("Failed to import the object '%s'.\n", sceneName.c_str());
                                 return false;
                         }
-			//objs = this->importer.getImportedObjects();
 
 			this->setAttributePointer(0, 3, 11, (void *)0); // vertex
                         this->enableArrayAttribute(0);

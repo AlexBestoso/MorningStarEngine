@@ -4,7 +4,6 @@ class GraphicsTexture{
 		int height = 0;
 		int nrChannels = 0;
 		unsigned char *data = NULL;
-		unsigned int texture;
 		
 		int activeParam2D[16];
 		GLenum paramName2D[16];
@@ -12,10 +11,15 @@ class GraphicsTexture{
 
 		int textureUnit = 0;
 	public:
+		unsigned int texture;
 		GraphicsTexture(){
 			for(int i=0; i<16; i++){
 				activeParam2D[i] = -1;
 			}
+		}
+
+		unsigned int getTexture(void){
+			return this->texture;
 		}
 
 		void setTextureUnit(int id){
@@ -31,6 +35,37 @@ class GraphicsTexture{
 			param2D[id] = param;
 			activeParam2D[id] = id;
 			return true;
+		}
+
+		unsigned int loadCubemap(std::string faces[6]){
+                        glGenTextures(1, &texture);
+                        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+                        int width, height, nrChannels;
+                        for (unsigned int i = 0; i < 6; i++){
+                                unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &
+                                nrChannels, 0);
+                                if (data){
+                                        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                                        0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+                                        );
+                                        stbi_image_free(data);
+                                }else{
+                                        std::cout << "Cubemap texture failed to load at path: " << faces[i] <<
+                                        std::endl;
+                                        stbi_image_free(data);
+                                }
+                        }
+
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                        return texture;
+                }
+
+		void genTexture(void){
+			glGenTextures(1, &texture);
 		}
 
 		bool loadTexture2D(const char *textureLoc){
@@ -61,13 +96,26 @@ class GraphicsTexture{
 				free(data);
 		}
 
+		void activate(void){
+			glActiveTexture(GL_TEXTURE0+textureUnit);
+		}
 		void bind2D(void){
 			glActiveTexture(GL_TEXTURE0+textureUnit);
 			glBindTexture(GL_TEXTURE_2D, texture);
 		}
 
+		void bindCube(void){
+			glActiveTexture(GL_TEXTURE0+textureUnit);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+		}
+
 		void unbind2D(void){
 			glActiveTexture(GL_TEXTURE0+textureUnit);
 			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		void unbindCube(void){
+			glActiveTexture(GL_TEXTURE0+textureUnit);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		}
 };

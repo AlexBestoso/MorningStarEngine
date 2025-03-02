@@ -93,6 +93,7 @@ class GraphicsEngine{
 		}
 
 		void setContext(int ctx){
+			printf("Changing graphics context.\n");
 			if(ctx >= contextListSize || ctx <= -1){
 				printf("Invalid context id; exiting.\n");
 				exit(EXIT_FAILURE);
@@ -134,6 +135,8 @@ class GraphicsEngine{
     			}
     			glfwMakeContextCurrent(window);
 			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+                        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			fetchContexts();
     			return true;
 		}

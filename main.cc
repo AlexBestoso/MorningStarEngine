@@ -4,6 +4,9 @@
 
 #include <X11/Xlib.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "./glm/glm/glm.hpp"
 #include "./glm/glm/gtc/matrix_transform.hpp"
 #include "./glm/glm/gtc/type_ptr.hpp"
@@ -69,8 +72,11 @@ int main(void){
 		
 		if(ctx != previous){
 			previous = ctx;
+			printf("Destroying context\n");
 			ge.contextDestroy();
+			printf("iupdating context\n");
 			ge.setContext(ctx);
+			printf("success\n");
 					
 
 		/*	switch(ctx){
