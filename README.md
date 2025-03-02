@@ -1,5 +1,5 @@
 #MorningStarEngine
-`Version 0.1.0 Alpha`<br>
+`Version 0.1.1 Alpha`<br>
 <br>
 To clone the the repository use : `git clone --recurse-submodules git@github.com:AlexBestoso/MorningStarEngine.git`
 <br><br>
