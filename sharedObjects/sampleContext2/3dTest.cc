@@ -65,13 +65,17 @@ class CustomTestContext : public ContextInterface{
                                         if(pos.x >= -a.x && pos.x <= a.x && pos.y >= -a.y && pos.y <= a.y){
                                                 pos = model * glm::vec4(scene.objImporter.waveObjects[i].v_data[j], 1.0);
 						devtools.processInput(glm::vec3(pos.x, pos.y, pos.z));
-                                                printf("(%f %f %f) : %s\n", pos.x, pos.y, pos.z, scene.objImporter.waveObjects[i].getName().c_str());
+                                                printf("(%f %f %f) : [%d:%d]%s\n", pos.x, pos.y, pos.z, i, j, scene.objImporter.waveObjects[i].getName().c_str());
                                                 break;
                                         }
 
                                 }
 			}
-			glm::vec4 pos = view * model * glm::vec4(0.0125, 0.0125, 0.0125, 1.0);
+                        glm::vec4 a = glm::vec4(glm::vec3(0.0125), 1.0);
+			glm::vec3 cp = activeCamera[0].getPos() * activeCamera[0].cameraFront;
+			glm::vec4 pos = glm::vec4(activeCamera[0].getPos(), 1.0);
+	
+			printf("dbg : %f %f %f\n", pos.x, pos.y, pos.z);
 			devtools.processInput(glm::vec3(pos.x, pos.y, pos.z)); // convert center of screen to world coords.
 		}
 

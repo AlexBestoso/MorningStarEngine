@@ -1,4 +1,4 @@
-class Menu2DButton : public GraphicsObject{
+class MorningButton : public GraphicsObject{
 	private:
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::vec3 extraColor = glm::vec3(0.0f);
@@ -7,52 +7,28 @@ class Menu2DButton : public GraphicsObject{
 
 		std::string texturePath = "";
 		
-		std::string vertexShaderPath = "./core/2D/menu/button.vs";
-                std::string fragmentShaderPath = "./core/2D/menu/button.fs";
+		std::string vertexShaderPath = "./core/2D/button/button.vs";
+                std::string fragmentShaderPath = "./core/2D/button/button.fs";
 
 		int hovered = 0;
 
 		float x_min=2, y_min=2, x_max=-2, y_max=-2;
-		float vertices[8*6*6] = {
+		
+
+		float vertices[8*6] = {
         		-1.0f, -1.0f, -0.5f,     0.0f, 0.0f,    0.0f, 0.0f, -1.0f,
         		 1.0f, -1.0f, -0.5f,     1.0f, 0.0f,    0.0f, 0.0f, -1.0f,
         		 1.0f,  1.0f, -0.5f,     1.0f, 1.0f,    0.0f, 0.0f, -1.0f,
         		 1.0f,  1.0f, -0.5f,     1.0f, 1.0f,    0.0f, 0.0f, -1.0f,
         		-1.0f,  1.0f, -0.5f,     0.0f, 1.0f,    0.0f, 0.0f, -1.0f,
        	 		-1.0f, -1.0f, -0.5f,     0.0f, 0.0f,    0.0f, 0.0f, -1.0f,
-        		-1.0f, -1.0f,  -0.5f,     0.0f, 0.0f, 	0.0f, 0.0f, 1.0f,
-         		 1.0f, -1.0f,  -0.5f,     1.0f, 0.0f, 	0.0f, 0.0f, 1.0f,
-         		 1.0f,  1.0f,  -0.5f,     1.0f, 1.0f, 	0.0f, 0.0f, 1.0f,
-         		 1.0f,  1.0f,  -0.5f,     1.0f, 1.0f, 	0.0f, 0.0f, 1.0f,
-       	 		-1.0f,  1.0f,  -0.5f,     0.0f, 1.0f, 	0.0f, 0.0f, 1.0f,
-       	 		-1.0f, -1.0f,  -0.5f,     0.0f, 0.0f, 	0.0f, 0.0f, 1.0f,
-        		-1.0f,  1.0f,  -0.5f,     1.0f, 0.0f,   -1.0f, 0.0f, 0.0f,
-        		-1.0f,  1.0f, -0.5f,     1.0f, 1.0f,   -1.0f, 0.0f, 0.0f,
-        		-1.0f, -1.0f, -0.5f,     0.0f, 1.0f,   -1.0f, 0.0f, 0.0f,
-        		-1.0f, -1.0f, -0.5f,     0.0f, 1.0f,   -1.0f, 0.0f, 0.0f,
-        		-1.0f, -1.0f, -0.5f,     0.0f, 0.0f,   -1.0f, 0.0f, 0.0f,
-        		-1.0f,  1.0f,  -0.5f,     1.0f, 0.0f,   -1.0f, 0.0f, 0.0f,
-        		 1.0f,  1.0f,  -0.5f,     1.0f, 0.0f,   1.0f, 0.0f, 0.0f,
-        		 1.0f,  1.0f, -0.5f,     1.0f, 1.0f,   1.0f, 0.0f, 0.0f,
-        		 1.0f, -1.0f, -0.5f,     0.0f, 1.0f,   1.0f, 0.0f, 0.0f,
-        		 1.0f, -1.0f, -0.5f,     0.0f, 1.0f,   1.0f, 0.0f, 0.0f,
-        		 1.0f, -1.0f, -0.5f,     0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
-        		 1.0f,  1.0f,  -0.5f,     1.0f, 0.0f,   1.0f, 0.0f, 0.0f,
-        		-1.0f, -1.0f, -0.5f,     0.0f, 1.0f,    0.0f, -1.0f, 0.0f,
-        		 1.0f, -1.0f, -0.5f,     1.0f, 1.0f,    0.0f, -1.0f, 0.0f,
-        		 1.0f, -1.0f,  -0.5f,     1.0f, 0.0f,    0.0f, -1.0f, 0.0f,
-        		 1.0f, -1.0f,  -0.5f,     1.0f, 0.0f,    0.0f, -1.0f, 0.0f,
-        		-1.0f, -1.0f,  -0.5f,     0.0f, 0.0f,    0.0f, -1.0f, 0.0f,
-        		-1.0f, -1.0f, -0.5f,     0.0f, 1.0f,    0.0f, -1.0f, 0.0f,
-			-1.0f,  1.0f, -0.5f,     0.0f, 1.0f,    0.0f, 1.0f, 0.0f,
-        		 1.0f,  1.0f, -0.5f,     1.0f, 1.0f,    0.0f, 1.0f, 0.0f,
-        		 1.0f,  1.0f,  -0.5f,     1.0f, 0.0f,    0.0f, 1.0f, 0.0f,
-        		 1.0f,  1.0f,  -0.5f,     1.0f, 0.0f,    0.0f, 1.0f, 0.0f,
-        		-1.0f,  1.0f,  -0.5f,     0.0f, 0.0f,    0.0f, 1.0f, 0.0f,
-        		-1.0f,  1.0f, -0.5f,     0.0f, 1.0f,    0.0f, 1.0f, 0.0f,
-    		};
+        	};
+		
 	public:
+		graphics_master_t *vtex = (graphics_master_t *)&vertices;
+		size_t vtex_size = 6;
 		std::string name = "";
+
 		void setSize(float x, float y, float z){
 			model = glm::scale(model, glm::vec3(x, y, z));
 		}
@@ -128,7 +104,7 @@ class Menu2DButton : public GraphicsObject{
 			//x_max = vertices[0];
 			//y_min = vertices[1];
 			//y_max = vertices[1];
-                        for(int i=0; i<8*6*6; i++){
+                        for(int i=0; i<8*vtex_size; i++){
                                 glm::vec4 val(vertices[i], vertices[i+1], 1, 1);
                                 val = model * val;
                                 if(val.x < x_min)
@@ -172,7 +148,7 @@ class Menu2DButton : public GraphicsObject{
 			this->setUniform("extraColor", this->extraColor);
 			this->setUniform("hovered", this->hovered);
 
-                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                        glDrawArrays(GL_TRIANGLES, 0, vtex_size);
 		}
 
 		void destroy(){

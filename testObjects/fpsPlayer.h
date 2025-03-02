@@ -70,7 +70,7 @@ class FpsPlayer : public GraphicsObject{
 		glm::vec3 momentum = glm::vec3(0);
 		glm::vec3 force = glm::vec3(0);
 		glm::vec3 travel = glm::normalize(glm::vec3(1.0f));
-		float height = 0.298666;
+		float height = 1.000000;//0.298666;
 		float gravity = 0.0667408;
 		float jumpStrength = 0.05;
 		bool respectGravity = true;

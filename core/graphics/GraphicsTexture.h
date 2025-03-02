@@ -4,7 +4,6 @@ class GraphicsTexture{
 		int height = 0;
 		int nrChannels = 0;
 		unsigned char *data = NULL;
-		unsigned int texture;
 		
 		int activeParam2D[16];
 		GLenum paramName2D[16];
@@ -12,10 +11,15 @@ class GraphicsTexture{
 
 		int textureUnit = 0;
 	public:
+		unsigned int texture;
 		GraphicsTexture(){
 			for(int i=0; i<16; i++){
 				activeParam2D[i] = -1;
 			}
+		}
+
+		unsigned int getTexture(void){
+			return this->texture;
 		}
 
 		void setTextureUnit(int id){
@@ -60,6 +64,10 @@ class GraphicsTexture{
                         return texture;
                 }
 
+		void genTexture(void){
+			glGenTextures(1, &texture);
+		}
+
 		bool loadTexture2D(const char *textureLoc){
 			glGenTextures(1, &texture);
 			glActiveTexture(GL_TEXTURE0+textureUnit);
@@ -88,6 +96,9 @@ class GraphicsTexture{
 				free(data);
 		}
 
+		void activate(void){
+			glActiveTexture(GL_TEXTURE0+textureUnit);
+		}
 		void bind2D(void){
 			glActiveTexture(GL_TEXTURE0+textureUnit);
 			glBindTexture(GL_TEXTURE_2D, texture);

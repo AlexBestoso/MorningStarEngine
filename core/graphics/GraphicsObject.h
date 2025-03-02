@@ -17,6 +17,12 @@ typedef struct GraphicsLight{
 	float cutOff;
 }graphics_light_t;
 
+typedef struct masterVertex{
+	float position[3];
+	float texmap_pos[2];
+	float normal_pos[3];
+}graphics_master_t;
+
 class GraphicsObject{
 	private:
 		unsigned int elementBufferObject = 0;
@@ -33,6 +39,26 @@ class GraphicsObject{
 		graphics_material_t material;
 		graphics_light_t light;
 		WavefrontImport objImporter;
+
+		GraphicsTexture* getTexture(void){
+			return &this->texture;
+		}
+
+		void fillMasterPosition(glm::vec3 pos, graphics_master_t* out){
+			out->position[0] = pos.x;
+			out->position[1] = pos.y;
+			out->position[2] = pos.z;
+		}
+		void fillMasterTexmap(glm::vec2 pos, graphics_master_t* out){
+			out->texmap_pos[0] = pos.x;
+			out->texmap_pos[1] = pos.y;
+		}
+
+		void fillMasterNormal(glm::vec3 pos, graphics_master_t* out){
+			out->normal_pos[0] = pos.x;
+			out->normal_pos[1] = pos.y;
+			out->normal_pos[2] = pos.z;
+		}
 
 		virtual void setGES(struct GuiEngineStruct ges){
 			this->ges = ges;
@@ -135,6 +161,12 @@ class GraphicsObject{
 
 		void bindVao(void){
 			  glBindVertexArray(vertexArrayObject);
+		}
+
+		void simplyGenerate(void){
+			this->generateObjectIds(true, true, false);
+                        this->bindVao();
+                        this->bindVbo();
 		}
 		
 		void unbindVao(void){
@@ -257,6 +289,10 @@ class GraphicsObject{
 
 			this->storeVertexData(sizeof(float)*dataSize, data, GL_STATIC_DRAW);
 			glDrawArrays(drawMode, 0, strideSize);
+		}
+
+		void replaceBufferData(GLintptr offset, GLsizeiptr size, const void * data){
+			glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 		}
 
 		virtual void draw(void){

@@ -11,6 +11,7 @@ class Menu2D : public GraphicsObject{
 		std::string vertexShaderPath = "./core/2D/menu/menu.vs";
 		std::string fragmentShaderPath = "./core/2D/menu/menu.fs";
 		
+		MorningText textObject;
 		Menu2DButton menuButtons[30];
 		int activeMenuButtons[30] = {-1};
 		// Input2D menuInputs[30];
@@ -150,6 +151,15 @@ class Menu2D : public GraphicsObject{
 					}
 				}
 			}
+
+
+			textObject.setText("This is a magic banana.");
+			textObject.setPos(25.0f, 25.0f);
+			textObject.setScale(1.0f);
+			textObject.setColor(0.3f, 0.7f, 0.9f);
+
+			textObject.create();
+			
 			return true;
 		}
 
@@ -158,6 +168,8 @@ class Menu2D : public GraphicsObject{
 				menuButtons[i].destroy();
 			}
 			texture.destroy();
+			//textObject.freeFace();
+			//textObject.freeLib();
 			GraphicsObject::destroy();
 		}
 
@@ -175,5 +187,7 @@ class Menu2D : public GraphicsObject{
 	                                menuButtons[i].draw();
 				}
                         }	
+			
+		//	textObject.draw("This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
 		}
 };
