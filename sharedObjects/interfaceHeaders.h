@@ -8,9 +8,9 @@ using namespace std;
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../glm/glm/glm.hpp"
-#include "../glm/glm/gtc/matrix_transform.hpp"
-#include "../glm/glm/gtc/type_ptr.hpp"
+#include "../NEW_CODE_BASE/src/glm/glm/glm.hpp"
+#include "../NEW_CODE_BASE/src/glm/glm/gtc/matrix_transform.hpp"
+#include "../NEW_CODE_BASE/src/glm/glm/gtc/type_ptr.hpp"
 
 #include <stdio.h>
 #include <string>
