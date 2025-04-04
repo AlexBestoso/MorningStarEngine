@@ -1,7 +1,7 @@
 #include "./entity.error.h"
 class Entity{
 	private:
-				GLenum mode = GL_POINTS;
+		GLenum mode = GL_POINTS;
 		int drawStart = 0;
 		int indexCount = 0;
 
@@ -41,8 +41,8 @@ class Entity{
 		}
 
 		void addShaderAttributes(int i, int size, int stride, int offset){
-			glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride * sizeof(float), (const void *)&offset);
 			glEnableVertexAttribArray(i);
+			glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (const void *)&offset);
 		}
 		void initShader(std::string vtxShader, std::string fragShader){
 			try{

@@ -1,6 +1,10 @@
-COMPILE=g++ main.cc -lm -lglfw -lGLESv2 -lXrandr -lpthread -lXi -lX11 -lXmu -lglut -lGL -lX11 -ldl -lxml2 $(shell pkg-config --cflags freetype2) -lfreetype -z defs -g -o morningStarEngine
+FLAGS=-I./src/ -lm -lglfw -lGLESv2 -lXrandr -lpthread -lXi -lX11 -lXmu -lglut -lGL -lX11 -ldl -lxml2 $(shell pkg-config --cflags freetype2) -lfreetype -z defs -g
 all:
-	$(COMPILE)
+	g++ -c main.cpp $(FLAGS) 
+	g++ -c ./src/core/core.cpp $(FLAGS)
+	g++ -c ./src/windowCtrl/windowCtrl.cpp $(FLAGS)
+	g++ -c ./src/shader/shader.cpp $(FLAGS)
+	g++ -o morningStarEngine main.o core.o windowCtrl.o shader.o $(FLAGS)
 main:
 	$(COMPILE) 
 run:
