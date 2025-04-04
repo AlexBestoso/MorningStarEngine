@@ -1,7 +1,5 @@
 #include "../../main.h"
 #include "../error/error.h"
-#include "../windowCtrl/windowCtrl.h"
-#include "../shader/shader.h"
 #include "../entity/entity.h"
 #include "../../junk/testEntity.h"
 
@@ -28,15 +26,6 @@ void mouse_click_callback(GLFWwindow*, int button, int action, int /*mod*/){
         }
 }
 
-void keyboard_callback(GLFWwindow* window, int key, int /*scancode*/, int /*action*/, int mods){
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        	glfwSetWindowShouldClose(window, true);
-        if((key >= 0x41 && key <= 0x5a) && mods ==0){
-                key += (0x61-0x41);
-        }
-       // updateKeyboard((GLFW_PRESS == action || GLFW_REPEAT == action), key, action, mods);
-        //updateKeyboardSpecial((GLFW_PRESS == action || GLFW_REPEAT == action), key);
-}
 
 void mouse_callback(GLFWwindow* , double , double ){
  /*       gui_engine_global.mouse.mouseX = xpos;

@@ -1,11 +1,9 @@
 #include "../../main.h"
 #include "../error/error.h"
-#include "../windowCtrl/windowCtrl.h"
-#include "../shader/shader.h"
 
 #include "./entity.error.h"
 #include "./entity.h"
-		Entity::Entity(void){
+		Entity::Entity(void) : WindowCtrl(){
 			elementBufferObject = 0;
                 	vertexBufferObject = 0;
                 	vertexArrayObject = 0;
@@ -16,6 +14,19 @@
                 	mass = 0;
                 	birthday = 0.0;
                 	attributesDefined = false;
+			vertecies = NULL;
+			verteciesSize = 0;
+
+		}
+
+		Entity::Entity(const char *windowTitle) : WindowCtrl(windowTitle){
+			Entity();
+		}
+
+		
+		void Entity::setVertecies(GLfloat *obj, size_t s){
+			this->vertecies = obj;	
+			this->verteciesSize = s;
 		}
 
 		void Entity::pointMode(void){
@@ -36,15 +47,15 @@
 			this->indexCount = i;
 		}
 
-		void Entity::use(void){
-			shader.use();
-		}
+		//void Entity::use(void){
+	//		shader.use();
+	//	}
 
-		void Entity::addShaderAttributes(unsigned int i, int size, unsigned int stride, const void *offset){
+	/*	void Entity::addShaderAttributes(unsigned int i, int size, unsigned int stride, const void *offset){
 			
 			glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), &offset);
 			glEnableVertexAttribArray(i);
-		}
+		}*/
 		void Entity::initShader(std::string vtxShader, std::string fragShader){
 			try{
 				this->shader.setVertexShader(vtxShader.c_str());
@@ -64,11 +75,11 @@
                                 glGenBuffers(1, &elementBufferObject);
                 }
 
-		void Entity::draw(void){
-			glDrawArrays(mode, drawStart, indexCount);
-		}
+	//	void Entity::draw(void){
+	//		glDrawArrays(mode, drawStart, indexCount);
+	//	}
 
-                void Entity::bindVao(void){
+                /*void Entity::bindVao(void){
              		glBindVertexArray(vertexArrayObject);
                 }
 
@@ -86,9 +97,9 @@
 
                 void Entity::bindEbo(void){
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
-                }
+                }*/
 		
-		void Entity::simpActive(void){
+		/*void Entity::simpActive(void){
 			generateObjectIds(true, true, false);
 			bindVao();
 			bindVbo();
@@ -97,15 +108,15 @@
 		void Entity::simpDeactive(void){
 			unbindVbo();
 			unbindVao();
-		}
+		}*/
 
-                void Entity::storeVertexData(GLsizeiptr size, const void * data, GLenum drawMode){
+                /*void Entity::storeVertexData(GLsizeiptr size, const void * data, GLenum drawMode){
                         glBufferData(GL_ARRAY_BUFFER, size, data, drawMode);
                 }
 		
 		void Entity::storeVertexData(GLsizeiptr size, const void * data){
                         glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
-                }
+                }*/
 	
 
 

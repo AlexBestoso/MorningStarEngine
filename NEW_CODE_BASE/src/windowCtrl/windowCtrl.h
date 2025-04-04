@@ -1,10 +1,12 @@
-class WindowCtrl{
+
+#include "../shader/shader.h"
+class WindowCtrl : public Shader{
 	private:
 		GLFWwindow *window;
 		std::string title;
 		int screenWidth;
 		int screenHeight;
-		
+		float soulColor[4];
 		
 		void fetchScreenDimensions(void);
 		
@@ -52,4 +54,24 @@ class WindowCtrl{
                 void setMouseCursorPosCallback(void(*callback)(GLFWwindow*, double, double));
 		void setWindowRefreshCb(void(*cb)(GLFWwindow*));
 		void setErrorHandleCallback(void(*cb)(int, const char *));
+
+		void drawClear(void);
+		void drawTriangle(GLint first, GLsizei count);
+		void poll(void);
+		void kill(void);
+
+		void generateVao(GLsizei n, GLuint *obj);
+                // the same function is used to generate ebo
+                void generateVbo(GLsizei n, GLuint *obj);
+                void bindVao(GLuint obj);
+                void bindVbo(GLuint obj);
+                void bindVeo(GLuint obj);
+		void unbindVao(void);
+                void unbindVbo(void);
+                void unbindVeo(void);
+		
+		void pushInputStatic(GLfloat *data, GLsizeiptr dataSize);
+		void pushInputDynamic(GLfloat *data, GLsizeiptr dataSize);
+		void defineInput(unsigned int i, int size, unsigned int stride, const void *offset);
+
 };

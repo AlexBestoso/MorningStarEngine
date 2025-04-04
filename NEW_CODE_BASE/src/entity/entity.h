@@ -1,4 +1,5 @@
-class Entity{
+#include "../windowCtrl/windowCtrl.h"
+class Entity : public WindowCtrl{
 	private:
 		GLenum mode;
 		int drawStart;
@@ -11,6 +12,8 @@ class Entity{
 		double birthday;
 		
 		bool attributesDefined;
+		GLfloat *vertecies;
+		size_t verteciesSize;
 		
 	public:
 	
@@ -19,26 +22,28 @@ class Entity{
                 unsigned int vertexArrayObject;
 	
 		Entity(void);		
+		Entity(const char *windowTitle);
 
+		void setVertecies(GLfloat *obj, size_t s);
 		void pointMode(void);
 		void triangleMode(void);
 		void lineMode(void);
 		void setDrawStart(int i);
 		void setIndexCount(int i);
-		void use(void);
-		void addShaderAttributes(unsigned int i, int size, unsigned int stride, const void *offset);
+		//void use(void);
+		//void addShaderAttributes(unsigned int i, int size, unsigned int stride, const void *offset);
 		void initShader(std::string vtxShader, std::string fragShader);
 		void generateObjectIds(bool arrayObj, bool vertBuff, bool eleObj);
-		virtual void draw(void);
-                void bindVao(void);
-		void unbindVao(void);
-                void unbindVbo(void);
-                void bindVbo(void);
-                void bindEbo(void);
+		//virtual void draw(void);
+                //void bindVao(void);
+		//void unbindVao(void);
+                //void unbindVbo(void);
+                //void bindVbo(void);
+                //void bindEbo(void);
 		void simpActive(void);
 		void simpDeactive(void);
-                void storeVertexData(GLsizeiptr size, const void * data, GLenum drawMode);
-		void storeVertexData(GLsizeiptr size, const void * data);
+                //oid storeVertexData(GLsizeiptr size, const void * data, GLenum drawMode);
+		//void storeVertexData(GLsizeiptr size, const void * data);
                 void setElementArrayData(GLsizeiptr size, const GLvoid *indecies, GLenum drawMode);
 		void destroy(void);
 		void replaceBufferData(GLintptr offset, GLsizeiptr size, const void * data);

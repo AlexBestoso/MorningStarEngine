@@ -17,22 +17,32 @@
                         this->title = "";
                         this->screenWidth = 700;
                         this->screenHeight = 700;
+			this->soulColor[0] = 0.0;
+                        this->soulColor[1] = 0.2;
+                        this->soulColor[2] = 0.2;
+                        this->soulColor[3] = 1.0;
+
 		}
 		WindowCtrl::WindowCtrl(const char *t){
 			this->window = NULL;
                 	this->screenWidth = 700;
                 	this->screenHeight = 700;
 			this->setTitle(t);
-			//this->init();
+			this->soulColor[0] = 0.0;
+                        this->soulColor[1] = 0.2;
+                        this->soulColor[2] = 0.2;
+                        this->soulColor[3] = 1.0;
+
+			this->init();
 		}
 		bool WindowCtrl::shouldClose(void){
 			return (!glfwWindowShouldClose(this->getWindow()));
 		}
 		void WindowCtrl::init(void){
-			//if(glfwInit() == GLFW_FALSE)
-			//	throw WindowCtrlError("init", "Failed to initalize glfw.");
+			if(glfwInit() == GLFW_FALSE)
+				throw WindowCtrlError("init", "Failed to initalize glfw.");
                         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-                        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+                        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
                         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
                         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
                         glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
@@ -69,7 +79,7 @@
 		}
 
 		void WindowCtrl::current(void){
-			glfwMakeContextCurrent(this->window);
+			glfwMakeContextCurrent(this->getWindow());
 		}
 		void WindowCtrl::depthTest(bool enabled){
 			if(enabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
@@ -191,4 +201,74 @@
 			 if(enabled) glEnable(GL_PROGRAM_POINT_SIZE); else glDisable(GL_PROGRAM_POINT_SIZE);
 
 		} 
+		
+		void WindowCtrl::drawClear(void){
+			glClearColor(this->soulColor[0], this->soulColor[1], this->soulColor[2], this->soulColor[3]);
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+
+		void WindowCtrl::drawTriangle(GLint first, GLsizei count){
+			glDrawArrays(GL_TRIANGLES, first, count);
+		}
+
+		void WindowCtrl::poll(void){
+			glfwSwapBuffers(this->getWindow());
+                        glfwPollEvents();
+		}
+		
+		void WindowCtrl::kill(void){
+			glfwTerminate();
+		}
+
+		void WindowCtrl::generateVao(GLsizei n, GLuint *obj){
+			glGenVertexArrays(n, obj);
+		}
+		// the same function is used to generate ebo
+		void WindowCtrl::generateVbo(GLsizei n, GLuint *obj){
+                	glGenBuffers(n, obj);
+		}
+		
+		void WindowCtrl::bindVao(GLuint obj){
+			glBindVertexArray(obj);
+		}
+		void WindowCtrl::bindVbo(GLuint obj){
+			glBindBuffer(GL_ARRAY_BUFFER, obj);
+		}
+		void WindowCtrl::bindVeo(GLuint obj){
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj);
+		}
+
+		void WindowCtrl::unbindVao(void){
+                        glBindVertexArray(0);
+                }
+
+                void WindowCtrl::unbindVbo(void){
+                        glBindBuffer(GL_ARRAY_BUFFER, 0);
+                }
+
+                void WindowCtrl::unbindVeo(void){
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                }
+
+		void WindowCtrl::pushInputStatic(GLfloat *data, GLsizeiptr dataSize){
+			glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_STATIC_DRAW);	
+			GLenum err = glGetError();
+			if(err != GL_NO_ERROR){
+				printf("Failed to push data to store : %d\n", err);
+			}
+		}
+
+		void WindowCtrl::pushInputDynamic(GLfloat *data, GLsizeiptr dataSize){
+                        glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
+                        GLenum err = glGetError();
+                        if(err != GL_NO_ERROR){
+                                printf("Failed to push data to store : %d\n", err);
+                        }
+                }
+
+		void WindowCtrl::defineInput(unsigned int i, int size, unsigned int stride, const void *offset){
+			// index 'i' has a point with 'size' values. 'stride' is the index that the point ends, and 'offset' is where it starts. 
+                        glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), &offset);
+                        glEnableVertexAttribArray(i);
+                }
 

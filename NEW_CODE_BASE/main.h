@@ -27,9 +27,9 @@
 #include <fcntl.h>
 #include <typeinfo>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void CoreFrameBuffer(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_click_callback(GLFWwindow* window, int button, int action, int mod);
-void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void CoreKeyboard(GLFWwindow* window, int key, int scancode, int action, int mods);
 void refreshWindowCB(GLFWwindow *window);
 void glutErrorHandle(int code, const char *msg);
