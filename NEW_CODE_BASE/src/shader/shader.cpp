@@ -13,6 +13,7 @@
 
 		}
 		void Shader::setVertexShader(const char *fname){
+			printf("Loading vertex shader '%s' size ", fname);
                         struct stat st;
                         stat(fname, &st);
                         if(st.st_size <= 0){
@@ -20,18 +21,25 @@
 				err += "is empty or cannot be found.";
 				throw ShaderError("addVertexShader", err);	
                         }
-                        memset(vertBuffer, 0x0, 10000);
+			size_t fileSize = 0;
+			for(int i=0; i<st.st_size; i++) fileSize++;
+			printf("%ld bytes\n", fileSize);
 
                         int fd = open(fname, O_RDONLY);
                         if(!fd)
 				throw ShaderError("addVertexShader", "Failed to open vertex shader file.");
 
-                        read(fd, vertBuffer, st.st_size);
+                        if(read(fd, vertBuffer, fileSize) != st.st_size){
+				close(fd);
+				throw ShaderError("addVertexShader", "Failed to read vertex shader file.\n");
+			}
                         close(fd);
-                        vertBuffer[st.st_size] = 0x00;
-
+			
                         vertexHandle = glCreateShader(GL_VERTEX_SHADER);
-			char *fbuf = vertBuffer;
+			if(vertexHandle == 0)
+				throw ShaderError("addFragmentShader", "Failed to create shader.");
+			const GLchar *fbuf = (const GLchar*)&vertBuffer;
+			
                         glShaderSource(vertexHandle, 1, &fbuf, NULL);
                         glCompileShader(vertexHandle);
 
@@ -40,29 +48,38 @@
                         glGetShaderiv(vertexHandle, GL_COMPILE_STATUS, &success);
                         if (!success){
                                 glGetShaderInfoLog(vertexHandle, 512, NULL, infoLog);
-                                vertexHandle = -1;
+                                vertexHandle = 0;
 				throw ShaderError("addVertexShader", infoLog);
                         }
                 }
 
 		void Shader::setFragmentShader(const char *fname){
+			printf("Loading fragmet shader '%s' size ", fname);
                         struct stat st;
                         stat(fname, &st);
                         if(st.st_size <= 0)
                                 throw ShaderError("addFragmentShader", "Failed to detect fragment shader file.");
 
-			memset(fragBuffer, 0x0, 10000);
+			size_t fileSize = 0;
+                        for(int i=0; i<st.st_size; i++) fileSize++;
+			printf("%ld bytes\n", fileSize);
 
                         int fd = open(fname, O_RDONLY);
                         if(!fd)
                                 throw ShaderError("addFragmentShader", "Failed to open fragment shader file.");
 
-                        read(fd, fragBuffer, st.st_size);
-                        fragBuffer[st.st_size] = 0x00;
+                        if(read(fd, fragBuffer, fileSize) != st.st_size){
+				close(fd);
+				throw ShaderError("addFragmentShader", "Failed to read fragment shader file.");
+			}
                         close(fd);
 
-			char *fbuf = fragBuffer;
+			
                         fragmentHandle  = glCreateShader(GL_FRAGMENT_SHADER);
+			if(fragmentHandle == 0)
+				throw ShaderError("addFragmentShader", "Failed to create shader.");
+			const GLchar *fbuf = (const GLchar*)&fragBuffer;
+
                         glShaderSource(fragmentHandle, 1, &fbuf, NULL);
                         glCompileShader(fragmentHandle);
 
@@ -71,13 +88,15 @@
                         glGetShaderiv(fragmentHandle, GL_COMPILE_STATUS, &success);
                         if (!success){
                                 glGetShaderInfoLog(fragmentHandle, 512, NULL, infoLog);
-                                fragmentHandle = -1;
+                                fragmentHandle = 0;
 				throw ShaderError("addFragmentShader", infoLog);
                         }
                 }
 
 		void Shader::link(void){
                         programHandle  = glCreateProgram();
+			if(programHandle == 0)
+				throw ShaderError("link", "failed to create gl program handle.\n");
                       	glAttachShader(programHandle, vertexHandle);
                       	glAttachShader(programHandle, fragmentHandle);
                         
@@ -93,8 +112,8 @@
 				throw ShaderError("linkShaders", infoLog);
                         }
 
-			glDetachShader(programHandle, vertexHandle);
-			glDetachShader(programHandle, fragmentHandle);
+			//glDetachShader(programHandle, vertexHandle);
+			//glDetachShader(programHandle, fragmentHandle);
 			
 			glDeleteShader(vertexHandle);
                         glDeleteShader(fragmentHandle);
@@ -110,7 +129,10 @@
 
 
 		void Shader::getUniform(const char *varName, int *ret){
-                        glGetUniformiv(glGetUniformLocation(programHandle, varName), 1, ret);
+			GLint loc = glGetUniformLocation(programHandle, varName);
+			GLuint trueLoc = 0;
+			for(int i=0; i<loc; i++) trueLoc++;
+                        glGetUniformiv(trueLoc, 1, ret);
                 }
                 void Shader::setUniform(const char *varName, int val){
                         glUniform1i(glGetUniformLocation(programHandle, varName), val);

@@ -8,7 +8,7 @@
 #include "./core.error.h"
 #include "./core.h"
 extern int global_w, global_h;
-void mouse_click_callback(GLFWwindow* window, int button, int action, int mod){
+void mouse_click_callback(GLFWwindow*, int button, int action, int /*mod*/){
         if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
                 //gui_engine_global.mouse.click_left = true;
         }else if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
@@ -28,7 +28,7 @@ void mouse_click_callback(GLFWwindow* window, int button, int action, int mod){
         }
 }
 
-void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+void keyboard_callback(GLFWwindow* window, int key, int /*scancode*/, int /*action*/, int mods){
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         	glfwSetWindowShouldClose(window, true);
         if((key >= 0x41 && key <= 0x5a) && mods ==0){
@@ -38,7 +38,7 @@ void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, in
         //updateKeyboardSpecial((GLFW_PRESS == action || GLFW_REPEAT == action), key);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+void mouse_callback(GLFWwindow* , double , double ){
  /*       gui_engine_global.mouse.mouseX = xpos;
         gui_engine_global.mouse.mouseY = ypos;
         if(firstMouse) // this bool variable is initially set to true
@@ -76,13 +76,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
                 	this->soulColor[3] = 1.0;
                	 	this->time = 0;
                 	this->dbg = false;
+			this->a = 1;
+			this->b = 1;
+			this->c = 1;
 		}
 		
 		void Core::init(void){
-			glfwSwapInterval(1);
-			global_w = screenWidth;
-			global_h = screenHeight;
-    			glViewport(0, 0, global_w, global_h);
+			//glfwSwapInterval(1);
+    			//glViewport(0, 0, global_w, global_h);
 			test.init();
 		}
 
@@ -94,7 +95,22 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 		void Core::process(void){
 			glClearColor(soulColor[0], soulColor[1], soulColor[2], soulColor[3]);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
+			
+			soulColor[0] +=  0.01 * a;
+			soulColor[1] +=  0.01 * b;
+			soulColor[2] +=  0.01 * c;
 
+			if(soulColor[0] > 1 || soulColor[0] < 0){
+				a*=-1;
+			}
+
+			if(soulColor[1] > 1 || soulColor[1] < 0){
+				b*=-1;
+			}
+
+			if(soulColor[2] > 1 || soulColor[2] < 0){
+				c*=-1;
+			}
 			test.draw();
 		}
 
@@ -103,6 +119,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 				time = glfwGetTime();
 				glfwSwapBuffers(window.getWindow());
 				glfwPollEvents();
+				//test.destroy();
 			}catch(CoreException &e){
 				throw CoreError(e, "pulse", "failed to get window.");
 			}

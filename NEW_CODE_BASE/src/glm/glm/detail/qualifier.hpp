@@ -81,7 +81,7 @@ namespace detail
 		};
 #	endif
 
-	template<length_t L, typename T, bool is_aligned>
+	template<size_t L, typename T, bool is_aligned>
 	struct storage
 	{
 		typedef struct type {
@@ -90,7 +90,7 @@ namespace detail
 	};
 
 #	if GLM_HAS_ALIGNOF
-		template<length_t L, typename T>
+		template<size_t L, typename T>
 		struct storage<L, T, true>
 		{
 			typedef struct alignas(L * sizeof(T)) type {
