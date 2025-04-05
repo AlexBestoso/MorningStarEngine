@@ -34,14 +34,21 @@ testEnt adam;
 const char *adamVtxShdr = "./junk/testEntity.vetx.glsl"; 
 const char *adamFraShdr = "./junk/tetEntity.frag.glsl";
 const char *adamGeoShdr = "./junk/testEntity.geom.glsl";
-
+static const float glob_vertex[] = {
+	0.5f, 0.5f, 0.0f
+//        0.1f, 0.1f, 0.0f,
+//        -0.1f, -0.1f, 0.0f 
+        //vertecies[8] = 0.0f;  // top 
+};
 int main(void){
-	God.alphaBlendFunc();
+
+	try{
         God.depthTest(true);
         God.blend(true); 
-        God.clipDistance(true, 1); 
-        God.colorLogic(false); 
-        God.cullFace(false); 
+	God.alphaBlendFunc();
+        God.clipDistance(false, 1); 
+        God.colorLogic(true); 
+        God.cullFace(true); 
         God.debugOutput(false); 
         God.syncDebugOutput(false); 
         God.depthClamp(false); 
@@ -59,24 +66,24 @@ int main(void){
         God.sampleAlphaToCoverage(false); 
         God.sampleAlphaToOne(false); 
         God.sampleCoverage(false); 
+	God.sampleShading(true);
 
 	God.setFrameResizeCallBack(CoreFrameBuffer);
 	God.setKeyboardCallback(CoreKeyboard);
 	God.current();
 	
 	adam.fillSoul(&God);
+	printf("Adding glob vertex %ld\n", sizeof(glob_vertex));
+	adam.setVertex((float*)&glob_vertex, sizeof(glob_vertex));
 	adam.setVertexShader(adamVtxShdr);
 	adam.setFragmentShader(adamFraShdr);
-	try{
 		adam.setGeometryShader(adamGeoShdr);
-	}catch(CoreException &e){
-		e.out();
-	};
-	adam.compile();
+		adam.compile();
+	
 
 	adam.setVao();
-	adam.setVbo();
 	adam.bindVao();
+	adam.setVbo();
 	adam.bindVbo();
 	adam.defineInput();	
 	adam.unbindVbo();
@@ -87,6 +94,10 @@ int main(void){
 		adam.draw();	
 		God.poll();
 	}
+	}catch(CoreException &e){
+		e.out();
+	};
+
 	printf("Exiting application.\n");
 	God.kill();
 	exit(EXIT_FAILURE);

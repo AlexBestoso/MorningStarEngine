@@ -14,6 +14,17 @@
 
 		}
 
+		Shader::~Shader(){
+			glDeleteShader(vertexHandle);
+                        glDeleteShader(geometryHandle);
+                        glDeleteShader(fragmentHandle);
+
+			glDetachShader(programHandle, vertexHandle);
+                       	glDetachShader(programHandle, geometryHandle);
+                        glDetachShader(programHandle, fragmentHandle);
+		
+			deleteProgram();
+		}
 		void Shader::setGeometryShader(const char *fname){
 			printf("Loading geometry shader '%s' size ", fname);
                         struct stat st;
@@ -156,6 +167,7 @@
                         }
 
 			//glDetachShader(programHandle, vertexHandle);
+                       // glDetatchShader(programHandle, geometryHandle);
 			//glDetachShader(programHandle, fragmentHandle);
 			
 			glDeleteShader(vertexHandle);

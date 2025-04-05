@@ -10,6 +10,7 @@ class Shader{
 	public:
 		unsigned int programHandle;
 		Shader(void);
+		~Shader();
 		void setVertexShader(const char *fname);
 		void setFragmentShader(const char *fname);
 		void setGeometryShader(const char *fname);

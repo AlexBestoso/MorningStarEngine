@@ -26,6 +26,8 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <typeinfo>
+#include <thread>
+#include <vector>
 
 void CoreFrameBuffer(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -33,3 +35,5 @@ void mouse_click_callback(GLFWwindow* window, int button, int action, int mod);
 void CoreKeyboard(GLFWwindow* window, int key, int scancode, int action, int mods);
 void refreshWindowCB(GLFWwindow *window);
 void glutErrorHandle(int code, const char *msg);
+
+

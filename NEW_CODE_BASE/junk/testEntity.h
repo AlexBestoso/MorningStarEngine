@@ -10,12 +10,17 @@ class testEnt{
 
 		glm::mat4 model;
 		glm::vec3 color;
-		float vertecies[9];
+
+		//std::vector<float >vertecies;
+		float *vertecies;
+		GLsizeiptr verteciesCount;
 		
 		bool initalized;
 
 	public:	
 		testEnt(void);
+		void activate(void);
+		void setVertex(float *vtx, GLsizeiptr vtxS);
 		void fillSoul(Entity *grace);
 		void setVertexShader(const char *loc);
 		void setFragmentShader(const char *loc);

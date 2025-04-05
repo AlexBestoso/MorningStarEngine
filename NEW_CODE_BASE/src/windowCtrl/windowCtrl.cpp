@@ -50,17 +50,17 @@ extern int global_h;
                         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
                         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
                         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-                        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+        //                glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
  //                       glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
 //                        glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR, GLFW_RELEASE_BEHAVIOR_FLUSH);
-                        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-                        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+      //                  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    //                    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
    //                     glfwWindowHint(GLFW_SAMPLES, 3);
                         //glfwWindowHint(GLFW_STEREO, GLFW_TRUE);
-                        glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+  //                      glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
      //                   glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_ROBUSTNESS);
-			glfwWindowHintString(GLFW_X11_CLASS_NAME, "MORNINGCLASS");
-			glfwWindowHintString(GLFW_X11_INSTANCE_NAME, "MORNINGINST");
+//			glfwWindowHintString(GLFW_X11_CLASS_NAME, "MORNINGCLASS");
+//			glfwWindowHintString(GLFW_X11_INSTANCE_NAME, "MORNINGINST");
 			
 			this->fetchScreenDimensions();
 			this->window = glfwCreateWindow(this->screenWidth, this->screenHeight, title.c_str(), NULL/*glfwGetPrimaryMonitor()*/, NULL);
@@ -215,8 +215,12 @@ extern int global_h;
 		}
 
 		void WindowCtrl::drawTriangle(GLint first, GLsizei count){
-			glDrawArrays(GL_POINTS, first, count);
+			glDrawArrays(GL_TRIANGLES, first, count);
 		}
+		
+		void WindowCtrl::drawPoint(GLint first, GLsizei count){
+                        glDrawArrays(GL_POINTS, first, count);
+                }
 
 		void WindowCtrl::poll(void){
 			glfwSwapBuffers(this->getWindow());
@@ -257,16 +261,19 @@ extern int global_h;
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 }
 
-		void WindowCtrl::pushInputStatic(GLfloat *data, GLsizeiptr dataSize){
-			glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_STATIC_DRAW);	
+		void WindowCtrl::pushInputStatic(void *data, GLsizeiptr dataSize){
+			glBufferData(GL_ARRAY_BUFFER, dataSize, (const void *)data, GL_STATIC_DRAW);	
 			GLenum err = glGetError();
 			if(err != GL_NO_ERROR){
 				printf("Failed to push data to store : %d\n", err);
 			}
 		}
 
-		void WindowCtrl::pushInputDynamic(GLfloat *data, GLsizeiptr dataSize){
-                        glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
+		void WindowCtrl::pushInputDynamic(void *data, GLsizeiptr dataSize){
+			if(data == NULL)
+				throw WindowCtrlError("pushInputDynamic", "data is null.\n");
+			printf("Pushing %ld vertecies\n", dataSize);
+                        glBufferData(GL_ARRAY_BUFFER, dataSize, (const void *)data, GL_DYNAMIC_DRAW);
                         GLenum err = glGetError();
                         if(err != GL_NO_ERROR){
                                 printf("Failed to push data to store : %d\n", err);
@@ -275,7 +282,8 @@ extern int global_h;
 
 		void WindowCtrl::defineInput(unsigned int i, int size, unsigned int stride, const void *offset){
 			// index 'i' has a point with 'size' values. 'stride' is the index that the point ends, and 'offset' is where it starts. 
-                        glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), &offset);
+			printf("Using stride of %d, vs %ld\n", stride, stride*sizeof(GLfloat));
+                        glVertexAttribPointer(i, size, GL_FLOAT, GL_TRUE, stride*sizeof(GLfloat), &offset);
                         glEnableVertexAttribArray(i);
                 }
 

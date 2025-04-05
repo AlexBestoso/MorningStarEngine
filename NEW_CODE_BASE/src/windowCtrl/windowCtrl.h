@@ -57,6 +57,7 @@ class WindowCtrl : public Shader{
 
 		void drawClear(void);
 		void drawTriangle(GLint first, GLsizei count);
+		void drawPoint(GLint first, GLsizei count);
 		void poll(void);
 		void kill(void);
 
@@ -70,8 +71,8 @@ class WindowCtrl : public Shader{
                 void unbindVbo(void);
                 void unbindVeo(void);
 		
-		void pushInputStatic(GLfloat *data, GLsizeiptr dataSize);
-		void pushInputDynamic(GLfloat *data, GLsizeiptr dataSize);
+		void pushInputStatic(void *data, GLsizeiptr dataSize);
+		void pushInputDynamic(void *data, GLsizeiptr dataSize);
 		void defineInput(unsigned int i, int size, unsigned int stride, const void *offset);
 
 };

@@ -8,6 +8,10 @@
 extern int global_w;
 extern int global_h;
 
+void testEnt::setVertex(float * vtx, GLsizeiptr vtxS){
+	this->vertecies = (float *)&vtx;
+	this->verteciesCount = vtxS;
+}
 void testEnt::fillSoul(Entity *grace){
 	this->soul = grace;
 }
@@ -128,46 +132,28 @@ void testEnt::defineInput(void){
                 printf("Entity is soulless.\n");
                 return;
         }
-	this->soul->pushInputStatic(this->vertecies, 9/*sizeof(this->vertecies)*/);
-	this->soul->defineInput(0, 3, 3, (const void *)0);
+	this->activate();
+	this->bindVbo();
+	this->activate();
+	this->soul->pushInputDynamic((void *)this->vertecies, verteciesCount);
+	this->soul->defineInput(0, 1, 0, (const void *)0);
+}
+
+void testEnt::activate(void){
+	this->soul->use();
 }
 
 testEnt::testEnt(void){
 	model = glm::mat4(0.1f);
 	color = glm::vec3(1.0f, 0.5f, 0.2f);
-	vertecies[0] = -0.5f;
-	vertecies[1] = -0.5f; 
-	vertecies[2] = 0.5f; // left  
-
-	vertecies[3] = 0.5f; 
-	vertecies[4] = -0.5f; 
-	vertecies[5] = 0.5f; // right 
-	
-	vertecies[6] = 0.0f;  
-	vertecies[7] = 0.5f; 
-	vertecies[8] = 0.5f;  // top   
 	initalized = false;
 	soul = NULL;
+	vertecies = NULL;
 	vertexShader = NULL;
 	fragmentShader = NULL;
 }	
 		void testEnt::init(void){
-		/*	if(initalized)
-				return;
-			this->initShader("./junk/testEntity.vetx.glsl", "./junk/tetEntity.frag.glsl");
-			this->generateObjectIds(true, true, false);
-			this->bindVao();
 			
-			this->bindVbo();
-			this->storeVertexData(sizeof(vertecies), vertecies, GL_STATIC_DRAW);
-
-			this->addShaderAttributes(0, 3, 3, (const void *)0);
-
-			//this->unbindVbo();
-
-			//this->unbindVao();
-			
-			initalized = true;*/
 		}
 
 		void testEnt::draw(void){
@@ -177,12 +163,7 @@ testEnt::testEnt(void){
         		}
 			this->soul->use();
 			this->bindVao();
-			glViewport(0, 0, global_w, global_h);
-			GLint Viewport[4];
-                        glGetIntegerv(GL_VIEWPORT, Viewport);
-                        for(int i=0; i<4; i++){
-                                printf("%d, ", Viewport[i]);
-                        }printf("\n");
-			this->soul->drawTriangle(0, 3);
+			//glViewport(20, 20, global_w, global_h);
+			this->soul->drawPoint(0, 4);
 			
 		}
