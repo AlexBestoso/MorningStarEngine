@@ -139,6 +139,7 @@
 			if(programHandle == 0)
 				throw ShaderError("link", "failed to create gl program handle.\n");
                       	glAttachShader(programHandle, vertexHandle);
+                      	glAttachShader(programHandle, geometryHandle);
                       	glAttachShader(programHandle, fragmentHandle);
                         
                         glLinkProgram(programHandle);
@@ -149,6 +150,7 @@
                         if (!success) {
                                 glGetProgramInfoLog(programHandle, 512, NULL, infoLog);
                                 glDeleteShader(vertexHandle);
+				glDeleteShader(geometryHandle);
                                 glDeleteShader(fragmentHandle);
 				throw ShaderError("linkShaders", infoLog);
                         }
@@ -157,8 +159,8 @@
 			//glDetachShader(programHandle, fragmentHandle);
 			
 			glDeleteShader(vertexHandle);
-                        glDeleteShader(fragmentHandle);
                         glDeleteShader(geometryHandle);
+                        glDeleteShader(fragmentHandle);
                 }
 
 		void Shader::use(void){

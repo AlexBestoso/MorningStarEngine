@@ -82,7 +82,6 @@ int main(void){
 	adam.unbindVbo();
 	adam.unbindVao();
 	
-	glViewport(0, 0, global_w, global_w);
 	while(God.shouldClose()){
 		God.drawClear();
 		adam.draw();	

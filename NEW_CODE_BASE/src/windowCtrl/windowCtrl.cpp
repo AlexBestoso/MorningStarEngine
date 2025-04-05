@@ -210,11 +210,11 @@ extern int global_h;
 		
 		void WindowCtrl::drawClear(void){
 			glClearColor(this->soulColor[0], this->soulColor[1], this->soulColor[2], this->soulColor[3]);
-                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		}
 
 		void WindowCtrl::drawTriangle(GLint first, GLsizei count){
-			glDrawArrays(GL_TRIANGLES, first, count);
+			glDrawArrays(GL_POINTS, first, count);
 		}
 
 		void WindowCtrl::poll(void){
