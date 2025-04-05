@@ -7,10 +7,11 @@
 
 #include "./src/core/core.h"
 
-int global_w=700, global_h=700;
+int global_w=1918, global_h=1014;
 void CoreFrameBuffer(GLFWwindow*, int width, int height){
 	global_w=width;
 	global_h=height;
+	printf("resizing to %d %d\n", width, height);
     glViewport(0, 0, width, height);
 }
 
@@ -62,7 +63,6 @@ int main(void){
 	God.setFrameResizeCallBack(CoreFrameBuffer);
 	God.setKeyboardCallback(CoreKeyboard);
 	God.current();
-	glViewport(0, 0, global_w, global_w);
 	
 	adam.fillSoul(&God);
 	adam.setVertexShader(adamVtxShdr);

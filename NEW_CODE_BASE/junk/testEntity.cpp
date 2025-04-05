@@ -5,6 +5,9 @@
 
 #include "./testEntity.h"
 
+extern int global_w;
+extern int global_h;
+
 void testEnt::fillSoul(Entity *grace){
 	this->soul = grace;
 }
@@ -125,7 +128,7 @@ void testEnt::defineInput(void){
                 printf("Entity is soulless.\n");
                 return;
         }
-	this->soul->pushInputStatic(this->vertecies, sizeof(this->vertecies));
+	this->soul->pushInputStatic(this->vertecies, 9/*sizeof(this->vertecies)*/);
 	this->soul->defineInput(0, 3, 3, (const void *)0);
 }
 
@@ -135,9 +138,11 @@ testEnt::testEnt(void){
 	vertecies[0] = -0.5f;
 	vertecies[1] = -0.5f; 
 	vertecies[2] = 0.5f; // left  
+
 	vertecies[3] = 0.5f; 
 	vertecies[4] = -0.5f; 
 	vertecies[5] = 0.5f; // right 
+	
 	vertecies[6] = 0.0f;  
 	vertecies[7] = 0.5f; 
 	vertecies[8] = 0.5f;  // top   
@@ -172,6 +177,12 @@ testEnt::testEnt(void){
         		}
 			this->soul->use();
 			this->bindVao();
+			glViewport(0, 0, global_w, global_h);
+			GLint Viewport[4];
+                        glGetIntegerv(GL_VIEWPORT, Viewport);
+                        for(int i=0; i<4; i++){
+                                printf("%d, ", Viewport[i]);
+                        }printf("\n");
 			this->soul->drawTriangle(0, 3);
 			
 		}
