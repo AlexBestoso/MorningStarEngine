@@ -9,8 +9,49 @@
 			for(int i=0; i<10000; i++){
 				fragBuffer[i] = 0;
 				vertBuffer[i] = 0;
+				geometryBuffer[i] = 0;
 			}
 
+		}
+
+		void Shader::setGeometryShader(const char *fname){
+			printf("Loading geometry shader '%s' size ", fname);
+                        struct stat st;
+                        stat(fname, &st);
+                        if(st.st_size <= 0){
+                                std::string err = fname;
+                                err += "is empty or cannot be found.";
+                                throw ShaderError("addGeometryShader", err);
+                        }
+                        size_t fileSize = 0;
+                        for(int i=0; i<st.st_size; i++) fileSize++;
+                        printf("%ld bytes\n", fileSize);
+
+                        int fd = open(fname, O_RDONLY);
+                        if(!fd)
+                                throw ShaderError("addGeometryShader", "Failed to open shader file.");
+                        if(read(fd, geometryBuffer, fileSize) != st.st_size){
+                                close(fd);
+                                throw ShaderError("addGeometryShader", "Failed to read shader file.\n");
+                        }
+                        close(fd);
+
+			geometryHandle = glCreateShader(GL_GEOMETRY_SHADER);
+                        if(geometryHandle == 0)
+                                throw ShaderError("addFragmentShader", "Failed to create shader.");
+                        const GLchar *fbuf = (const GLchar*)&geometryBuffer;
+
+                        glShaderSource(geometryHandle, 1, &fbuf, NULL);
+                        glCompileShader(geometryHandle);
+
+                        int success;
+                        char infoLog[512];
+                        glGetShaderiv(geometryHandle, GL_COMPILE_STATUS, &success);
+                        if (!success){
+                                glGetShaderInfoLog(geometryHandle, 512, NULL, infoLog);
+                                vertexHandle = 0;
+                                throw ShaderError("addGeometryShader", infoLog);
+                        }
 		}
 		void Shader::setVertexShader(const char *fname){
 			printf("Loading vertex shader '%s' size ", fname);
@@ -117,6 +158,7 @@
 			
 			glDeleteShader(vertexHandle);
                         glDeleteShader(fragmentHandle);
+                        glDeleteShader(geometryHandle);
                 }
 
 		void Shader::use(void){

@@ -2,12 +2,18 @@
 #include "../error/error.h"
 #include "./windowCtrl.error.h"
 #include "./windowCtrl.h"
+extern int global_w; 
+extern int global_h;
 		void WindowCtrl::fetchScreenDimensions(void){
 			Display *d = XOpenDisplay(NULL);
 			Screen *s = DefaultScreenOfDisplay(d);
 			this->screenWidth = s->width;
 			this->screenHeight = s->height;
+			global_w = this->screenWidth;
+			global_h = this->screenHeight;
 			XCloseDisplay(d);
+		//	this->screenWidth = 2000;
+		//	this->screenHeight = 1000;
 			printf("Screen Size %dx%d\n", this->screenWidth, this->screenHeight);
 
 		}
@@ -48,11 +54,11 @@
                         glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
                         glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR, GLFW_RELEASE_BEHAVIOR_FLUSH);
                         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-                        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-                        glfwWindowHint(GLFW_SAMPLES, 1);
+                        glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
+                        glfwWindowHint(GLFW_SAMPLES, 3);
                         //glfwWindowHint(GLFW_STEREO, GLFW_TRUE);
                         glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-                        glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_LOSE_CONTEXT_ON_RESET);
+                        glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_ROBUSTNESS);
 			glfwWindowHintString(GLFW_X11_CLASS_NAME, "MORNINGCLASS");
 			glfwWindowHintString(GLFW_X11_INSTANCE_NAME, "MORNINGINST");
 			

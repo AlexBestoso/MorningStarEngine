@@ -19,6 +19,7 @@ class testEnt{
 		void fillSoul(Entity *grace);
 		void setVertexShader(const char *loc);
 		void setFragmentShader(const char *loc);
+		void setGeometryShader(const char *loc);
 		void compile(void);
 		void init(void);
 		

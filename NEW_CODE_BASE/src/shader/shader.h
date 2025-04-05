@@ -2,13 +2,17 @@ class Shader{
 	private:
 		unsigned int vertexHandle;
 		unsigned int fragmentHandle;
+		unsigned int geometryHandle;
+
 		char fragBuffer[10000];
 		char vertBuffer[10000];
+		char geometryBuffer[10000];
 	public:
 		unsigned int programHandle;
 		Shader(void);
 		void setVertexShader(const char *fname);
 		void setFragmentShader(const char *fname);
+		void setGeometryShader(const char *fname);
 		void link(void);
 		void use(void);
                 void deleteProgram(void);

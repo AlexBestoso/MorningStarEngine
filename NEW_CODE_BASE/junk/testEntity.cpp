@@ -26,6 +26,17 @@ void testEnt::setFragmentShader(const char *loc){
 	this->soul->setFragmentShader(loc);
 }
 
+void testEnt::setGeometryShader(const char *loc){
+	if(this->soul == NULL){
+		printf("Entity is soulless.\n");
+		return;
+	}
+
+	printf("Setting geometry shader...\n");
+	this->soul->setGeometryShader(loc);
+}
+
+
 void testEnt::compile(void){
 	if(this->soul == NULL){
 		printf("Entity is soulless.\n");
