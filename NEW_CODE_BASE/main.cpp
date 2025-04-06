@@ -34,14 +34,13 @@ testEnt adam;
 const char *adamVtxShdr = "./junk/testEntity.vetx.glsl"; 
 const char *adamFraShdr = "./junk/tetEntity.frag.glsl";
 const char *adamGeoShdr = "./junk/testEntity.geom.glsl";
-static const float glob_vertex[] = {
-	0.5f, 0.5f, 0.0f
-//        0.1f, 0.1f, 0.0f,
+int globsize = 2;
+GLfloat glob_vertex[] = {
+	 0.0f, 0.0f,
 //        -0.1f, -0.1f, 0.0f 
         //vertecies[8] = 0.0f;  // top 
 };
 int main(void){
-
 	try{
         God.depthTest(true);
         God.blend(true); 
@@ -72,22 +71,15 @@ int main(void){
 	God.setKeyboardCallback(CoreKeyboard);
 	God.current();
 	
-	adam.fillSoul(&God);
 	printf("Adding glob vertex %ld\n", sizeof(glob_vertex));
-	adam.setVertex((float*)&glob_vertex, sizeof(glob_vertex));
+	adam.fillSoul(&God);
+	adam.setVertex(glob_vertex, globsize);
 	adam.setVertexShader(adamVtxShdr);
 	adam.setFragmentShader(adamFraShdr);
-		adam.setGeometryShader(adamGeoShdr);
-		adam.compile();
+	adam.setGeometryShader(adamGeoShdr);
+	adam.compile();
 	
-
-	adam.setVao();
-	adam.bindVao();
-	adam.setVbo();
-	adam.bindVbo();
 	adam.defineInput();	
-	adam.unbindVbo();
-	adam.unbindVao();
 	
 	while(God.shouldClose()){
 		God.drawClear();

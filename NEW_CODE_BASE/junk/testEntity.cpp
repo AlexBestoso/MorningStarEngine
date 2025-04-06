@@ -8,8 +8,8 @@
 extern int global_w;
 extern int global_h;
 
-void testEnt::setVertex(float * vtx, GLsizeiptr vtxS){
-	this->vertecies = (float *)&vtx;
+void testEnt::setVertex(GLfloat * vtx, GLsizeiptr vtxS){
+	this->vertecies = vtx;
 	this->verteciesCount = vtxS;
 }
 void testEnt::fillSoul(Entity *grace){
@@ -39,7 +39,6 @@ void testEnt::setGeometryShader(const char *loc){
 		return;
 	}
 
-	printf("Setting geometry shader...\n");
 	this->soul->setGeometryShader(loc);
 }
 
@@ -132,14 +131,21 @@ void testEnt::defineInput(void){
                 printf("Entity is soulless.\n");
                 return;
         }
-	this->activate();
+	this->soul->use();
+	this->setVao();
+        this->setVbo();
+	this->bindVao();
 	this->bindVbo();
-	this->activate();
-	this->soul->pushInputDynamic((void *)this->vertecies, verteciesCount);
-	this->soul->defineInput(0, 1, 0, (const void *)0);
+	this->soul->pushInputDynamic(this->vertecies, verteciesCount);
+	this->soul->defineInput(0, 2, 0, (const void *)0);
+
 }
 
 void testEnt::activate(void){
+	if(this->soul == NULL){
+                printf("Entity is soulless.\n");
+                return;
+        }
 	this->soul->use();
 }
 
@@ -151,6 +157,7 @@ testEnt::testEnt(void){
 	vertecies = NULL;
 	vertexShader = NULL;
 	fragmentShader = NULL;
+	time = 0;
 }	
 		void testEnt::init(void){
 			
@@ -161,9 +168,17 @@ testEnt::testEnt(void){
                 		printf("Entity is soulless.\n");
                 		return;
         		}
+			if(!initalized)
+				time += 0.01;
+			else
+				time -= 0.01;
 			this->soul->use();
 			this->bindVao();
-			//glViewport(20, 20, global_w, global_h);
-			this->soul->drawPoint(0, 4);
-			
+			this->soul->setUniform("testing", time);
+			this->soul->drawPoint(0, verteciesCount/2);
+			if(!initalized && time >= 0.25){
+				initalized = true;
+			}else if(initalized && time <= -0.25){
+				initalized = false;
+			}
 		}

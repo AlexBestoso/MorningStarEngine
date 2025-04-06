@@ -7,6 +7,8 @@ class WindowCtrl : public Shader{
 		int screenWidth;
 		int screenHeight;
 		float soulColor[4];
+		float vtxStore[2048];
+		GLsizeiptr storeSize;
 		
 		void fetchScreenDimensions(void);
 		
@@ -72,7 +74,7 @@ class WindowCtrl : public Shader{
                 void unbindVeo(void);
 		
 		void pushInputStatic(void *data, GLsizeiptr dataSize);
-		void pushInputDynamic(void *data, GLsizeiptr dataSize);
+		void pushInputDynamic(float *data, GLsizeiptr dataSize);
 		void defineInput(unsigned int i, int size, unsigned int stride, const void *offset);
 
 };

@@ -27,6 +27,8 @@ extern int global_h;
                         this->soulColor[1] = 0.2;
                         this->soulColor[2] = 0.2;
                         this->soulColor[3] = 1.0;
+			for(int i=0; i<2048; i++)	
+				vtxStore[i] = 0.0;
 
 		}
 		WindowCtrl::WindowCtrl(const char *t){
@@ -38,6 +40,9 @@ extern int global_h;
                         this->soulColor[1] = 0.2;
                         this->soulColor[2] = 0.2;
                         this->soulColor[3] = 1.0;
+			for(int i=0; i<2048; i++)	
+				vtxStore[i] = 0.0;
+
 
 			this->init();
 		}
@@ -47,8 +52,8 @@ extern int global_h;
 		void WindowCtrl::init(void){
 			if(glfwInit() == GLFW_FALSE)
 				throw WindowCtrlError("init", "Failed to initalize glfw.");
-                        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-                        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+                        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+                        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
                         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         //                glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
  //                       glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
@@ -56,8 +61,9 @@ extern int global_h;
       //                  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     //                    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
    //                     glfwWindowHint(GLFW_SAMPLES, 3);
-                        //glfwWindowHint(GLFW_STEREO, GLFW_TRUE);
-  //                      glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+                        glfwWindowHint(GLFW_STEREO, GLFW_FALSE);
+                        glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+                        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
      //                   glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_ROBUSTNESS);
 //			glfwWindowHintString(GLFW_X11_CLASS_NAME, "MORNINGCLASS");
 //			glfwWindowHintString(GLFW_X11_INSTANCE_NAME, "MORNINGINST");
@@ -211,7 +217,7 @@ extern int global_h;
 		
 		void WindowCtrl::drawClear(void){
 			glClearColor(this->soulColor[0], this->soulColor[1], this->soulColor[2], this->soulColor[3]);
-                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
 		void WindowCtrl::drawTriangle(GLint first, GLsizei count){
@@ -269,11 +275,14 @@ extern int global_h;
 			}
 		}
 
-		void WindowCtrl::pushInputDynamic(void *data, GLsizeiptr dataSize){
+		void WindowCtrl::pushInputDynamic(GLfloat *data, GLsizeiptr dataSize){
 			if(data == NULL)
 				throw WindowCtrlError("pushInputDynamic", "data is null.\n");
-			printf("Pushing %ld vertecies\n", dataSize);
-                        glBufferData(GL_ARRAY_BUFFER, dataSize, (const void *)data, GL_DYNAMIC_DRAW);
+			
+			for(int i=0; i<2048 && i<dataSize; i++) vtxStore[i] = data[i];
+			storeSize = dataSize;
+
+                        glBufferData(GL_ARRAY_BUFFER, storeSize, vtxStore, GL_DYNAMIC_DRAW);
                         GLenum err = glGetError();
                         if(err != GL_NO_ERROR){
                                 printf("Failed to push data to store : %d\n", err);
@@ -282,7 +291,6 @@ extern int global_h;
 
 		void WindowCtrl::defineInput(unsigned int i, int size, unsigned int stride, const void *offset){
 			// index 'i' has a point with 'size' values. 'stride' is the index that the point ends, and 'offset' is where it starts. 
-			printf("Using stride of %d, vs %ld\n", stride, stride*sizeof(GLfloat));
                         glVertexAttribPointer(i, size, GL_FLOAT, GL_TRUE, stride*sizeof(GLfloat), &offset);
                         glEnableVertexAttribArray(i);
                 }

@@ -15,7 +15,7 @@
 		}
 
 		Shader::~Shader(){
-			glDeleteShader(vertexHandle);
+			/*glDeleteShader(vertexHandle);
                         glDeleteShader(geometryHandle);
                         glDeleteShader(fragmentHandle);
 
@@ -23,7 +23,7 @@
                        	glDetachShader(programHandle, geometryHandle);
                         glDetachShader(programHandle, fragmentHandle);
 		
-			deleteProgram();
+			deleteProgram();*/
 		}
 		void Shader::setGeometryShader(const char *fname){
 			printf("Loading geometry shader '%s' size ", fname);
@@ -148,13 +148,15 @@
 		void Shader::link(void){
                         programHandle  = glCreateProgram();
 			if(programHandle == 0)
-				throw ShaderError("link", "failed to create gl program handle.\n");
+				throw ShaderError("link", "failed to create gl program handle.");
                       	glAttachShader(programHandle, vertexHandle);
                       	glAttachShader(programHandle, geometryHandle);
                       	glAttachShader(programHandle, fragmentHandle);
-                        
-                        glLinkProgram(programHandle);
+                        if(programHandle == 0)
+				throw ShaderError("link", "Attach failure.");
 
+                        glLinkProgram(programHandle);
+                        
                         int success;
                         char infoLog[512];
                         glGetProgramiv(programHandle, GL_LINK_STATUS, &success);
@@ -173,6 +175,9 @@
 			glDeleteShader(vertexHandle);
                         glDeleteShader(geometryHandle);
                         glDeleteShader(fragmentHandle);
+			if(programHandle == 0)
+				throw ShaderError("link", "Linking Failed");
+
                 }
 
 		void Shader::use(void){
@@ -195,7 +200,16 @@
                 }
 
                 void Shader::setUniform(const char *varName, float val){
-                        glUniform1f(glGetUniformLocation(programHandle, varName), val);
+			if(programHandle == 0)
+				throw ShaderError("setUniform", "Invalid program handle.");
+			GLint uni = glGetUniformLocation(programHandle, varName);
+			switch(uni){
+				case GL_INVALID_VALUE:
+					throw ShaderError("setUniform", "Invalid value");
+				case GL_INVALID_OPERATION:
+					throw ShaderError("setUnitform", "Invalid operation");
+			}
+                        glUniform1f(uni, val);
                 }
 
                 void Shader::setUniform(const char *varName, glm::mat4 val){

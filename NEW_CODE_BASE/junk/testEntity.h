@@ -6,13 +6,14 @@ class testEnt{
 		GLuint vao;
 		GLuint vbo;
 		GLuint veo;
+		float time;
 
 
 		glm::mat4 model;
 		glm::vec3 color;
 
 		//std::vector<float >vertecies;
-		float *vertecies;
+		GLfloat *vertecies;
 		GLsizeiptr verteciesCount;
 		
 		bool initalized;
@@ -20,7 +21,7 @@ class testEnt{
 	public:	
 		testEnt(void);
 		void activate(void);
-		void setVertex(float *vtx, GLsizeiptr vtxS);
+		void setVertex(GLfloat *vtx, GLsizeiptr vtxS);
 		void fillSoul(Entity *grace);
 		void setVertexShader(const char *loc);
 		void setFragmentShader(const char *loc);

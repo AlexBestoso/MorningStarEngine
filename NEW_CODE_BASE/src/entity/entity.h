@@ -48,9 +48,9 @@ class Entity : public WindowCtrl{
 		void destroy(void);
 		void replaceBufferData(GLintptr offset, GLsizeiptr size, const void * data);
 		int getUniformLoc(const char *name);
-                void setUniform(const char *name, int val);
+               /* void setUniform(const char *name, int val);
                 void setUniform(const char *name, float val);
                 void setUniform(const char *name, glm::mat4 val);
                 void setUniform(const char *name, glm::vec3 val);
-                void setUniform(const char *name, glm::vec2 val);
+                void setUniform(const char *name, glm::vec2 val);*/
 };

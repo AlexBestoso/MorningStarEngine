@@ -139,7 +139,7 @@
                         return glGetUniformLocation(shader.programHandle, name);
                 }
 
-                void Entity::setUniform(const char *name, int val){
+  /*              void Entity::setUniform(const char *name, int val){
                         shader.setUniform(name, val);
                 }
                 void Entity::setUniform(const char *name, float val){
@@ -153,4 +153,4 @@
                 }
                 void Entity::setUniform(const char *name, glm::vec2 val){
                         shader.setUniform(name, val);
-                }
+                }*/

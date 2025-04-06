@@ -1,8 +1,10 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec2 aPos;
 
+uniform float testing;
 void main()
 {
-	gl_Position = vec4(aPos.x+1, aPos.y, aPos.z, 1.0);
+	vec2 newPos = aPos + vec2(testing);
+	gl_Position = vec4(newPos, 0.0, 1.0);
 	
 }
