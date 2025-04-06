@@ -1,0 +1,48 @@
+glBufferData
+
+target float array : 
+		$10 = (float (*)[2048]) 0x55555556a6a0 <God+30080>
+
+lea 	r8<-[rdi+0x7580] 	|
+mov 	ecx<-0x88e8		|
+lea	rsi<-[rdx*4+0x0]	| <-- this is where my vertex size is stored.
+mov	edi<-0x8892		|
+mov 	rdx<-r8			| <-- my vertex buffer ends up in rdx prior to glBuffer invokation.
+
+Going into glBufferData, follow rdx and rsi. The buffer and size constraint.
+
+bug may be located here : /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+
+and relative to this program, here  : 0x7ffff4f54896  call   0x7ffff4f53e30
+
+After which we encouter this block of code : 
+
+>    0x7ffff4f53e41  mov    r12,rsi       <-- moves buffer size into the r12 register.
+│    0x7ffff4f53e44  push   rbp      
+│    0x7ffff4f53e45  mov    rbp,rdx   	  <-- moves the buffers base pointer into the rbp register.
+
+Shit then gets moved over to here : 
+
+> 0x7ffff4f53ede  mov    WORD PTR [rdi],dx                                                                                                       │
+│    0x7ffff4f53ee1  mov    WORD PTR [rdi+0x2],bx                                                                                                   │
+│    0x7ffff4f53ee5  mov    DWORD PTR [rdi+0x4],r13d                                                                                                │
+│    0x7ffff4f53ee9  mov    QWORD PTR [rdi+0x8],r12   <-- our size appears to be put into here.
+│    0x7ffff4f53eed  mov    DWORD PTR [rdi+0x10],r14d                                                                                               │
+│    0x7ffff4f53ef1  mov    BYTE PTR [rdi+0x21],r15b                                                                                                │
+│    0x7ffff4f53ef5  mov    BYTE PTR [rdi+0x22],r9b                                                                                                 │
+│    0x7ffff4f53ef9  mov    QWORD PTR [rdi+0x18],rbp   <-- our array address is being put into this qword pointer.
+│    0x7ffff4f53efd  sete   BYTE PTR [rdi+0x20]                                                                                                     │
+│    0x7ffff4f53f01  test   al,al                                                                                                                   │
+│    0x7ffff4f53f03  jne    0x7ffff4f53f28                    
+
+
+We're then put back here.
+
+│    0x7ffff4f53f28  add    rsp,0x18                                                                                                                │
+│  > 0x7ffff4f53f2c  mov    rdx,r12  <-- size put into rdx │
+│    0x7ffff4f53f2f  mov    rsi,rbp  <-- array put into rsi│
+│    0x7ffff4f53f32  add    rdi,0x28 
+
+We then jump to a mem copy call
+
+This works fine; but sometimes between here and the start of this process, the data gets corrupted.

@@ -16,6 +16,7 @@ class WindowCtrl : public Shader{
 		WindowCtrl(void);
 		WindowCtrl(const char *title);
 		void init(void);
+		void reset(void);
 
 		void setTitle(const char *title);
 		GLFWwindow *getWindow(void);

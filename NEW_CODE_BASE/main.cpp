@@ -9,8 +9,6 @@
 
 int global_w=1918, global_h=1014;
 void CoreFrameBuffer(GLFWwindow*, int width, int height){
-	global_w=width;
-	global_h=height;
 	printf("resizing to %d %d\n", width, height);
     glViewport(0, 0, width, height);
 }
@@ -34,44 +32,24 @@ testEnt adam;
 const char *adamVtxShdr = "./junk/testEntity.vetx.glsl"; 
 const char *adamFraShdr = "./junk/tetEntity.frag.glsl";
 const char *adamGeoShdr = "./junk/testEntity.geom.glsl";
-int globsize = 2;
-GLfloat glob_vertex[] = {
-	 0.0f, 0.0f,
-//        -0.1f, -0.1f, 0.0f 
+int globsize = 4;
+GLfloat glob_vertex[4] = {
+	 -0.5f, 0.5f,
+        0.5f, -0.5f//, 0.0f 
         //vertecies[8] = 0.0f;  // top 
 };
-int main(void){
+int main(int argc, char *argv[]){
+	printf("%d %s\n", argc, argv[0]);
 	try{
+	God.init();
+	God.current();
         God.depthTest(true);
         God.blend(true); 
 	God.alphaBlendFunc();
-        God.clipDistance(false, 1); 
-        God.colorLogic(true); 
-        God.cullFace(true); 
-        God.debugOutput(false); 
-        God.syncDebugOutput(false); 
-        God.depthClamp(false); 
-        God.dither(false); 
-        God.framebufferSRGB(false); 
-        God.lineSmooth(false); 
-        God.multiSample(false); 
-        God.polygonOffsetFill(false); 
-        God.polygonOffsetLine(false); 
-        God.polygonOffsetPoint(false); 
-        God.ploygonSmooth(false); 
-        God.primitiveRestart(false); 
-        God.primitiveResartFixedIndex(false); 
-        God.rasterizerDiscard(false); 
-        God.sampleAlphaToCoverage(false); 
-        God.sampleAlphaToOne(false); 
-        God.sampleCoverage(false); 
-	God.sampleShading(true);
 
 	God.setFrameResizeCallBack(CoreFrameBuffer);
 	God.setKeyboardCallback(CoreKeyboard);
-	God.current();
 	
-	printf("Adding glob vertex %ld\n", sizeof(glob_vertex));
 	adam.fillSoul(&God);
 	adam.setVertex(glob_vertex, globsize);
 	adam.setVertexShader(adamVtxShdr);

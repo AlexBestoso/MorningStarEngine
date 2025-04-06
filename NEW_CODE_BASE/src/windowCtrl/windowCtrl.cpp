@@ -19,32 +19,24 @@ extern int global_h;
 		}
 		
 		WindowCtrl::WindowCtrl(void){
-			this->window = NULL;
-                        this->title = "";
-                        this->screenWidth = 1918;
-                        this->screenHeight = 1014;
-			this->soulColor[0] = 0.0;
-                        this->soulColor[1] = 0.2;
-                        this->soulColor[2] = 0.2;
-                        this->soulColor[3] = 1.0;
-			for(int i=0; i<2048; i++)	
-				vtxStore[i] = 0.0;
-
+			this->reset();
 		}
 		WindowCtrl::WindowCtrl(const char *t){
+			this->reset();
+                        this->setTitle(t);
+			
+		}
+		void WindowCtrl::reset(void){
 			this->window = NULL;
-                	this->screenWidth = 1918;
-                	this->screenHeight = 1014;
-			this->setTitle(t);
-			this->soulColor[0] = 0.0;
+                        this->screenWidth = 1918;
+                        this->screenHeight = 1014;
+                        this->setTitle("");
+                        this->soulColor[0] = 0.0;
                         this->soulColor[1] = 0.2;
                         this->soulColor[2] = 0.2;
                         this->soulColor[3] = 1.0;
-			for(int i=0; i<2048; i++)	
-				vtxStore[i] = 0.0;
-
-
-			this->init();
+                        for(int i=0; i<2048; i++)
+                                vtxStore[i] = 0.0;
 		}
 		bool WindowCtrl::shouldClose(void){
 			return (!glfwWindowShouldClose(this->getWindow()));
@@ -282,7 +274,7 @@ extern int global_h;
 			for(int i=0; i<2048 && i<dataSize; i++) vtxStore[i] = data[i];
 			storeSize = dataSize;
 
-                        glBufferData(GL_ARRAY_BUFFER, storeSize, vtxStore, GL_DYNAMIC_DRAW);
+                        glBufferData(GL_ARRAY_BUFFER, storeSize*4, (const void *)vtxStore, GL_DYNAMIC_DRAW);
                         GLenum err = glGetError();
                         if(err != GL_NO_ERROR){
                                 printf("Failed to push data to store : %d\n", err);
@@ -291,7 +283,7 @@ extern int global_h;
 
 		void WindowCtrl::defineInput(unsigned int i, int size, unsigned int stride, const void *offset){
 			// index 'i' has a point with 'size' values. 'stride' is the index that the point ends, and 'offset' is where it starts. 
-                        glVertexAttribPointer(i, size, GL_FLOAT, GL_TRUE, stride*sizeof(GLfloat), &offset);
+                        glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride*sizeof(GLfloat), &offset);
                         glEnableVertexAttribArray(i);
                 }
 

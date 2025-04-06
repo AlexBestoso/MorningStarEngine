@@ -131,13 +131,13 @@ void testEnt::defineInput(void){
                 printf("Entity is soulless.\n");
                 return;
         }
-	this->soul->use();
 	this->setVao();
         this->setVbo();
+	this->soul->use();
 	this->bindVao();
 	this->bindVbo();
 	this->soul->pushInputDynamic(this->vertecies, verteciesCount);
-	this->soul->defineInput(0, 2, 0, (const void *)0);
+	this->soul->defineInput(0, 2, 2, (const void *)0);
 
 }
 
@@ -168,10 +168,10 @@ testEnt::testEnt(void){
                 		printf("Entity is soulless.\n");
                 		return;
         		}
-			if(!initalized)
-				time += 0.01;
-			else
-				time -= 0.01;
+			//if(!initalized)
+			//	time += 0.01;
+			//else
+			//	time -= 0.01;
 			this->soul->use();
 			this->bindVao();
 			this->soul->setUniform("testing", time);

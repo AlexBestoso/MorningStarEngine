@@ -1,4 +1,4 @@
-FLAGS=-Wall -Werror -Wextra -Wshadow -pedantic -Wsign-conversion -O2 -I$(pwd)/src -lm -lglfw -lGLESv2 -lXrandr -lpthread -lXi -lX11 -lXmu -lglut -lGL -lX11 -ldl -lxml2 $(shell pkg-config --cflags freetype2) -lfreetype -z defs -g
+FLAGS=-Wall -Werror -Wextra -Wshadow -pedantic -Wsign-conversion -O2 -I$(pwd)/src -lm -lglfw  -lXrandr -lpthread -lXi -lX11 -lXmu -lglut -lGL -lGLU -lX11 -ldl -lxml2 $(shell pkg-config --cflags freetype2) -lfreetype -z defs -g
 all:
 	g++ -c main.cpp $(FLAGS) 
 	g++ -c ./src/error/error.cpp $(FLAGS)
