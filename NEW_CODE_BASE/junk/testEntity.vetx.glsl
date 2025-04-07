@@ -1,10 +1,15 @@
 #version 330 core
-layout (location = 0) in float aPos;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
 
-uniform float testing;
-void main()
-{
-	vec2 newPos = vec2(aPos, aPos+0.12);// + vec2(testing, 0);
-	gl_Position = vec4(newPos, 0.0, 1.0);
+out float magic;
+out vec4 color;
+
+
+void main(){
+	vec3 newPos = vec3(aPos);// + vec2(testing, 0);
+	gl_Position = vec4(newPos, 1.0);
+	
+	color = vec4(aColor, 1.0);//vec4(1.0, 0.0, 0.0, 1.0);
 	
 }

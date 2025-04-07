@@ -7,10 +7,21 @@
 
 #include "./src/core/core.h"
 
-int global_w=1918, global_h=1014;
+int global_w=100, global_h=100, global_c = 50, global_c2;
 void CoreFrameBuffer(GLFWwindow*, int width, int height){
-	printf("resizing to %d %d\n", width, height);
-    glViewport(0, 0, width, height);
+	global_w = width;
+	global_h = height;
+	global_c = width/2 + (width%2);
+	global_c2 = height/2 + (height%2); //height > width ? height/2 + (height%2) : width/2 + (width%2);
+
+	printf(
+		"Screen Dimensions: %d x %d\t centers (%d, %d)\n",
+		global_w,
+		global_h,
+		global_c,
+		global_c2
+	);
+    	glViewport(0, 0, width, height);
 }
 
 void CoreKeyboard(GLFWwindow* window, int key, int /*scancode*/, int /*action*/, int mods){
@@ -26,20 +37,21 @@ void CoreKeyboard(GLFWwindow* window, int key, int /*scancode*/, int /*action*/,
 void glutErrorHandle(int code, const char *msg){
         printf("GLUT ERROR [%d : %s]\n", code, msg);
 }
-//WindowCtrl window("MSGE");
-int main(int argc, char *argv[]){
-//nigger:
 Entity God("Morning Star Engine");
 testEnt adam;
 const char *adamVtxShdr = "./junk/testEntity.vetx.glsl"; 
 const char *adamFraShdr = "./junk/tetEntity.frag.glsl";
 const char *adamGeoShdr = "./junk/testEntity.geom.glsl";
-int globsize = 4;
-GLfloat glob_vertex[4] = {
-	 -0.5f, 0.5f,
-        0.5f, -0.5f//, 0.0f 
+int globsize = 6*2;
+GLfloat glob_vertex[6*2] = {
+	 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f
         //vertecies[8] = 0.0f;  // top 
 };
+
+//WindowCtrl window("MSGE");
+int main(int argc, char *argv[]){
+//nigger:
 
 	printf("%d %s\n", argc, argv[0]);
 	try{

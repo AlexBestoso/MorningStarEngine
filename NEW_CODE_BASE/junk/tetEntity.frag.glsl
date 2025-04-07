@@ -1,6 +1,12 @@
 #version 330 core
+in float magic;
+in vec4 fcolor;
+
 out vec4 FragColor;
+
+uniform float testing;
+
 void main()
 {
-	FragColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	FragColor = fcolor;//vec4(1.0, 0.0, 0.0, 1.0f);
 }

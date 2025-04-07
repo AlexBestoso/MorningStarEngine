@@ -7,7 +7,8 @@
 
 extern int global_w;
 extern int global_h;
-
+extern int global_c;
+extern int global_c2;
 void testEnt::setVertex(GLfloat * vtx, GLsizeiptr vtxS){
 	this->vertecies = vtx;
 	this->verteciesCount = vtxS;
@@ -137,7 +138,8 @@ void testEnt::defineInput(void){
 	this->bindVao();
 	this->bindVbo();
 	this->soul->pushInputDynamic(this->vertecies, verteciesCount);
-	this->soul->defineInput(0, 2, 2, (const void *)0);
+	this->soul->defineInput(0, 3, 6, (const void *)0);
+	this->soul->defineInput(1, 3, 6, (const void *)12);
 
 }
 
@@ -168,14 +170,18 @@ testEnt::testEnt(void){
                 		printf("Entity is soulless.\n");
                 		return;
         		}
-			//if(!initalized)
-			//	time += 0.01;
-			//else
-			//	time -= 0.01;
+			if(!initalized)
+				time += 0.01;
+			else
+				time -= 0.01;
 			this->soul->use();
 			this->bindVao();
 			this->soul->setUniform("testing", time);
-			this->soul->drawPoint(0, verteciesCount/2);
+			this->soul->setUniform("sWidth", (float)global_w);
+			this->soul->setUniform("sHeight", (float)global_h);
+			this->soul->setUniform("sCentW", (float)global_c);
+			this->soul->setUniform("sCentH", (float)global_c2);
+			this->soul->drawPoint(0, verteciesCount/6);
 			if(!initalized && time >= 0.25){
 				initalized = true;
 			}else if(initalized && time <= -0.25){

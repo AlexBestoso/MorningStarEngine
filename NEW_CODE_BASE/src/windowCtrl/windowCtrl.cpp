@@ -2,8 +2,6 @@
 #include "../error/error.h"
 #include "./windowCtrl.error.h"
 #include "./windowCtrl.h"
-extern int global_w; 
-extern int global_h;
 		void WindowCtrl::fetchScreenDimensions(void){
 			//Display *d = XOpenDisplay(NULL);
 			//Screen *s = DefaultScreenOfDisplay(d);
@@ -31,9 +29,9 @@ extern int global_h;
                         this->screenWidth = 1918;
                         this->screenHeight = 1014;
                         this->setTitle("");
-                        this->soulColor[0] = 0.0;
-                        this->soulColor[1] = 0.2;
-                        this->soulColor[2] = 0.2;
+                        this->soulColor[0] = 1.0;
+                        this->soulColor[1] = 1.0;
+                        this->soulColor[2] = 1.0;
                         this->soulColor[3] = 1.0;
                         for(int i=0; i<2048; i++)
                                 vtxStore[i] = 0.0;
