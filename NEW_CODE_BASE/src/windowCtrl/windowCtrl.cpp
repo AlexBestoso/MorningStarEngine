@@ -44,7 +44,8 @@ extern int global_h;
 		void WindowCtrl::init(void){
 			if(glfwInit() == GLFW_FALSE)
 				throw WindowCtrlError("init", "Failed to initalize glfw.");
-                        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
                         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
                         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         //                glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
@@ -283,7 +284,7 @@ extern int global_h;
 
 		void WindowCtrl::defineInput(unsigned int i, int size, unsigned int stride, const void *offset){
 			// index 'i' has a point with 'size' values. 'stride' is the index that the point ends, and 'offset' is where it starts. 
-                        glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride*sizeof(GLfloat), &offset);
+                        glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, stride*sizeof(GLfloat), offset);
                         glEnableVertexAttribArray(i);
                 }
 

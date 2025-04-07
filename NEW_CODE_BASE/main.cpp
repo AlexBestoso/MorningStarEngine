@@ -27,6 +27,8 @@ void glutErrorHandle(int code, const char *msg){
         printf("GLUT ERROR [%d : %s]\n", code, msg);
 }
 //WindowCtrl window("MSGE");
+int main(int argc, char *argv[]){
+//nigger:
 Entity God("Morning Star Engine");
 testEnt adam;
 const char *adamVtxShdr = "./junk/testEntity.vetx.glsl"; 
@@ -38,7 +40,7 @@ GLfloat glob_vertex[4] = {
         0.5f, -0.5f//, 0.0f 
         //vertecies[8] = 0.0f;  // top 
 };
-int main(int argc, char *argv[]){
+
 	printf("%d %s\n", argc, argv[0]);
 	try{
 	God.init();
@@ -70,6 +72,7 @@ int main(int argc, char *argv[]){
 
 	printf("Exiting application.\n");
 	God.kill();
+	//goto nigger;
 	exit(EXIT_FAILURE);
 }
 

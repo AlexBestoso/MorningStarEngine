@@ -1,6 +1,6 @@
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
-#include <GLFW/glfw3.h>
+#include "/home/morningstar/Documents/GithubRepositories/glfw/include/GLFW/glfw3.h"//<GLFW/glfw3.h>
 #include <GL/gl.h>
 
 #include <X11/Xlib.h>
