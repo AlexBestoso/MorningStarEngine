@@ -7,7 +7,7 @@
 
 extern int global_w;
 extern int global_h;
-extern int global_c;
+extern float global_c;
 extern int global_c2;
 void testEnt::setVertex(GLfloat * vtx, GLsizeiptr vtxS){
 	this->vertecies = vtx;
@@ -179,7 +179,7 @@ testEnt::testEnt(void){
 			this->soul->setUniform("testing", time);
 			this->soul->setUniform("sWidth", (float)global_w);
 			this->soul->setUniform("sHeight", (float)global_h);
-			this->soul->setUniform("sCentW", (float)global_c);
+			this->soul->setUniform("sCentW", global_c);
 			this->soul->setUniform("sCentH", (float)global_c2);
 			this->soul->drawPoint(0, verteciesCount/6);
 			if(!initalized && time >= 1.0){

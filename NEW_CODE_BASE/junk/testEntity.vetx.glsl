@@ -8,9 +8,9 @@ out vec4 color;
 uniform float testing;
 
 void main(){
-	vec3 newPos = vec3(aPos);// + vec2(testing, 0);
+	vec3 newPos = vec3(aPos.x-testing, aPos.y+testing, aPos.z-testing);// + vec2(testing, 0);
 	gl_Position = vec4(newPos, 1.0);
 	
-	color = vec4(aColor.x, aColor.y+testing, aColor.z-testing, 1);//vec4(1.0, 0.0, 0.0, 1.0);
+	color = vec4(aColor.x-testing, aColor.y+testing, testing, 1);//vec4(1.0, 0.0, 0.0, 1.0);
 	
 }

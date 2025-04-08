@@ -12,8 +12,8 @@ uniform float sCentW;
 uniform float sCentH;
 
 void setVtx(vec4 vtx){
-	vec4 persp = vec4(testing, testing, testing, testing);	
-	gl_Position = (gl_in[0].gl_Position + vtx*persp);
+	vec4 zoom = vec4(sCentW, sCentW, sCentW, sCentW);	
+	gl_Position = (gl_in[0].gl_Position + vtx*zoom);
 }
 void main() {
 	fcolor = color[0];

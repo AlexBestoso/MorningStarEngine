@@ -6,25 +6,6 @@
 #include "./core.error.h"
 #include "./core.h"
 extern int global_w, global_h;
-void mouse_click_callback(GLFWwindow*, int button, int action, int /*mod*/){
-        if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
-                //gui_engine_global.mouse.click_left = true;
-        }else if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
-                //gui_engine_global.mouse.click_left = false;
-        }
-
-        if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
-                //gui_engine_global.mouse.click_right = true;
-        }else if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
-                //gui_engine_global.mouse.click_right = false;
-        }
-
-        if(button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS){
-                //gui_engine_global.mouse.click_middle = true;
-        }else if(button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE){
-                //gui_engine_global.mouse.click_middle = false;
-        }
-}
 
 
 void mouse_callback(GLFWwindow* , double , double ){

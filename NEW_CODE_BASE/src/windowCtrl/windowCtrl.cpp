@@ -121,6 +121,12 @@
                         }
                         glfwSetCursorPosCallback(this->window, callback);
                 }
+
+		void WindowCtrl::setScrollCallback(void(*cb)(GLFWwindow*, double, double)){
+			if(this->window == NULL)
+				throw WindowCtrlError("setScrollCallback", "no available window object.");
+			glfwSetScrollCallback(this->window, cb);
+		}
 	
 		void WindowCtrl::setErrorHandleCallback(void(*cb)(int, const char *)){
 			glfwSetErrorCallback(cb);

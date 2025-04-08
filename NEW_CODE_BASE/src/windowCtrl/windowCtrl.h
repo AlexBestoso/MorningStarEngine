@@ -55,6 +55,7 @@ class WindowCtrl : public Shader{
 		void setKeyboardCallback(void (*callback)(GLFWwindow* window, int key, int scancode, int action, int mods));
 		void setMouseClickCallback(void(*callback)(GLFWwindow*, int, int, int));
                 void setMouseCursorPosCallback(void(*callback)(GLFWwindow*, double, double));
+		void setScrollCallback(void(*cb)(GLFWwindow*, double, double));
 		void setWindowRefreshCb(void(*cb)(GLFWwindow*));
 		void setErrorHandleCallback(void(*cb)(int, const char *));
 

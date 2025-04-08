@@ -7,23 +7,41 @@
 
 #include "./src/core/core.h"
 
-int global_w=100, global_h=100, global_c = 50, global_c2;
+int global_w=100, global_h=100, global_c2;
+float global_c = 0;
 void CoreFrameBuffer(GLFWwindow*, int width, int height){
 	global_w = width;
 	global_h = height;
-	global_c = width/2 + (width%2);
+//	global_c = width/2 + (width%2);
 	global_c2 = height/2 + (height%2); //height > width ? height/2 + (height%2) : width/2 + (width%2);
 
-	printf(
-		"Screen Dimensions: %d x %d\t centers (%d, %d)\n",
-		global_w,
-		global_h,
-		global_c,
-		global_c2
-	);
     	glViewport(0, 0, width, height);
 }
 
+void mouse_click_callback(GLFWwindow*, int button, int action, int /*mod*/){
+	printf("btn : %d | %d\n", button, action);
+        if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+                //gui_engine_global.mouse.click_left = true;
+        }else if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
+                //gui_engine_global.mouse.click_left = false;
+        }
+
+        if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
+                //gui_engine_global.mouse.click_right = true;
+        }else if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
+                //gui_engine_global.mouse.click_right = false;
+        }
+
+        if(button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS){
+                //gui_engine_global.mouse.click_middle = true;
+        }else if(button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE){
+                //gui_engine_global.mouse.click_middle = false;
+        }
+}
+void coreScroll(GLFWwindow*, double, double y){
+	global_c += y*0.001f;
+	printf("scroll offset : %lf\n", global_c);
+}
 void CoreKeyboard(GLFWwindow* window, int key, int /*scancode*/, int /*action*/, int mods){
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, true);
@@ -63,6 +81,8 @@ int main(int argc, char *argv[]){
 
 	God.setFrameResizeCallBack(CoreFrameBuffer);
 	God.setKeyboardCallback(CoreKeyboard);
+	God.setMouseClickCallback(mouse_click_callback);
+	God.setScrollCallback(coreScroll);
 	
 	adam.fillSoul(&God);
 	adam.setVertex(glob_vertex, globsize);
