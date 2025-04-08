@@ -171,9 +171,9 @@ testEnt::testEnt(void){
                 		return;
         		}
 			if(!initalized)
-				time += 0.01;
+				time += 0.001;
 			else
-				time -= 0.01;
+				time -= 0.001;
 			this->soul->use();
 			this->bindVao();
 			this->soul->setUniform("testing", time);
@@ -182,9 +182,9 @@ testEnt::testEnt(void){
 			this->soul->setUniform("sCentW", (float)global_c);
 			this->soul->setUniform("sCentH", (float)global_c2);
 			this->soul->drawPoint(0, verteciesCount/6);
-			if(!initalized && time >= 0.25){
+			if(!initalized && time >= 1.0){
 				initalized = true;
-			}else if(initalized && time <= -0.25){
+			}else if(initalized && time <= -1.0){
 				initalized = false;
 			}
 		}

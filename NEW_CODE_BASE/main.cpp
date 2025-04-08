@@ -42,7 +42,7 @@ testEnt adam;
 const char *adamVtxShdr = "./junk/testEntity.vetx.glsl"; 
 const char *adamFraShdr = "./junk/tetEntity.frag.glsl";
 const char *adamGeoShdr = "./junk/testEntity.geom.glsl";
-int globsize = 6*2;
+int globsize = 6*1;
 GLfloat glob_vertex[6*2] = {
 	 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
         0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f
